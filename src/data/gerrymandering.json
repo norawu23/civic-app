@@ -1,0 +1,333 @@
+{
+  "topic": "gerrymandering",
+  "title": "Gerrymandering",
+  "icon": "🗳️",
+  "levels": {
+    "level1": {
+      "title": "How It Works",
+      "flashcards": [
+        {
+          "id": "ger-f-01",
+          "term": "District",
+          "definition": "A geographic area that elects one representative to a legislative body. The U.S. is divided into hundreds of congressional districts, each of which sends one person to the House of Representatives."
+        },
+        {
+          "id": "ger-f-02",
+          "term": "Redistricting",
+          "definition": "The process of redrawing the boundaries of electoral districts. This happens every 10 years after the census, when population shifts require districts to be rebalanced so each one represents roughly the same number of people."
+        },
+        {
+          "id": "ger-f-03",
+          "term": "Gerrymandering",
+          "definition": "The practice of drawing district boundaries in a deliberate way to give one political party an advantage over another. The goal is to either pack opposing voters into as few districts as possible, or spread them out so thinly they cannot win anywhere."
+        },
+        {
+          "id": "ger-f-04",
+          "term": "Packing",
+          "definition": "A gerrymandering technique where you draw a district that crams as many opposing party voters as possible into one district. They win that one district by a huge margin, but waste votes that could have helped them elsewhere."
+        },
+        {
+          "id": "ger-f-05",
+          "term": "Cracking",
+          "definition": "A gerrymandering technique where you split a large group of opposing party voters across multiple districts so they are a minority in each one and cannot win any of them."
+        },
+        {
+          "id": "ger-f-06",
+          "term": "Safe Seat",
+          "definition": "A district that is so heavily dominated by one party that the outcome of the election is almost never in doubt. Gerrymandering intentionally creates safe seats for the party drawing the maps."
+        },
+        {
+          "id": "ger-f-07",
+          "term": "Census",
+          "definition": "A count of every person living in the U.S. conducted every 10 years. The results determine how many congressional seats each state gets and trigger the redistricting process."
+        },
+        {
+          "id": "ger-f-08",
+          "term": "Partisan",
+          "definition": "Strongly aligned with one political party. Partisan gerrymandering means drawing maps to benefit a specific party rather than to fairly represent voters."
+        },
+        {
+          "id": "ger-f-09",
+          "term": "Independent Redistricting Commission",
+          "definition": "A proposed or existing body made up of non-partisan members whose job is to draw district maps without political interference. Some states use these to prevent gerrymandering."
+        },
+        {
+          "id": "ger-f-10",
+          "term": "Wasted Vote",
+          "definition": "A vote that does not contribute to electing a candidate. In gerrymandering, the goal is to maximize the other party's wasted votes, either by packing them so they win by unnecessary margins, or cracking them so they always fall just short of winning."
+        }
+      ],
+      "quiz": [
+        {
+          "id": "ger-q1-01",
+          "question": "What is redistricting?",
+          "options": [
+            "The process of counting every person in the U.S.",
+            "The process of electing a new representative",
+            "The process of redrawing electoral district boundaries",
+            "The process of removing a politician from office"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "ger-q1-02",
+          "question": "What is the difference between packing and cracking?",
+          "options": [
+            "They are the same technique with different names",
+            "Packing concentrates opposing voters into one district, cracking splits them across many districts",
+            "Packing splits opposing voters, cracking concentrates them",
+            "Packing applies to Senate races, cracking applies to House races"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "ger-q1-03",
+          "question": "Why does gerrymandering happen after the census?",
+          "options": [
+            "Because the census determines who can vote",
+            "Because the census elects new representatives",
+            "Because the census changes how many senators each state has",
+            "Because the census triggers redistricting, which is when district maps are redrawn"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "ger-q1-04",
+          "question": "What is a wasted vote in the context of gerrymandering?",
+          "options": [
+            "A vote cast for a third party candidate",
+            "A vote cast by someone who is not registered",
+            "A vote that does not contribute to electing a candidate, either because the winner did not need it or because the candidate lost anyway",
+            "A vote cast in the wrong district"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "ger-q1-05",
+          "question": "What is the purpose of an independent redistricting commission?",
+          "options": [
+            "To count the population every 10 years",
+            "To decide how many seats each state gets in Congress",
+            "To remove gerrymandered politicians from office",
+            "To draw district maps without partisan political influence"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    },
+    "level2": {
+      "title": "Why It's Contested",
+      "cards": [
+        {
+          "id": "ger-l2-01",
+          "title": "Both Parties Do It",
+          "content": "Gerrymandering is not a problem unique to one political party. Both Republicans and Democrats have drawn maps to benefit themselves when they had the power to do so. Republicans currently control more state legislatures and have gerrymandered more districts in recent years, but Democrats have done the same in states where they hold power, like Maryland and Illinois. This makes it a hard problem to solve politically, because the party in power almost always benefits from the current system and has little incentive to change it."
+        },
+        {
+          "id": "ger-l2-02",
+          "title": "It Makes Your Vote Feel Pointless",
+          "content": "In a heavily gerrymandered district, the outcome of the general election is almost predetermined. The real election happens in the primary, where a smaller, more extreme group of voters from one party chooses the candidate. This means the representative ends up answering to a narrow slice of voters rather than the district as a whole. Research suggests this contributes to political polarization, because politicians in safe seats have no reason to appeal to the middle or compromise with the other side."
+        },
+        {
+          "id": "ger-l2-03",
+          "title": "The Supreme Court Has Mostly Stayed Out of It",
+          "content": "In 2019, the Supreme Court ruled in Rucho v. Common Cause that federal courts cannot strike down partisan gerrymandering, even when maps are clearly drawn to benefit one party. The court said it was a political question, not a legal one, and left it up to states to solve. This means there is currently no federal legal remedy for partisan gerrymandering, and the only solutions available are state level reforms like independent redistricting commissions or voter-approved ballot measures."
+        },
+        {
+          "id": "ger-l2-04",
+          "title": "The Difference Between Partisan and Racial Gerrymandering",
+          "content": "Federal courts can and do strike down maps drawn along racial lines, because the Voting Rights Act and the Constitution explicitly prohibit racial discrimination in voting. However, the Supreme Court has said there is no equivalent federal prohibition on partisan gerrymandering. This means a map drawn to pack Democratic or Republican voters together is currently legal under federal law, even if an identical map drawn along racial lines would be struck down immediately."
+        }
+      ]
+    },
+    "level3": {
+      "title": "What's Happening Now",
+      "cards": [
+        {
+          "id": "ger-l3-01",
+          "title": "Louisiana v. Callais, April 2026",
+          "content": "On April 29, 2026, the Supreme Court issued one of the most consequential voting rights decisions in decades. In a 6-3 ruling in Louisiana v. Callais, the court struck down Louisiana's congressional map, which had been drawn to include two majority-Black districts. The ruling weakened Section 2 of the Voting Rights Act, which prohibits voting rules and district maps that discriminate on the basis of race, to the point where legal experts say it is nearly impossible to enforce. Writing for the majority, Justice Samuel Alito argued the Constitution almost never permits the government to draw districts on the basis of race. Justice Elena Kagan wrote in dissent that the majority had completed the demolition of the Voting Rights Act.",
+          "source": {
+            "label": "SCOTUSblog — Court decides major Voting Rights Act case",
+            "url": "https://www.scotusblog.com/2026/04/court-decides-major-voting-rights-act-case"
+          }
+        },
+        {
+          "id": "ger-l3-02",
+          "title": "What Section 2 Was and Why It Mattered",
+          "content": "Before this ruling, Section 2 of the Voting Rights Act was one of the primary legal tools minority voters could use to challenge district maps that diluted their political power. If a state drew maps that packed or cracked minority voters so they could not elect their preferred candidates, those voters could sue under Section 2. The 6-3 decision effectively ended that protection, requiring states to draw maps without regard to race even in cases where doing so results in minority voters being spread across districts in ways that prevent them from electing anyone. The ruling built on a 2013 decision that had already weakened a separate part of the Voting Rights Act by removing the requirement for certain states to get federal approval before changing their voting laws.",
+          "source": {
+            "label": "Stateline — Supreme Court voting rights ruling and its impact on local power",
+            "url": "https://stateline.org/2026/05/04/supreme-court-voting-rights-ruling-set-to-reshape-local-power-from-statehouses-to-school-boards"
+          }
+        },
+        {
+          "id": "ger-l3-03",
+          "title": "The Immediate Political Impact",
+          "content": "The ruling triggered an immediate response from state legislatures. Within an hour of the decision, the Republican-controlled Florida House approved a heavily gerrymandered map that analysts estimated could net Republicans four more House seats in the 2026 elections. Other Republican-controlled states including Arkansas, Missouri, Mississippi, and South Carolina indicated they would revisit their own maps. Analysts estimated that in 10 state legislatures across the South, Republicans could gain more than 190 seats currently held by Democrats, most of them Black representatives in majority-minority districts that the new ruling puts at risk.",
+          "source": {
+            "label": "The Hill — Republicans respond to Supreme Court voting rights ruling",
+            "url": "https://thehill.com/homenews/senate/5856231-republicans-hail-supreme-court-decision"
+          }
+        },
+        {
+          "id": "ger-l3-04",
+          "title": "The Connection to Partisan Gerrymandering",
+          "content": "Remember from Level 2 that federal courts cannot strike down maps for purely partisan reasons, following the 2019 Rucho v. Common Cause decision. The Callais ruling effectively closes the second major avenue for federal challenges as well. Critics argue states can now draw maps that dilute minority voters' power by framing those decisions as partisan rather than racial, and there is no longer a meaningful federal legal remedy available to challenge them. Supporters of the ruling argue the Constitution prohibits racial classifications in redistricting regardless of intent, and that maps should be drawn without regard to race even when the practical effect disadvantages minority communities.",
+          "source": {
+            "label": "SCOTUSblog — Court gives immediate effect to Voting Rights Act decision",
+            "url": "https://www.scotusblog.com/2026/05/court-gives-immediate-effect-to-voting-rights-act-decision"
+          }
+        },
+        {
+          "id": "ger-l3-05",
+          "title": "Where Reform Stands and What Happens Next",
+          "content": "As of mid-2026, no federal legislation restoring the protections removed by the Callais ruling has passed. Reform advocates are calling on Congress to pass new voting rights legislation, but no bill has advanced in the Senate. The ruling came just months before the 2026 midterm elections, meaning states are actively redrawing maps that could affect who wins seats in Congress this November. States that use independent redistricting commissions, like California, Michigan, and Arizona, are largely unaffected because their maps are not drawn by politicians. The outcome of the 2026 elections will likely determine whether Congress has the votes to pass new voting rights protections.",
+          "source": {
+            "label": "AP News — Supreme Court voting rights ruling ahead of 2026 midterms",
+            "url": "https://apnews.com"
+          }
+        }
+      ],
+      "quiz": [
+        {
+          "id": "ger-q3-01",
+          "question": "What did the Supreme Court rule in Louisiana v. Callais in April 2026?",
+          "options": [
+            "That partisan gerrymandering is unconstitutional under the First Amendment",
+            "That all states must use independent redistricting commissions going forward",
+            "That the Voting Rights Act applies equally to partisan and racial gerrymandering",
+            "That Louisiana's majority-Black congressional district was an unconstitutional racial gerrymander, effectively gutting Section 2 of the Voting Rights Act"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "ger-q3-02",
+          "question": "What was Section 2 of the Voting Rights Act designed to do?",
+          "options": [
+            "Require federal approval before states could change voting laws",
+            "Ban all forms of gerrymandering in federal elections",
+            "Guarantee every citizen the right to vote regardless of race",
+            "Prohibit voting rules or district maps that discriminate on the basis of race and require states to give minority voters the opportunity to elect their preferred candidates"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "ger-q3-03",
+          "question": "Why do critics argue the Callais ruling effectively allows racial gerrymandering to continue?",
+          "options": [
+            "Because the ruling made it easier for minority voters to sue under Section 2",
+            "Because the ruling only applies to Louisiana",
+            "Because the ruling required states to draw majority-minority districts everywhere",
+            "Because states can now draw maps that dilute minority voters' power under the cover of partisan motivation, with no meaningful federal legal remedy available to challenge them"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "ger-q3-04",
+          "question": "What happened in Florida within an hour of the Callais ruling?",
+          "options": [
+            "Florida passed legislation creating an independent redistricting commission",
+            "Florida filed a lawsuit challenging the Supreme Court's decision",
+            "Florida announced it would redraw maps to create more majority-minority districts",
+            "The Republican-controlled Florida House approved a heavily gerrymandered map that could net Republicans four additional House seats"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "ger-q3-05",
+          "question": "Which states are largely unaffected by the Callais ruling and why?",
+          "options": [
+            "States with large minority populations and strong local voting rights laws",
+            "States where Democrats control the legislature and can draw protective maps",
+            "States where federal courts have issued injunctions blocking new maps",
+            "States like California, Michigan, and Arizona that use independent redistricting commissions, because their maps are not drawn by politicians in the first place"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    }
+  },
+  "opinionBuilders": [
+    {
+      "id": "ger-ob-01",
+      "required": true,
+      "question": "Should the process of drawing electoral district maps be taken away from state politicians and given to independent commissions?",
+      "contextCards": [
+        {
+          "id": "ger-ob1-c01",
+          "title": "Who currently draws the maps?",
+          "content": "In most U.S. states, electoral district maps are drawn by the state legislature, which means the politicians who benefit from the maps are the same people drawing them. In a state where one party controls the legislature, that party draws the maps for the next 10 years. This means the people in power get to decide which voters are in which districts before a single vote is cast in the next election."
+        },
+        {
+          "id": "ger-ob1-c02",
+          "title": "How independent commissions work",
+          "content": "Some states have adopted independent redistricting commissions, where maps are drawn by a panel of citizens rather than politicians. Members are typically selected through an application process designed to screen out political operatives and lobbyists. California, Arizona, and Michigan are among the states that use this model. Supporters argue these commissions produce fairer maps. Critics argue that truly nonpartisan commissioners are impossible to find, and that the selection process itself can be manipulated."
+        },
+        {
+          "id": "ger-ob1-c03",
+          "title": "The argument for independent commissions",
+          "content": "Supporters argue that allowing politicians to draw their own districts is a fundamental conflict of interest. They point out that in a healthy democracy, voters should choose their representatives, not the other way around. When politicians draw maps that guarantee their own reelection, they are insulating themselves from accountability. An independent commission removes that conflict of interest and makes elections more competitive, which forces representatives to actually respond to their constituents."
+        },
+        {
+          "id": "ger-ob1-c04",
+          "title": "The argument against independent commissions",
+          "content": "Critics argue that redistricting is inherently a political process and that pretending otherwise is naive. They point out that someone has to decide who sits on an independent commission, and that decision is itself political. They also argue that elected legislators are accountable to voters in a way that appointed commissioners are not. If a legislature draws bad maps, voters can vote them out. If an independent commission draws bad maps, there is no democratic mechanism to hold them accountable."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: independent commissions still require someone to decide who the commissioners are. That selection process can be influenced by the same political forces that currently control redistricting. Some critics argue this just moves the political manipulation one step earlier in the process rather than eliminating it. How does your thinking account for how you would ensure the commission itself is genuinely independent?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: if politicians draw maps that guarantee their own reelection, it becomes very difficult for voters to remove them even if they are doing a poor job. The accountability argument cuts both ways. Yes, voters can theoretically vote out legislators who draw bad maps, but if those maps make it nearly impossible for the other party to win, that accountability mechanism is significantly weakened. How does your thinking account for that tension?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I support independent commissions, but I think the selection process for commissioners needs to be extremely transparent and carefully designed to prevent the same political forces from influencing who gets appointed.",
+          "I think politicians drawing their own maps is a conflict of interest, but I am not convinced independent commissions fully solve the problem. I think the real solution needs to include clear legal standards for what a fair map looks like.",
+          "I do not support taking redistricting away from legislatures entirely, but I think there need to be stronger legal constraints on how maps can be drawn, with real enforcement mechanisms.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on who should draw electoral maps, name one legitimate concern with your preferred approach, and explain how you think that concern should be addressed. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    },
+    {
+      "id": "ger-ob-02",
+      "required": false,
+      "question": "Should the Supreme Court have the power to strike down electoral maps that are drawn to benefit one political party?",
+      "contextCards": [
+        {
+          "id": "ger-ob2-c01",
+          "title": "What the Supreme Court decided",
+          "content": "In 2019, the Supreme Court ruled in Rucho v. Common Cause that federal courts do not have the power to strike down maps drawn for partisan reasons. The majority argued that deciding what level of partisanship is too much is a political question, not a legal one, and that there is no clear standard courts could use to make that judgment consistently. The dissent argued that the court was abandoning its responsibility to protect voters from unconstitutional manipulation of the democratic process."
+        },
+        {
+          "id": "ger-ob2-c02",
+          "title": "The difference between partisan and racial gerrymandering",
+          "content": "Federal courts can and do strike down maps drawn along racial lines, because the Voting Rights Act and the Constitution explicitly prohibit racial discrimination in voting. However, the Supreme Court has said there is no equivalent federal prohibition on partisan gerrymandering. This means a map that is drawn to pack Democratic or Republican voters together is currently legal under federal law, even if an identical map drawn along racial lines would be struck down immediately."
+        },
+        {
+          "id": "ger-ob2-c03",
+          "title": "The argument for Supreme Court intervention",
+          "content": "Some legal scholars argue that extreme partisan gerrymandering violates the First Amendment by punishing voters for their political beliefs, and the equal protection clause by treating voters differently based on party affiliation. They argue that the court's refusal to act has left voters with no meaningful federal remedy when their votes are systematically diluted. From this perspective, the court is not being asked to pick political winners and losers. It is being asked to ensure that elections are competitive enough to be meaningful."
+        },
+        {
+          "id": "ger-ob2-c04",
+          "title": "The argument against Supreme Court intervention",
+          "content": "Others argue that the Constitution deliberately left election administration to the states, and that federal courts inserting themselves into redistricting would represent a significant and potentially dangerous expansion of judicial power. They also argue that there is no neutral legal standard for determining when partisanship crosses a line, which means courts would effectively be making political judgments rather than legal ones. From this perspective, the solution to gerrymandering should come from voters and state legislatures, not from unelected federal judges."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: giving federal courts the power to strike down partisan maps requires a legal standard for deciding when partisanship goes too far. Every election map has some partisan effect. Drawing a clear line between acceptable and unacceptable partisanship is genuinely difficult, and different judges could draw that line in very different places. How does your thinking account for the risk that this power could be applied inconsistently depending on which judges are making the call?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: if federal courts cannot intervene and state legislatures control their own maps, the practical question is what remedy exists for voters in heavily gerrymandered states. State level solutions like ballot initiatives require significant resources and organization to pass, and in some states the legislature has the power to block or reverse them. How does your thinking account for situations where voters have no realistic path to fixing maps that systematically dilute their votes?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I think the Supreme Court should have the power to strike down extreme partisan gerrymanders, but only if Congress or the court itself establishes a clear and consistent legal standard for what crosses the line.",
+          "I do not think federal courts should be deciding what counts as too much partisanship, but I think Congress should pass federal legislation setting clear rules for redistricting that apply to all states equally.",
+          "I think the most realistic solution is a combination of state level independent commissions and stronger federal voting rights legislation, rather than relying on the courts to fix this case by case.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on whether the Supreme Court should have this power, name one legitimate concern with your preferred approach, and explain how you think that concern should be addressed. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    }
+  ]
+}

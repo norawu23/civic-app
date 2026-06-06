@@ -1,0 +1,333 @@
+{
+  "topic": "gunRights",
+  "title": "Gun Rights",
+  "icon": "⚖️",
+  "levels": {
+    "level1": {
+      "title": "How It Works",
+      "flashcards": [
+        {
+          "id": "gun-f-01",
+          "term": "Second Amendment",
+          "definition": "The part of the U.S. Constitution that protects the right to keep and bear arms. It reads: A well regulated Militia, being necessary to the security of a free State, the right of the people to keep and bear Arms, shall not be infringed. Courts have debated for decades exactly what this means and how far it extends."
+        },
+        {
+          "id": "gun-f-02",
+          "term": "ATF (Bureau of Alcohol, Tobacco, Firearms and Explosives)",
+          "definition": "The federal agency responsible for enforcing federal gun laws. The ATF regulates the manufacture, sale, and possession of firearms and investigates crimes involving guns."
+        },
+        {
+          "id": "gun-f-03",
+          "term": "Background Check",
+          "definition": "A screening process required by federal law before a licensed dealer can sell a gun. It checks whether the buyer has a criminal record, a history of domestic violence, or other disqualifying factors. Private sales between individuals are not currently required to go through background checks in most states."
+        },
+        {
+          "id": "gun-f-04",
+          "term": "Ghost Gun",
+          "definition": "A firearm assembled from parts or a kit, often purchased online, that does not have a serial number and cannot be traced by law enforcement. Ghost guns have been increasingly found at crime scenes because they bypass the normal background check process."
+        },
+        {
+          "id": "gun-f-05",
+          "term": "Concealed Carry",
+          "definition": "The practice of carrying a hidden firearm in public. Most states require a permit to carry a concealed weapon. The rules for who can get a permit and where guns can be carried vary widely from state to state."
+        },
+        {
+          "id": "gun-f-06",
+          "term": "The Heller Decision (2008)",
+          "definition": "A landmark Supreme Court ruling that established for the first time that the Second Amendment protects an individual's right to own a gun for self-defense in the home, separate from service in a militia. Before this ruling, the individual right to gun ownership was less legally settled."
+        },
+        {
+          "id": "gun-f-07",
+          "term": "The Bruen Decision (2022)",
+          "definition": "A Supreme Court ruling that dramatically expanded gun rights by striking down a New York law that required people to show a specific need before getting a concealed carry permit. The ruling also set a new legal standard: gun regulations can only be upheld if they are consistent with the country's historical tradition of gun regulation at the time of the founding in the late 1700s."
+        },
+        {
+          "id": "gun-f-08",
+          "term": "Red Flag Law",
+          "definition": "A law that allows courts to temporarily remove guns from someone who is considered a danger to themselves or others. A family member, law enforcement officer, or sometimes a teacher can petition a court for a red flag order. The person can appeal to get their guns back."
+        },
+        {
+          "id": "gun-f-09",
+          "term": "Bump Stock",
+          "definition": "An accessory that attaches to a semi-automatic rifle and allows it to fire at a rate similar to an automatic weapon. Bump stocks were used in the 2017 Las Vegas shooting, which killed 60 people. The Supreme Court struck down a federal ban on bump stocks in 2024."
+        },
+        {
+          "id": "gun-f-10",
+          "term": "Universal Background Check",
+          "definition": "A proposed policy that would require background checks for all gun sales, including private sales between individuals and sales at gun shows, not just sales by licensed dealers. Supporters argue it closes a major loophole. Critics argue it is difficult to enforce and burdens law-abiding gun owners."
+        }
+      ],
+      "quiz": [
+        {
+          "id": "gun-q1-01",
+          "question": "What did the Supreme Court's Bruen decision in 2022 change about gun law?",
+          "options": [
+            "It banned concealed carry permits in all states",
+            "It required universal background checks for all gun sales",
+            "It overturned the Heller decision and removed individual gun rights",
+            "It struck down New York's concealed carry law and set a new standard requiring gun regulations to be consistent with historical traditions at the time of the founding"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q1-02",
+          "question": "What makes ghost guns difficult for law enforcement to deal with?",
+          "options": [
+            "They are illegal to manufacture in all 50 states",
+            "They fire faster than regular firearms",
+            "They can only be purchased at gun shows",
+            "They do not have serial numbers, making them impossible to trace, and they are assembled from kits that previously did not require background checks"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q1-03",
+          "question": "What is the difference between the current background check system and a universal background check?",
+          "options": [
+            "Universal background checks apply only to handguns, not rifles",
+            "The current system requires background checks for all sales, universal would add mental health screening",
+            "There is no difference, all gun sales currently require background checks",
+            "The current system only requires background checks from licensed dealers, while universal background checks would extend that requirement to private sales between individuals"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q1-04",
+          "question": "What does a red flag law allow?",
+          "options": [
+            "Law enforcement to permanently confiscate guns from anyone with a criminal record",
+            "The federal government to ban certain types of firearms",
+            "Gun owners to carry firearms in any public space without a permit",
+            "Courts to temporarily remove guns from someone considered a danger to themselves or others, based on a petition from family members or law enforcement"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q1-05",
+          "question": "What did the Heller decision establish for the first time?",
+          "options": [
+            "That states can ban handguns entirely",
+            "That the Second Amendment only protects gun ownership for military service",
+            "That background checks are constitutionally required for all gun purchases",
+            "That the Second Amendment protects an individual's right to own a gun for self-defense in the home, separate from service in a militia"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    },
+    "level2": {
+      "title": "Why It's Contested",
+      "cards": [
+        {
+          "id": "gun-l2-01",
+          "title": "What Does the Second Amendment Actually Mean?",
+          "content": "The text of the Second Amendment mentions a well regulated Militia before protecting the right to bear arms. For most of American history, courts interpreted this as primarily protecting gun ownership in the context of military or militia service. The 2008 Heller decision changed this by establishing an individual right to gun ownership for self-defense. But the exact boundaries of that right remain deeply contested. Does it cover all types of weapons? Does it extend to public spaces? Can the government regulate who can buy guns and how? These questions are still being worked out in courts across the country."
+        },
+        {
+          "id": "gun-l2-02",
+          "title": "The Public Safety Argument",
+          "content": "The U.S. has significantly higher rates of gun violence than other wealthy countries. Supporters of stricter gun laws argue this is directly connected to the ease with which people can obtain firearms, particularly through private sales that do not require background checks. They point to research suggesting background checks, red flag laws, and waiting periods reduce gun deaths. They argue that reasonable regulations do not violate the Second Amendment, just as free speech protections do not prevent laws against fraud or threats. From this perspective, gun regulation is a straightforward public safety issue."
+        },
+        {
+          "id": "gun-l2-03",
+          "title": "The Self-Defense and Rights Argument",
+          "content": "Critics of stricter gun laws argue that the right to bear arms is a fundamental constitutional right that cannot be significantly restricted without violating the Constitution. They argue that law-abiding gun owners should not be burdened by regulations designed to stop criminals, who will find ways to obtain weapons regardless of the law. They also argue that guns are an important tool for self-defense, particularly in rural areas where law enforcement response times are long. From this perspective, gun control laws primarily disarm law-abiding citizens while doing little to reduce crime."
+        },
+        {
+          "id": "gun-l2-04",
+          "title": "The Role of the States",
+          "content": "Gun laws vary dramatically across the country. California, New York, and Illinois have some of the strictest gun laws in the nation, including assault weapons bans, waiting periods, and universal background checks. Texas, Florida, and most Southern and Western states have much looser restrictions, with some allowing permitless concealed carry. This variation creates a complex patchwork where guns purchased legally in one state can easily be transported to another with stricter laws. The debate over whether gun policy should be set nationally or left to states is one of the central tensions in the gun rights debate."
+        }
+      ]
+    },
+    "level3": {
+      "title": "What's Happening Now",
+      "cards": [
+        {
+          "id": "gun-l3-01",
+          "title": "The Supreme Court Upholds Ghost Gun Regulations",
+          "content": "In March 2025, the Supreme Court ruled 7 to 2 to uphold a Biden-era regulation requiring background checks and serial numbers for ghost gun kits sold online. The ruling found that existing gun laws allow the ATF to regulate these kits because they can be readily converted into functioning firearms. The number of ghost guns recovered at crime scenes had grown from fewer than 1,700 in 2017 to 27,000 in 2023. Since the regulation took effect, ghost gun numbers have flattened or declined in several major cities including New York, Los Angeles, and Philadelphia. However, the ruling left open the possibility of future challenges based on constitutional grounds.",
+          "source": {
+            "label": "PBS NewsHour — Biden rule requiring background checks for ghost guns upheld by Supreme Court",
+            "url": "https://www.pbs.org/newshour/politics/biden-rule-requiring-serial-numbers-and-background-checks-for-ghost-guns-upheld-by-supreme-court"
+          }
+        },
+        {
+          "id": "gun-l3-02",
+          "title": "The Ghost Gun Fight Is Not Over",
+          "content": "Despite the Supreme Court ruling, legal experts and law enforcement officials warn the battle over ghost guns is far from finished. The Trump administration ordered a review of federal gun regulations, raising the possibility that the administration could seek to rescind the ghost gun rule that the court upheld. Gun rights groups have also indicated they plan to bring new challenges based on the constitutional Bruen standard, arguing that ghost gun regulations cannot be justified by reference to historical gun laws from the founding era. The court's ruling was based on administrative law rather than the Second Amendment, leaving the constitutional question unresolved.",
+          "source": {
+            "label": "NPR — Ghost guns may make a comeback despite Supreme Court ruling",
+            "url": "https://www.npr.org/2025/03/26/nx-s1-5341404/supreme-court-ghost-guns"
+          }
+        },
+        {
+          "id": "gun-l3-03",
+          "title": "The Bruen Standard Reshapes Gun Law Across the Country",
+          "content": "The 2022 Bruen decision continues to reshape gun laws at every level of government. Under the Bruen standard, any gun regulation must be justified by reference to historical laws from the late 1700s. This has led courts to strike down laws ranging from prohibitions on gun possession by people under domestic violence restraining orders to restrictions on carrying guns near schools. In 2026, the Supreme Court is considering Wolford v. Lopez, a case involving Hawaii's law restricting where concealed carry permit holders can bring guns. A majority of the justices appeared skeptical of Hawaii's restrictions during oral arguments in January 2026, suggesting the court may strike them down.",
+          "source": {
+            "label": "Constitution Center — The Supreme Court considers expanding gun possession guidelines",
+            "url": "https://constitutioncenter.org/blog/the-supreme-court-considers-expanding-gun-possession-guidelines"
+          }
+        },
+        {
+          "id": "gun-l3-04",
+          "title": "Marijuana Users and Gun Rights",
+          "content": "In March 2026, the Supreme Court heard arguments in a case testing whether the federal law prohibiting marijuana users from owning guns is constitutional under the Bruen standard. Federal law currently prohibits anyone who is an unlawful user of a controlled substance from possessing firearms. But marijuana is now legal in 24 states, creating a situation where millions of people who are using a legal substance under state law are technically prohibited from owning a gun under federal law. The case raises the question of whether a prohibition that would have made no sense in the 1700s, when marijuana regulation did not exist, can survive the Bruen test.",
+          "source": {
+            "label": "NPR — Supreme Court wrestles with gun rights, marijuana, and the right to own a gun",
+            "url": "https://www.npr.org/2026/03/02/nx-s1-5732498/supreme-court-marijuana-gun"
+          }
+        },
+        {
+          "id": "gun-l3-05",
+          "title": "Where Federal Gun Legislation Stands",
+          "content": "No significant federal gun legislation has passed since the Bipartisan Safer Communities Act in 2022, which was the first major federal gun law in nearly three decades. That law enhanced background checks for buyers under 21, funded state red flag laws, and closed a loophole for domestic abusers. Since then, Congress has been unable to advance further gun legislation despite repeated mass shootings. The political dynamic is familiar: large majorities of Americans support specific measures like universal background checks and red flag laws in polling, but those measures face significant opposition in the Senate and have not reached a vote. The result is that most of the significant action on gun policy is happening in courts rather than in Congress.",
+          "source": {
+            "label": "NPR — On gun control, Supreme Court and Congress move in opposite directions",
+            "url": "https://www.npr.org/2022/06/27/1107919152/on-gun-control-two-big-steps-in-opposite-directions"
+          }
+        }
+      ],
+      "quiz": [
+        {
+          "id": "gun-q3-01",
+          "question": "What did the Supreme Court rule in March 2025 regarding ghost guns?",
+          "options": [
+            "That ghost guns are protected by the Second Amendment and cannot be regulated",
+            "That all ghost guns must be turned in to law enforcement within 90 days",
+            "That states can ban ghost guns but the federal government cannot",
+            "That existing gun laws allow the ATF to require background checks and serial numbers for ghost gun kits sold online, upholding the Biden-era regulation"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q3-02",
+          "question": "Why do legal experts warn the ghost gun fight is not over despite the Supreme Court ruling?",
+          "options": [
+            "Because the ruling only applied to three states and not the whole country",
+            "Because Congress immediately passed legislation reversing the ruling",
+            "Because the ruling banned all future ghost gun regulations",
+            "Because the ruling was based on administrative law rather than the Second Amendment, leaving open future constitutional challenges under the Bruen standard, and the Trump administration could seek to rescind the regulation"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q3-03",
+          "question": "What makes the Bruen standard significant for gun law?",
+          "options": [
+            "It requires all gun regulations to be approved by a national referendum",
+            "It gives states the power to override federal gun laws",
+            "It prohibits the Supreme Court from hearing gun rights cases for 10 years",
+            "It requires gun regulations to be justified by reference to historical gun laws from the late 1700s, making many modern regulations vulnerable to legal challenge"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q3-04",
+          "question": "Why does the case involving marijuana users and gun rights raise new legal questions?",
+          "options": [
+            "Because marijuana users have always been explicitly protected by the Second Amendment",
+            "Because the Supreme Court has never before ruled on any drug-related gun case",
+            "Because the federal government has no authority to regulate gun ownership at all",
+            "Because marijuana is now legal in many states and marijuana regulation did not exist in the 1700s, making it unclear whether a prohibition on marijuana users owning guns can survive the Bruen historical standard"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "gun-q3-05",
+          "question": "Which of the following best describes the current state of federal gun legislation?",
+          "options": [
+            "Congress passed major new gun legislation in 2025 that expanded background checks nationally",
+            "The Supreme Court has ordered Congress to pass universal background check legislation",
+            "The federal government has banned all private gun sales pending new legislation",
+            "No significant federal gun legislation has passed since 2022, and most major action on gun policy is happening through court cases rather than through Congress"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    }
+  },
+  "opinionBuilders": [
+    {
+      "id": "gun-ob-01",
+      "required": true,
+      "question": "Should the U.S. government require universal background checks for all gun purchases, including private sales?",
+      "contextCards": [
+        {
+          "id": "gun-ob1-c01",
+          "title": "How many gun sales currently skip background checks?",
+          "content": "Under current federal law, only licensed gun dealers are required to conduct background checks. Private sales between individuals, including many sales at gun shows, do not require a background check in most states. Estimates suggest that somewhere between 20% and 40% of all gun sales in the U.S. occur without a background check, though the exact number is difficult to verify precisely because private sales are not tracked. Twenty-two states and Washington D.C. have passed their own laws requiring background checks for some or all private sales."
+        },
+        {
+          "id": "gun-ob1-c02",
+          "title": "What do background checks actually catch?",
+          "content": "The federal background check system, known as NICS, blocked approximately 300,000 gun sales in 2023 alone. The system screens for felony convictions, domestic violence records, certain mental health adjudications, and other disqualifying factors. However, the system relies on states and agencies accurately reporting records to the federal database, and there are significant gaps. The 2017 Sutherland Springs church shooting in Texas, which killed 26 people, was carried out by someone who should have been disqualified but whose records were not properly reported to the federal database."
+        },
+        {
+          "id": "gun-ob1-c03",
+          "title": "The argument for universal background checks",
+          "content": "Supporters argue that requiring background checks only for licensed dealers while leaving private sales unregulated creates an easily exploited loophole. They point to research from Johns Hopkins University suggesting that states with universal background check laws have lower rates of gun trafficking and gun homicide. They argue that most gun owners support background checks in principle and that extending the requirement to private sales is a common-sense measure that does not meaningfully burden law-abiding gun owners, who would pass the check anyway."
+        },
+        {
+          "id": "gun-ob1-c04",
+          "title": "The argument against universal background checks",
+          "content": "Critics argue that universal background checks are difficult to enforce because private sales between individuals are inherently hard to monitor. They contend that criminals obtain guns through theft and illegal channels rather than private sales, meaning the requirement would burden law-abiding citizens without meaningfully reducing crime. Some gun rights advocates also argue that a universal background check system would effectively create a national gun registry, since tracking all sales requires tracking all transfers, which they argue poses a threat to privacy and could be used for future confiscation efforts."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: universal background checks require a system to verify that every private sale has been checked. That system would need to track gun transfers in a way that current law deliberately avoids. Gun rights advocates argue this amounts to a de facto national gun registry, which federal law currently prohibits. Even people who support background checks in principle sometimes oppose universal requirements because of this concern. How does your thinking account for how a universal background check system could be designed to work without creating a registry of gun owners?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: the background check system exists specifically to prevent people who are legally prohibited from owning guns, including people with violent felony convictions and domestic abuse records, from purchasing them through legal channels. The private sale loophole creates a pathway for those same people to acquire guns without being screened. The question is not whether background checks should exist at all, but whether the current gap between licensed and private sales makes sense as a policy. How does your thinking account for the fact that people who are already legally prohibited from owning guns can currently bypass the screening system through private sales?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I support universal background checks, but I think the policy needs to include explicit legal protections against any kind of national gun registry to address the privacy concerns that make many gun owners oppose it.",
+          "I do not support universal background checks as currently proposed, but I think the more important priority is fixing the reporting gaps in the existing background check system, since those gaps have already contributed to mass shootings.",
+          "I think the debate over universal background checks misses a bigger problem, which is that the background check database is full of gaps and inaccuracies that allow dangerous people to pass checks they should fail.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on universal background checks, name one legitimate concern with your preferred approach, and explain how a well-designed policy could address that concern. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    },
+    {
+      "id": "gun-ob-02",
+      "required": false,
+      "question": "Should states have the right to set their own gun laws, or should there be a single national standard?",
+      "contextCards": [
+        {
+          "id": "gun-ob2-c01",
+          "title": "How different are state gun laws right now?",
+          "content": "The gap between the strictest and loosest state gun laws in the U.S. is enormous. California requires a background check for all gun sales including private transfers, has a 10-day waiting period, bans assault-style weapons, and requires a permit to purchase a handgun. In contrast, Wyoming has no permit requirement to purchase, no waiting period, no assault weapons ban, and allows permitless concealed carry. Both states are operating entirely within federal law. This means a gun that is illegal to own in one state may be perfectly legal a few hundred miles away."
+        },
+        {
+          "id": "gun-ob2-c02",
+          "title": "The problem of state lines",
+          "content": "Researchers who study gun trafficking have found that a significant percentage of guns used in crimes in states with strict gun laws were originally purchased in states with looser laws. A study by the ATF found that roughly 60% of guns recovered at crime scenes in states with strict gun laws were originally purchased in other states. This creates a situation where states that pass stricter laws see their effectiveness limited by neighboring states with looser regulations. Supporters of a national standard argue this is a fundamental problem with leaving gun policy entirely to states."
+        },
+        {
+          "id": "gun-ob2-c03",
+          "title": "The argument for state control",
+          "content": "Supporters of state-level gun policy argue that gun culture and public safety needs vary dramatically across different parts of the country. A rural rancher in Montana has different practical needs and faces different risks than a resident of downtown Chicago. They argue that states are better positioned to tailor laws to their specific communities and that a one-size-fits-all national standard would impose inappropriate restrictions on people in areas with different circumstances. They also argue that the Constitution deliberately leaves most policing and public safety decisions to states rather than the federal government."
+        },
+        {
+          "id": "gun-ob2-c04",
+          "title": "The argument for a national standard",
+          "content": "Supporters of a national standard argue that gun violence is a national problem that cannot be solved state by state when guns move freely across borders. They point to the trafficking data showing that strict state laws are undermined by loose laws in neighboring states. They also argue that a patchwork of 50 different sets of rules creates confusion for law-abiding gun owners who travel and makes enforcement more difficult. From this perspective, the variation in state laws is not a feature of federalism but a loophole that allows the weakest state standards to effectively set the floor for the entire country."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with states should decide. Here is something worth sitting with before your evolved take: the trafficking data suggests that when states set their own standards, the states with the loosest laws effectively set the standard for neighboring states too, because guns purchased legally in one state can be driven across the border. This means a strict state's gun laws are only as strong as its neighbors' laws allow. How does your thinking account for the fact that state-level control may not actually give strict states the ability to enforce their own standards?",
+        "no": "You started with a national standard. Here is something worth sitting with before your evolved take: a national gun standard would have to be set by Congress, which means it would reflect whatever political coalition can pass it at a given moment. The same political dynamics that currently prevent Congress from passing any significant gun legislation would determine what a national standard looks like. There is also a genuine question about whether uniform national rules make sense for a country with enormous variation in geography, population density, and gun culture. How does your thinking account for what a national standard would actually look like in practice and who would set it?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I think states should be able to set their own gun laws, but the federal government needs to do more to prevent guns from being trafficked across state lines, since that undermines the ability of strict states to enforce their own standards.",
+          "I think there should be a national floor of minimum gun safety standards, like universal background checks, while still allowing states to pass stricter laws if their communities want them.",
+          "I think the national versus state debate misses the core issue, which is that no set of laws, national or state, can be effective if the background check database has major gaps and private sales go untracked.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on whether gun policy should be set nationally or by states, name one legitimate concern with your preferred approach, and explain how a well-designed policy could address that concern. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    }
+  ]
+}

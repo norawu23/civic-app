@@ -1,0 +1,333 @@
+{
+  "topic": "taxes",
+  "title": "Taxes",
+  "icon": "💰",
+  "levels": {
+    "level1": {
+      "title": "How It Works",
+      "flashcards": [
+        {
+          "id": "tax-f-01",
+          "term": "Tax",
+          "definition": "A required payment collected by the government from individuals and businesses. Taxes are the primary way the government funds public services like roads, schools, the military, and healthcare programs."
+        },
+        {
+          "id": "tax-f-02",
+          "term": "Income Tax",
+          "definition": "A tax on the money you earn. In the U.S., both the federal government and most state governments charge income tax. The more you earn, the higher percentage you typically pay."
+        },
+        {
+          "id": "tax-f-03",
+          "term": "Progressive Tax",
+          "definition": "A tax system where people who earn more money pay a higher percentage of their income in taxes. The U.S. federal income tax is a progressive tax. The idea is that people with more money can afford to contribute a larger share."
+        },
+        {
+          "id": "tax-f-04",
+          "term": "Flat Tax",
+          "definition": "A tax system where everyone pays the same percentage of their income regardless of how much they earn. For example, if the flat tax rate is 15%, someone earning $30,000 and someone earning $3,000,000 both pay 15%."
+        },
+        {
+          "id": "tax-f-05",
+          "term": "Tax Bracket",
+          "definition": "A range of income that is taxed at a specific rate under a progressive tax system. In the U.S., you do not pay the highest rate on all your income, only on the portion that falls within each bracket."
+        },
+        {
+          "id": "tax-f-06",
+          "term": "Sales Tax",
+          "definition": "A tax added to the price of goods and services at the point of purchase. Sales tax is set by state and local governments and varies widely across the country. Unlike income tax, everyone pays the same rate regardless of how much they earn."
+        },
+        {
+          "id": "tax-f-07",
+          "term": "Capital Gains Tax",
+          "definition": "A tax on the profit made from selling an asset like stocks, real estate, or a business. If you buy a stock for $1,000 and sell it for $5,000, you pay capital gains tax on the $4,000 profit."
+        },
+        {
+          "id": "tax-f-08",
+          "term": "Payroll Tax",
+          "definition": "A tax taken directly out of your paycheck by your employer before you receive it. Payroll taxes fund Social Security and Medicare. Both you and your employer pay a portion."
+        },
+        {
+          "id": "tax-f-09",
+          "term": "Tax Deduction",
+          "definition": "An expense you are allowed to subtract from your taxable income, which reduces how much tax you owe. Common deductions include mortgage interest, charitable donations, and student loan interest."
+        },
+        {
+          "id": "tax-f-10",
+          "term": "National Debt",
+          "definition": "The total amount of money the federal government owes because it has spent more than it has collected in taxes over time. When the government spends more than it takes in, it borrows money to make up the difference, adding to the national debt."
+        }
+      ],
+      "quiz": [
+        {
+          "id": "tax-q1-01",
+          "question": "What is the difference between a progressive tax and a flat tax?",
+          "options": [
+            "A progressive tax applies to businesses, a flat tax applies to individuals",
+            "A flat tax is higher than a progressive tax",
+            "A progressive tax charges higher earners a higher percentage, while a flat tax charges everyone the same percentage",
+            "A progressive tax is set by the federal government, a flat tax is set by states"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "tax-q1-02",
+          "question": "What do payroll taxes fund?",
+          "options": [
+            "Public schools and road construction",
+            "The military and national defense",
+            "Federal employee salaries",
+            "Social Security and Medicare"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "tax-q1-03",
+          "question": "If you earn $50,000 and are in the 22% tax bracket, what does that mean?",
+          "options": [
+            "You pay 22% on all $50,000 of your income",
+            "You pay 22% only on income above $50,000",
+            "You pay 22% only on the portion of your income that falls within that bracket, not on your entire income",
+            "You pay 22% unless you have deductions"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "tax-q1-04",
+          "question": "What is a tax deduction?",
+          "options": [
+            "A penalty added to your taxes for filing late",
+            "The percentage of income you owe in taxes",
+            "A government payment sent to low income earners",
+            "An expense you can subtract from your taxable income to reduce how much you owe"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "tax-q1-05",
+          "question": "What is the national debt?",
+          "options": [
+            "The total amount of taxes collected by the federal government each year",
+            "The amount of money the government owes to other countries",
+            "The difference between what rich and poor Americans pay in taxes",
+            "The total amount of money the federal government owes because it has spent more than it has collected in taxes over time"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    },
+    "level2": {
+      "title": "Why It's Contested",
+      "cards": [
+        {
+          "id": "tax-l2-01",
+          "title": "How Much Should the Wealthy Pay?",
+          "content": "One of the central debates in tax policy is how much wealthier Americans should contribute compared to everyone else. Supporters of higher taxes on the wealthy argue that a progressive system is fair because people with more money have benefited more from public investments like roads, courts, and educated workers, and can afford to give more back. Critics argue that high taxes on wealthy individuals and businesses discourage investment, slow economic growth, and drive money out of the country to lower-tax places. Both sides agree that taxes are necessary. They disagree fundamentally about what fair contribution looks like."
+        },
+        {
+          "id": "tax-l2-02",
+          "title": "What Should Taxes Pay For?",
+          "content": "Even if people agree on how much to collect, they often disagree sharply on what to spend it on. Some people believe the government should use tax revenue to fund a strong social safety net, including healthcare, housing assistance, food programs, and education, arguing these investments reduce inequality and give everyone a fair shot. Others argue the government should keep taxes low and let individuals and businesses decide how to spend their own money, arguing that private spending is more efficient and that people know their own needs better than the government does. This disagreement is at the heart of most budget debates in Congress."
+        },
+        {
+          "id": "tax-l2-03",
+          "title": "The Regressive Nature of Some Taxes",
+          "content": "Not all taxes work the same way. Sales tax and payroll taxes are often described as regressive, meaning they take a larger percentage of income from lower earners than from higher earners. For example, if a person earning $25,000 a year and a person earning $250,000 a year both pay 8% sales tax on everyday purchases, the lower earner is spending a much larger share of their total income on that tax. Some people argue this makes the overall tax system unfair even if income taxes are progressive. Others argue sales taxes are simple, predictable, and necessary for state and local governments to fund services."
+        },
+        {
+          "id": "tax-l2-04",
+          "title": "The Deficit and Who Pays for It",
+          "content": "The U.S. government has run a deficit, meaning it spends more than it collects in taxes, for most of the past several decades. This has contributed to a national debt that now exceeds $36 trillion. Some people argue the solution is to raise taxes, particularly on corporations and high earners, to bring spending and revenue closer to balance. Others argue the solution is to cut government spending rather than raise taxes. Still others argue that deficits are not inherently dangerous and that the government can continue borrowing as long as the economy grows. This three-way disagreement makes tax and budget policy one of the hardest areas to reach compromise in Congress."
+        }
+      ]
+    },
+    "level3": {
+      "title": "What's Happening Now",
+      "cards": [
+        {
+          "id": "tax-l3-01",
+          "title": "The One Big Beautiful Bill Act",
+          "content": "On July 4, 2025, President Trump signed the One Big Beautiful Bill Act into law. It is one of the most significant pieces of tax legislation in decades. The law made permanent many of the tax cuts from the 2017 Tax Cuts and Jobs Act that were set to expire at the end of 2025, including lower income tax rates and a larger standard deduction. The Congressional Budget Office, which is a nonpartisan government agency that analyzes the cost of legislation, estimated the law will add approximately $4.1 to $4.6 trillion to the national debt over the next decade.",
+          "source": {
+            "label": "NPR Planet Money — How the One Big Beautiful Bill will affect everyday Americans",
+            "url": "https://www.npr.org/2025/07/04/1255224475/one-big-beautiful-bill-tax-cuts-tips-medicaid"
+          }
+        },
+        {
+          "id": "tax-l3-02",
+          "title": "Who Benefits and Who Does Not",
+          "content": "According to analyses by the Congressional Budget Office and the Joint Committee on Taxation, the benefits of the new tax law are not spread evenly. People with higher incomes are expected to receive the most significant tax cuts. Many lower-income households may see their overall resources decrease. One analysis estimated that middle-income Americans will see their taxes go up by an average of $900 in 2026 relative to what they would have paid if the previous tax policies had simply continued, while the wealthiest 1% are projected to pay at least $1 trillion less in taxes over the next decade.",
+          "source": {
+            "label": "PBS NewsHour — Trump signs One Big Beautiful Bill on July 4",
+            "url": "https://www.pbs.org/newshour/nation/60-years-after-medicaid-was-signed-into-law-trumps-one-big-beautiful-bill-is-chiseling-it-back"
+          }
+        },
+        {
+          "id": "tax-l3-03",
+          "title": "The Trade-Off: Cutting Medicaid and Food Assistance",
+          "content": "To help pay for the tax cuts, the law includes more than $1 trillion in cuts over a decade to Medicaid and the Supplemental Nutrition Assistance Program, commonly known as food stamps or SNAP. The cuts work primarily by imposing new work requirements on people receiving benefits and shifting certain costs from the federal government to states. The American Medical Association estimated that approximately 11.8 million people would lose healthcare coverage as a result. Supporters of the cuts argued they remove people from programs who do not truly need them and reduce government dependency. Critics argued the cuts would harm the poorest and most vulnerable Americans.",
+          "source": {
+            "label": "NPR — How Medicaid cuts survived despite hospital lobbying",
+            "url": "https://www.npr.org/sections/shots-health-news/2025/07/14/nx-s1-5465119/health-care-lobby-hospitals-medicaid-cuts"
+          }
+        },
+        {
+          "id": "tax-l3-04",
+          "title": "The Debate Over What the Cuts Actually Mean",
+          "content": "The debate over the Medicaid cuts became contentious partly because of a disagreement about basic facts. Health and Human Services Secretary Robert F. Kennedy Jr. claimed publicly that there were no cuts to Medicaid, pointing to projections showing total Medicaid spending would still increase by 47% over the next decade. Independent fact-checkers and health economists argued this was misleading, because total spending was projected to grow due to population growth and rising healthcare costs regardless of the law, and that cutting $1 trillion from projected spending still means millions of people losing coverage compared to what they would have had. This disagreement illustrates a broader challenge in tax and budget debates: the same numbers can be presented in very different ways depending on what baseline you compare them to.",
+          "source": {
+            "label": "FactCheck.org — Kennedy denies the One Big Beautiful Bill Act's spending cuts to Medicaid",
+            "url": "https://www.factcheck.org/2026/05/kennedy-denies-the-one-big-beautiful-bill-acts-spending-cuts-to-medicaid"
+          }
+        },
+        {
+          "id": "tax-l3-05",
+          "title": "The National Debt and What Comes Next",
+          "content": "The new law has reignited debate about the national debt, which now exceeds $36 trillion. Each year the government pays hundreds of billions of dollars just in interest on that debt. Critics of the law argue that adding $4 trillion more to the debt while cutting programs for low-income Americans is the wrong set of priorities. Supporters argue the tax cuts will stimulate economic growth that will generate new tax revenue over time, reducing the long-term debt impact. The 2026 midterm elections will likely determine whether Congress addresses the debt through additional spending cuts, tax increases, or continues borrowing. Control of the House and Senate is expected to be closely contested.",
+          "source": {
+            "label": "NPR — How a bigger deficit will affect all of us",
+            "url": "https://www.npr.org/2025/07/04/1255224475/one-big-beautiful-bill-tax-cuts-tips-medicaid"
+          }
+        }
+      ],
+      "quiz": [
+        {
+          "id": "tax-q3-01",
+          "question": "What did the One Big Beautiful Bill Act primarily do to the tax code?",
+          "options": [
+            "It raised the top income tax rate for the highest earners",
+            "It replaced the progressive tax system with a flat tax",
+            "It eliminated the capital gains tax for most Americans",
+            "It made permanent many of the 2017 tax cuts that were set to expire, including lower income tax rates and a larger standard deduction"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "tax-q3-02",
+          "question": "According to the Congressional Budget Office, how much will the One Big Beautiful Bill Act add to the national debt over the next decade?",
+          "options": [
+            "Approximately $400 billion",
+            "Approximately $1 trillion",
+            "Approximately $2 trillion",
+            "Approximately $4.1 to $4.6 trillion"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "tax-q3-03",
+          "question": "How did the law help pay for the tax cuts?",
+          "options": [
+            "By raising sales taxes in states that receive federal funding",
+            "By increasing payroll taxes on high earners",
+            "By eliminating the mortgage interest deduction",
+            "By cutting more than $1 trillion from Medicaid and food assistance programs over a decade, primarily through work requirements and shifting costs to states"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "tax-q3-04",
+          "question": "Why did fact-checkers push back on the claim that there were no cuts to Medicaid?",
+          "options": [
+            "Because Medicaid spending was projected to decrease in absolute terms",
+            "Because the law eliminated Medicaid entirely for people under 65",
+            "Because the work requirements had already been ruled unconstitutional by courts",
+            "Because total spending was expected to grow anyway due to population and cost increases, and cutting $1 trillion from projected spending still means millions of people losing coverage"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "tax-q3-05",
+          "question": "Which of the following best describes where the tax and debt debate stands heading into the 2026 midterm elections?",
+          "options": [
+            "Both parties have agreed on a plan to reduce the national debt through a combination of tax increases and spending cuts",
+            "The Supreme Court has ruled that the One Big Beautiful Bill Act's tax cuts are unconstitutional",
+            "Congress is set to pass a second reconciliation bill that will raise taxes on the wealthy to offset the debt increase",
+            "The 2026 midterms will likely determine whether Congress addresses the growing national debt through additional spending cuts, tax increases, or continued borrowing, with control of both chambers closely contested"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    }
+  },
+  "opinionBuilders": [
+    {
+      "id": "tax-ob-01",
+      "required": true,
+      "question": "Should the U.S. government raise taxes on the wealthy to reduce the national debt and fund public services?",
+      "contextCards": [
+        {
+          "id": "tax-ob1-c01",
+          "title": "How much do the wealthy currently pay?",
+          "content": "The U.S. tax code already has a progressive structure, meaning higher earners pay higher rates. The top federal income tax rate is currently 37%, applying to individuals earning over $578,000 per year. However, many wealthy Americans pay a lower effective tax rate than that because a large portion of their income comes from investments, which are taxed at the lower capital gains rate rather than the income tax rate. A 2021 ProPublica investigation found that some of the wealthiest Americans paid effective tax rates in the low single digits in certain years due to legal tax strategies."
+        },
+        {
+          "id": "tax-ob1-c02",
+          "title": "What does the national debt actually mean for everyday people?",
+          "content": "The U.S. national debt currently exceeds $36 trillion. Each year the government pays hundreds of billions of dollars just in interest on that debt, money that cannot be spent on roads, schools, or healthcare. Some economists argue that continuing to run large deficits risks making the debt so large that interest payments crowd out virtually everything else the government does. Others argue the debt is manageable as long as the economy grows and interest rates stay reasonable, and that cutting programs or raising taxes to reduce it could do more harm than good."
+        },
+        {
+          "id": "tax-ob1-c03",
+          "title": "The argument for raising taxes on the wealthy",
+          "content": "Supporters argue that the wealthiest Americans and largest corporations have seen their share of national income grow dramatically over the past 40 years while their effective tax rates have fallen. They point out that the top marginal tax rate was above 90% during the economically strong 1950s and above 70% through the 1970s. They argue that restoring higher rates on top earners would generate significant revenue without affecting the vast majority of Americans, and that the alternative is either cutting essential services or continuing to grow the debt."
+        },
+        {
+          "id": "tax-ob1-c04",
+          "title": "The argument against raising taxes on the wealthy",
+          "content": "Critics argue that high taxes on wealthy individuals and corporations reduce the incentive to invest, start businesses, and create jobs. They point to research suggesting that when tax rates get too high, wealthy people and businesses move money to lower-tax jurisdictions, meaning the government collects less revenue than expected. They also argue that the government's spending problem is larger than its revenue problem, and that raising taxes without addressing spending will not meaningfully reduce the debt. Some economists argue that tax cuts, by stimulating growth, can actually increase total tax revenue over time."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: raising taxes on the wealthy is often more complicated in practice than in theory. Wealthy individuals and corporations have access to accountants and legal strategies that allow them to reduce their taxable income, shift money to lower-tax states or countries, or restructure how they receive income to avoid higher rates. Some economists argue this means tax increases on the wealthy often generate less revenue than projected. How does your thinking account for the gap between the tax rates on paper and what wealthy people actually end up paying?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: if taxes on the wealthy are not raised, the main alternatives for reducing the national debt are cutting government spending or continuing to borrow. Cutting spending means reducing programs that many Americans depend on, including Social Security, Medicare, and education funding. Continuing to borrow adds to a debt that already costs hundreds of billions of dollars a year just in interest payments. How does your thinking account for where the money should come from instead?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I support raising taxes on the wealthy, but I think the more important goal is closing loopholes that allow wealthy people to pay lower effective rates than their official bracket, rather than just raising the top rate.",
+          "I do not support raising taxes on the wealthy, but I think the government needs a serious plan for reducing the national debt that goes beyond tax cuts, including a realistic approach to spending.",
+          "I think the debate over whether to raise or cut taxes misses the bigger issue, which is that the tax code is full of loopholes and inconsistencies that allow similar levels of wealth to be taxed at very different rates depending on how it was earned.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on whether taxes on the wealthy should be raised, name one legitimate concern with your preferred approach, and explain how you think that concern should be addressed. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    },
+    {
+      "id": "tax-ob-02",
+      "required": false,
+      "question": "Should the U.S. replace its current progressive income tax system with a flat tax where everyone pays the same percentage?",
+      "contextCards": [
+        {
+          "id": "tax-ob2-c01",
+          "title": "How a flat tax would change things in practice",
+          "content": "Under a flat tax, every earner would pay the same percentage of their income regardless of how much they make. Proposals typically suggest a rate somewhere between 15% and 20%. For someone earning $30,000, a 17% flat tax means $5,100 in federal income tax. For someone earning $3,000,000, the same 17% means $510,000. Supporters argue this is simpler and more equal. Critics point out that $5,100 represents a much larger share of what a low earner needs to cover basic expenses than $510,000 does for a high earner, even though the percentage is identical."
+        },
+        {
+          "id": "tax-ob2-c02",
+          "title": "The simplicity argument",
+          "content": "One of the strongest arguments for a flat tax is that it would dramatically simplify the tax code. The current U.S. tax code runs to thousands of pages and is so complex that most Americans pay professionals to file their taxes. A simple flat rate with few deductions would make filing straightforward for most people and reduce the billions of dollars spent annually on tax compliance. Some flat tax proposals would allow people to file their taxes on a single page or even a postcard. Critics argue that simplicity alone is not a good reason to change a system if the simpler version is less fair."
+        },
+        {
+          "id": "tax-ob2-c03",
+          "title": "The fairness debate",
+          "content": "Whether a flat tax is fair depends entirely on how you define fairness. Supporters argue it is the most fair system because everyone contributes the same share, treating all citizens equally regardless of income. Critics argue that equal percentages do not produce equal sacrifice. A person earning $25,000 paying 17% has $20,750 left to cover rent, food, healthcare, and everything else. A person earning $2,500,000 paying 17% has $2,075,000 left. Critics argue that true fairness requires accounting for the fact that the first few dollars of income are spent on necessities while additional dollars above that represent discretionary wealth."
+        },
+        {
+          "id": "tax-ob2-c04",
+          "title": "What a flat tax would mean for government revenue",
+          "content": "Most analyses of flat tax proposals suggest they would significantly reduce the total amount of tax revenue the federal government collects, at least in the short term, because the wealthy would pay lower effective rates than they currently do. This would either require large cuts to government programs or a significant increase in the national debt. Supporters of the flat tax argue that the economic growth stimulated by lower taxes on high earners would eventually generate enough new tax revenue to make up the difference. Critics argue this assumption has not been consistently supported by evidence from past tax cuts."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: most flat tax proposals would result in a significant tax cut for the highest earners and a tax increase for many middle and lower income earners compared to what they pay today, depending on the rate chosen and what deductions are eliminated. The simplicity and equal percentage arguments are compelling, but the practical effect on different income groups varies widely depending on how the flat tax is designed. How does your thinking account for the possibility that the version of a flat tax that gets passed might look very different from the version you have in mind?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: the current progressive tax system is extraordinarily complex, costly to administer, and full of loopholes that disproportionately benefit people with access to expensive accountants and tax attorneys. Keeping a progressive system does not automatically mean keeping a fair one. Some people who oppose a flat tax still acknowledge that the current system produces deeply unequal effective rates across similar income levels. How does your thinking account for the real problems with the current system, and what would a better alternative actually look like?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I support a flat tax in principle because equal percentages feel fair, but I think any flat tax proposal needs to include a meaningful exemption for income below a certain threshold so that low earners are not disproportionately burdened.",
+          "I do not support replacing the progressive system with a flat tax, but I think the current system needs significant reform to close loopholes that allow wealthy people to pay lower effective rates than middle class earners.",
+          "I think the debate between flat and progressive misses the real issue, which is that the complexity of the current tax code creates a system where your effective tax rate depends more on your access to accountants than on what the law actually says.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on whether the U.S. should adopt a flat tax, name one legitimate concern with your preferred approach, and explain how a well-designed tax policy could address that concern. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    }
+  ]
+}

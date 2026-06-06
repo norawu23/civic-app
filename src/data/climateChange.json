@@ -1,0 +1,333 @@
+{
+  "topic": "climateChange",
+  "title": "Climate Change",
+  "icon": "🌍",
+  "levels": {
+    "level1": {
+      "title": "How It Works",
+      "flashcards": [
+        {
+          "id": "cli-f-01",
+          "term": "Climate Change",
+          "definition": "The long-term shift in global temperatures and weather patterns. While some climate change is natural, scientists overwhelmingly agree that human activities, primarily burning fossil fuels, have been the main driver of climate change since the mid-20th century."
+        },
+        {
+          "id": "cli-f-02",
+          "term": "Greenhouse Gas",
+          "definition": "A gas that traps heat in the atmosphere, causing the planet to warm. The most significant greenhouse gas produced by human activity is carbon dioxide, released by burning coal, oil, and natural gas. Methane, released by livestock and natural gas leaks, is another major greenhouse gas."
+        },
+        {
+          "id": "cli-f-03",
+          "term": "Fossil Fuels",
+          "definition": "Coal, oil, and natural gas. They are called fossil fuels because they formed from the remains of ancient organisms over millions of years. Burning them releases carbon dioxide that had been stored underground for millions of years back into the atmosphere."
+        },
+        {
+          "id": "cli-f-04",
+          "term": "EPA (Environmental Protection Agency)",
+          "definition": "The federal agency responsible for protecting human health and the environment. The EPA sets and enforces regulations on air and water pollution, including limits on greenhouse gas emissions from power plants, vehicles, and industrial facilities."
+        },
+        {
+          "id": "cli-f-05",
+          "term": "Carbon Emissions",
+          "definition": "The release of carbon dioxide into the atmosphere, primarily from burning fossil fuels. The U.S. is the second largest emitter of carbon dioxide in the world, after China."
+        },
+        {
+          "id": "cli-f-06",
+          "term": "Renewable Energy",
+          "definition": "Energy generated from sources that naturally replenish themselves, such as solar, wind, and hydroelectric power. Unlike fossil fuels, renewable energy sources do not produce carbon emissions when generating electricity."
+        },
+        {
+          "id": "cli-f-07",
+          "term": "The Paris Agreement",
+          "definition": "An international treaty signed in 2015 by nearly 200 countries committing to reduce greenhouse gas emissions in order to limit global warming to well below 2 degrees Celsius above pre-industrial levels. The U.S. joined under President Obama, withdrew under President Trump's first term, rejoined under President Biden, and withdrew again under President Trump's second term in January 2026."
+        },
+        {
+          "id": "cli-f-08",
+          "term": "The Inflation Reduction Act (IRA)",
+          "definition": "A law passed in 2022 under President Biden that represented the largest federal investment in clean energy in U.S. history. It provided tax credits for electric vehicles, renewable energy projects, and energy-efficient appliances, with the goal of reducing U.S. greenhouse gas emissions."
+        },
+        {
+          "id": "cli-f-09",
+          "term": "Carbon Tax",
+          "definition": "A fee charged to companies or individuals based on the amount of carbon dioxide their activities produce. The idea is to make fossil fuels more expensive, which encourages a shift toward cleaner energy sources. No national carbon tax currently exists in the U.S."
+        },
+        {
+          "id": "cli-f-10",
+          "term": "The Endangerment Finding",
+          "definition": "A 2009 EPA determination that greenhouse gases threaten public health and welfare. This finding is the legal foundation for all federal regulations of carbon emissions. Without it, the EPA has no legal authority to regulate greenhouse gases. The Trump administration has sought to reverse it."
+        }
+      ],
+      "quiz": [
+        {
+          "id": "cli-q1-01",
+          "question": "What is the Endangerment Finding and why does it matter?",
+          "options": [
+            "It is a court ruling that requires all companies to report their carbon emissions annually",
+            "It is a provision of the Paris Agreement that sets emissions targets for the U.S.",
+            "It is a congressional law that created the EPA's authority over environmental regulation",
+            "It is a 2009 EPA determination that greenhouse gases threaten public health, which is the legal foundation for all federal regulation of carbon emissions"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q1-02",
+          "question": "What makes renewable energy different from fossil fuels in terms of climate impact?",
+          "options": [
+            "Renewable energy produces less electricity than fossil fuels",
+            "Renewable energy requires more government subsidies than fossil fuels",
+            "Renewable energy is only available in certain parts of the country",
+            "Renewable energy sources do not produce carbon emissions when generating electricity, while burning fossil fuels releases carbon dioxide that contributes to climate change"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q1-03",
+          "question": "How many times has the U.S. withdrawn from the Paris Agreement?",
+          "options": [
+            "Once, under President Obama",
+            "Once, under President Biden",
+            "It has never withdrawn from the Paris Agreement",
+            "Twice, once under President Trump's first term and again under President Trump's second term in January 2026"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q1-04",
+          "question": "What was the primary goal of the Inflation Reduction Act's climate provisions?",
+          "options": [
+            "To impose a national carbon tax on fossil fuel companies",
+            "To require all new cars sold in the U.S. to be electric by 2030",
+            "To withdraw the U.S. from the Paris Agreement",
+            "To reduce U.S. greenhouse gas emissions by providing tax credits for electric vehicles, renewable energy projects, and energy-efficient appliances"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q1-05",
+          "question": "What is a carbon tax designed to do?",
+          "options": [
+            "Punish individuals who own gas-powered vehicles",
+            "Generate revenue to pay down the national debt",
+            "Replace the EPA's authority to regulate greenhouse gases",
+            "Make fossil fuels more expensive in order to encourage a shift toward cleaner energy sources"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    },
+    "level2": {
+      "title": "Why It's Contested",
+      "cards": [
+        {
+          "id": "cli-l2-01",
+          "title": "Is the Science Settled?",
+          "content": "Among climate scientists, there is overwhelming consensus that human activity is causing the planet to warm and that this poses serious risks. Major scientific bodies including NASA, NOAA, and the Intergovernmental Panel on Climate Change have repeatedly affirmed this conclusion based on decades of research. However, there is genuine debate among economists, policymakers, and the public about how severe the impacts will be, how quickly they will occur, and what the right policy responses are. Some politicians and commentators dispute the science itself, arguing that natural variation explains most observed warming. The scientific community strongly disagrees with this position, but it remains politically influential."
+        },
+        {
+          "id": "cli-l2-02",
+          "title": "Who Should Pay for Climate Action?",
+          "content": "Even among people who accept the scientific consensus on climate change, there is major disagreement about who should bear the costs of addressing it. Some argue that large corporations and fossil fuel companies, which have profited from decades of carbon emissions, should be required to pay for the transition to clean energy through regulations and carbon taxes. Others argue that the costs of climate regulations fall disproportionately on working-class consumers, who pay more for energy and goods, while wealthier people can more easily absorb those costs or afford electric vehicles and solar panels. This tension makes climate policy deeply connected to debates about economic fairness."
+        },
+        {
+          "id": "cli-l2-03",
+          "title": "The Economic Trade-Off Argument",
+          "content": "Critics of aggressive climate regulation argue that forcing a rapid transition away from fossil fuels would devastate industries and communities that depend on coal, oil, and gas for their livelihoods. They point to states like West Virginia, Wyoming, and parts of Texas where fossil fuel industries employ large numbers of workers and generate significant tax revenue for schools and public services. They argue that the economic pain of a rapid transition would be concentrated among working-class communities that can least afford it. Supporters of climate action counter that the long-term economic costs of unchecked climate change, including damage from floods, droughts, and extreme weather, far exceed the costs of transitioning to clean energy now."
+        },
+        {
+          "id": "cli-l2-04",
+          "title": "The Global Fairness Argument",
+          "content": "The U.S. is the second largest current emitter of greenhouse gases and the largest historical emitter. However, countries like China and India are growing rapidly and are expected to account for an increasingly large share of future emissions. Some people argue it is unfair for the U.S. to impose costly climate regulations on American businesses and consumers when China and India are not making equivalent sacrifices. Others argue that the U.S. has a special responsibility to lead on climate because it has contributed more to the problem historically than any other country, and that refusing to act until other countries do is a formula for no action at all."
+        }
+      ]
+    },
+    "level3": {
+      "title": "What's Happening Now",
+      "cards": [
+        {
+          "id": "cli-l3-01",
+          "title": "The U.S. Withdraws from the Paris Agreement Again",
+          "content": "On January 20, 2025, President Trump signed an executive order beginning the process of withdrawing the U.S. from the Paris Agreement for the second time. The withdrawal became effective on January 27, 2026, after the required one-year waiting period. The U.S. also announced in January 2026 that it was withdrawing from the United Nations Framework Convention on Climate Change, the broader international treaty that underlies all global climate cooperation and has been in place since 1992. This means the U.S. now stands alongside Libya, Yemen, and Iran as the only countries outside the Paris Agreement framework.",
+          "source": {
+            "label": "PBS NewsHour — What to know about Trump's executive actions on climate and environment",
+            "url": "https://www.pbs.org/newshour/nation/heres-what-to-know-about-trumps-executive-actions-on-climate-and-environment"
+          }
+        },
+        {
+          "id": "cli-l3-02",
+          "title": "Rolling Back the Inflation Reduction Act",
+          "content": "The One Big Beautiful Bill Act, signed by President Trump on July 4, 2025, repealed or accelerated the phase-out of many of the Inflation Reduction Act's clean energy tax credits. Electric vehicle tax credits ended on September 30, 2025. Federal incentives for rooftop solar, heat pumps, and home insulation are set to expire at the end of 2026. In the first half of 2025, U.S. renewable energy investment fell by 36% compared to the same period the year before. The administration also cancelled billions of dollars in green energy grants and tried to halt offshore wind projects already under construction.",
+          "source": {
+            "label": "NPR — Six significant changes in U.S. climate policy under Trump",
+            "url": "https://www.npr.org/2025/11/10/nx-s1-5601876/trump-cop30-climate-brazil-belem"
+          }
+        },
+        {
+          "id": "cli-l3-03",
+          "title": "Dismantling the EPA's Climate Authority",
+          "content": "The Trump administration moved aggressively in 2025 to dismantle the EPA's legal authority to regulate greenhouse gases. The administration proposed reversing the 2009 Endangerment Finding, which is the legal foundation for all federal carbon regulations. It also proposed gutting Biden-era rules limiting emissions from power plants, vehicles, and the oil and gas industry. EPA administrator Lee Zeldin described the agency's deregulatory push as the greatest deregulation in the nation's history. Critics argued the moves would lock in decades of higher emissions and make it significantly harder for future administrations to restore climate regulations.",
+          "source": {
+            "label": "FactCheck.org — Trump, Project 2025, and climate change",
+            "url": "https://www.factcheck.org/2025/10/trump-project-2025-and-climate-change-fossil-fuels"
+          }
+        },
+        {
+          "id": "cli-l3-04",
+          "title": "States and Cities Push Back",
+          "content": "While the federal government has pulled back from climate action, many states, cities, and companies have continued or accelerated their own efforts. California, New York, Illinois, and more than a dozen other states have maintained or strengthened their own climate laws, and several have filed lawsuits challenging the federal rollbacks. Major corporations including Apple, Google, and Microsoft have maintained their own net-zero emissions commitments regardless of federal policy. The Trump administration responded by directing the Justice Department to target state laws that it argued impede energy development, setting up a legal conflict between federal and state authority over climate policy.",
+          "source": {
+            "label": "NPR — As Trump vows to embrace fossil fuels, U.S. climate policy won't change quickly",
+            "url": "https://www.npr.org/2025/02/01/nx-s1-5273496/trump-biden-climate-change-energy-fossil-fuels-paris-agreement"
+          }
+        },
+        {
+          "id": "cli-l3-05",
+          "title": "Where Global Emissions Stand",
+          "content": "Despite international agreements and years of climate commitments, global greenhouse gas emissions have continued to rise. A 2025 report found that the 20 most polluting countries, including China, the U.S., and India, plan to produce more than twice the amount of fossil fuels in 2030 than would be consistent with limiting global warming to 1.5 degrees Celsius. China is driving much of the increase, planning to reduce coal production more slowly than previously committed. Scientists say emissions need to peak before 2025 and decline 43% by 2030 to meet the Paris Agreement's 1.5-degree target, a goal that currently appears out of reach.",
+          "source": {
+            "label": "NPR — Oil, coal, and gas production plans bury climate change goals",
+            "url": "https://www.npr.org/2025/09/22/nx-s1-5545645/oil-gas-china-fossil-fuels-climate-paris-agreement"
+          }
+        }
+      ],
+      "quiz": [
+        {
+          "id": "cli-q3-01",
+          "question": "What happened to the U.S. and the Paris Agreement in January 2026?",
+          "options": [
+            "The U.S. rejoined the Paris Agreement after negotiations with China",
+            "The U.S. became the leader of the Paris Agreement's enforcement committee",
+            "The Paris Agreement was dissolved after the U.S. withdrew",
+            "The U.S. withdrawal from the Paris Agreement became effective, and the U.S. also announced it was withdrawing from the broader UN climate treaty that underlies all international climate cooperation"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q3-02",
+          "question": "What happened to U.S. renewable energy investment in the first half of 2025?",
+          "options": [
+            "It increased by 36% due to new state-level incentives",
+            "It stayed roughly the same as the previous year",
+            "It doubled due to private sector investment",
+            "It fell by 36% compared to the same period the year before, following the rollback of federal clean energy tax credits"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q3-03",
+          "question": "Why is the Endangerment Finding significant in the context of the 2025 climate rollbacks?",
+          "options": [
+            "Because it is the international treaty that requires the U.S. to reduce emissions",
+            "Because it funds the Green Climate Fund that helps developing countries",
+            "Because it requires Congress to vote on all new climate regulations",
+            "Because it is the legal foundation for all federal carbon regulations, and reversing it would remove the EPA's authority to regulate greenhouse gases entirely"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q3-04",
+          "question": "How have states responded to the federal government's rollback of climate policy?",
+          "options": [
+            "All states have followed the federal government's lead and rolled back their own climate laws",
+            "States have been unable to respond because federal law overrides state climate policy",
+            "States have petitioned the Paris Agreement directly to replace the federal government's commitments",
+            "Many states have maintained or strengthened their own climate laws and filed lawsuits challenging federal rollbacks, while the Trump administration directed the Justice Department to target state laws impeding energy development"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "cli-q3-05",
+          "question": "Which of the following best describes the current state of global emissions?",
+          "options": [
+            "Global emissions have peaked and are now declining due to international agreements",
+            "China has met its Paris Agreement targets and emissions are falling rapidly",
+            "The U.S. is now the largest emitter in the world after China increased its commitments",
+            "Global emissions continue to rise, with major emitters planning to produce more than twice the fossil fuels consistent with the Paris Agreement's 1.5-degree target, making that goal currently appear out of reach"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    }
+  },
+  "opinionBuilders": [
+    {
+      "id": "cli-ob-01",
+      "required": true,
+      "question": "Should the U.S. federal government require companies to reduce their carbon emissions, even if it increases costs for businesses and consumers?",
+      "contextCards": [
+        {
+          "id": "cli-ob1-c01",
+          "title": "How much do U.S. companies currently emit?",
+          "content": "The U.S. is the second largest greenhouse gas emitter in the world. The electricity sector, which is dominated by fossil fuel power plants, accounts for roughly 25% of U.S. emissions. Transportation accounts for another 28%, and industrial processes account for about 23%. The remaining emissions come from agriculture, buildings, and other sources. Scientists say global emissions need to be cut roughly in half by 2030 to avoid the worst effects of climate change, which would require significant reductions across all of these sectors."
+        },
+        {
+          "id": "cli-ob1-c02",
+          "title": "What do emission reductions actually cost?",
+          "content": "The costs of reducing carbon emissions vary widely depending on the method. Switching from coal to natural gas for electricity generation is relatively cheap and already happening due to market forces. Building utility-scale solar and wind power has become cheaper than building new coal plants in most of the country. The more expensive reductions involve industries like steel, cement, and aviation, where there are no easy low-carbon alternatives yet. Economists generally agree that the costs of reducing emissions are real but manageable, and that they are lower than the long-term costs of unchecked climate change, though projections vary significantly."
+        },
+        {
+          "id": "cli-ob1-c03",
+          "title": "The argument for federal emission requirements",
+          "content": "Supporters argue that without federal mandates, companies have no financial incentive to reduce emissions because the costs of climate change are spread across society and future generations rather than being borne by the companies doing the emitting. This is sometimes called a market failure. They argue that regulations level the playing field by ensuring all companies face the same requirements, preventing a race to the bottom where companies that ignore emissions gain a competitive advantage over those that invest in clean energy. They also point to the economic opportunities in clean energy industries, which are growing rapidly and creating new jobs."
+        },
+        {
+          "id": "cli-ob1-c04",
+          "title": "The argument against federal emission requirements",
+          "content": "Critics argue that federal emission mandates increase the cost of energy and goods for consumers, disproportionately hurting lower-income households that spend a larger share of their income on energy. They also argue that regulations on U.S. companies put them at a competitive disadvantage compared to foreign competitors, especially in China, that face fewer restrictions. Some argue that technological innovation, driven by the market rather than government mandates, is a more efficient path to reducing emissions, and that regulations stifle the flexibility companies need to find the most cost-effective solutions."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: federal emission requirements apply to U.S. companies but not to foreign competitors, which means they can increase costs for American businesses without reducing global emissions if production simply moves to countries with looser regulations. This is sometimes called carbon leakage. Even people who strongly support climate action sometimes disagree about whether domestic regulations are effective if they are not paired with international agreements or border adjustments that level the playing field. How does your thinking account for the possibility that U.S. regulations alone might shift emissions to other countries rather than reducing them globally?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: without any federal requirement to reduce emissions, companies have no financial incentive to do so because the costs of climate change, including flood damage, drought, and extreme heat, are paid by society broadly rather than by the companies producing the emissions. This means the market on its own is unlikely to drive the reductions scientists say are necessary within the timeframe they say is necessary. How does your thinking account for what mechanism other than government regulation would drive the large-scale emission reductions that most economists say are needed?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I support federal emission requirements, but I think they need to be paired with measures that protect lower-income households from higher energy costs, such as rebates or dividend payments funded by the revenue from carbon fees.",
+          "I do not support broad federal emission mandates, but I think the government should invest heavily in clean energy research and development, since technological breakthroughs are likely to reduce emissions more effectively and at lower cost than regulations.",
+          "I think the most effective climate policy would combine a price on carbon that applies equally to all companies with border adjustments that prevent carbon leakage by charging imports from countries without equivalent standards.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on whether the federal government should require companies to reduce carbon emissions, name one legitimate concern with your preferred approach, and explain how a well-designed policy could address that concern. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    },
+    {
+      "id": "cli-ob-02",
+      "required": false,
+      "question": "Should the U.S. rejoin and fully commit to international climate agreements like the Paris Agreement?",
+      "contextCards": [
+        {
+          "id": "cli-ob2-c01",
+          "title": "What the Paris Agreement actually requires",
+          "content": "The Paris Agreement does not impose legally binding emission reduction targets on countries. Instead, each country sets its own voluntary targets, called Nationally Determined Contributions, and is required to report on its progress. The agreement's main enforcement mechanism is transparency and international pressure rather than penalties. Critics argue this makes it toothless. Supporters argue that the framework of shared commitments and regular reporting creates political accountability that drives real action, even without hard enforcement. The U.S. withdrawal means it no longer submits targets or reports, and it stops contributing to the climate finance fund that helps developing countries transition to clean energy."
+        },
+        {
+          "id": "cli-ob2-c02",
+          "title": "What U.S. withdrawal actually means in practice",
+          "content": "When the U.S. withdraws from the Paris Agreement, it does not prevent states, cities, or companies from continuing to pursue emission reductions on their own. California, New York, and dozens of other states have their own climate laws. Major U.S. corporations have set their own emissions reduction targets. However, withdrawal does signal to the rest of the world that the U.S. is not committed to international climate cooperation, which can undermine the political momentum of the agreement. It also means the U.S. stops contributing to the Green Climate Fund, which helps poorer countries adapt to climate change and build clean energy infrastructure."
+        },
+        {
+          "id": "cli-ob2-c03",
+          "title": "The argument for rejoining",
+          "content": "Supporters argue the U.S. has a unique responsibility to lead on climate change because it is the largest historical emitter of greenhouse gases and one of the wealthiest countries in the world. They argue that withdrawal undermines the credibility of the international climate framework and gives other countries a justification for weakening their own commitments. They also point out that climate change is a global problem that cannot be solved by any one country acting alone, and that U.S. participation in international agreements is essential for building the kind of coordinated global response that scientists say is necessary."
+        },
+        {
+          "id": "cli-ob2-c04",
+          "title": "The argument against rejoining",
+          "content": "Critics argue that the Paris Agreement is a bad deal for the U.S. because it imposes costs on American businesses and workers while allowing major emitters like China and India to continue increasing their emissions for years. They argue that the U.S. has already made significant progress in reducing emissions through market forces and technological innovation, without needing an international agreement to mandate it. Some also argue that international climate agreements involve ceding sovereignty to international bodies and committing to financial transfers to other countries that are not in the U.S. national interest."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: the Paris Agreement's targets are voluntary and there is no enforcement mechanism for countries that fail to meet them. Since the agreement was signed in 2015, most major emitters including China have not met their stated targets, and global emissions have continued to rise. Some climate advocates argue that the agreement creates the illusion of action without the substance, and that the energy spent on international negotiations would be better focused on domestic policy. How does your thinking account for whether rejoining an agreement with no enforcement mechanism actually translates into meaningful emission reductions?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: climate change is a global problem caused by cumulative emissions from many countries over many decades. No single country, including the U.S., can solve it by acting alone. International agreements are the only mechanism for coordinating action across the nearly 200 countries whose emissions collectively determine the trajectory of global warming. The U.S. is also the largest historical emitter, meaning American emissions have contributed more to the current problem than those of any other country. How does your thinking account for how the global emission reductions scientists say are necessary would actually happen without some form of international coordination?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I support the U.S. rejoining the Paris Agreement, but I think the agreement needs to be strengthened with real enforcement mechanisms, because voluntary targets without consequences have not been sufficient to drive the reductions that are needed.",
+          "I do not think the U.S. should rejoin the Paris Agreement in its current form, but I think the U.S. should negotiate a new international climate framework that includes binding targets and real consequences for major emitters like China.",
+          "I think the question of whether to rejoin the Paris Agreement is less important than whether the U.S. actually implements serious domestic climate policy, since domestic action is what determines real emission reductions regardless of what international agreements say.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on whether the U.S. should rejoin international climate agreements, name one legitimate concern with your preferred approach, and explain how you think that concern should be addressed. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    }
+  ]
+}

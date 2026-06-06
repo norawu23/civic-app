@@ -1,0 +1,328 @@
+{
+  "topic": "immigration",
+  "title": "Immigration",
+  "icon": "🗺️",
+  "levels": {
+    "level1": {
+      "title": "How It Works",
+      "flashcards": [
+        {
+          "id": "imm-f-01",
+          "term": "Immigration",
+          "definition": "The process of moving to a new country to live permanently. People immigrate for many reasons — work, family, safety, or a better life."
+        },
+        {
+          "id": "imm-f-02",
+          "term": "Citizenship",
+          "definition": "Full legal membership in a country. U.S. citizens can vote, hold a passport, and cannot be deported."
+        },
+        {
+          "id": "imm-f-03",
+          "term": "Naturalization",
+          "definition": "The legal process by which a non-citizen becomes a U.S. citizen. It typically requires 5 years of legal residency, passing an English and civics test, and attending a ceremony."
+        },
+        {
+          "id": "imm-f-04",
+          "term": "Green Card",
+          "definition": "A document that allows a non-citizen to live and work permanently in the U.S. It is the step before citizenship."
+        },
+        {
+          "id": "imm-f-05",
+          "term": "Visa",
+          "definition": "A temporary government permission to enter a country for a specific purpose — like work, school, or tourism. Visas expire."
+        },
+        {
+          "id": "imm-f-06",
+          "term": "Asylum",
+          "definition": "Protection granted to someone who has fled their home country due to persecution, war, or violence. Asylum seekers must apply and prove their case."
+        },
+        {
+          "id": "imm-f-07",
+          "term": "Undocumented",
+          "definition": "A person living in a country without legal immigration status. This can happen by entering without permission or by staying after a visa expires."
+        },
+        {
+          "id": "imm-f-08",
+          "term": "Deportation",
+          "definition": "The formal removal of a non-citizen from a country by the government. A person can be deported if they violate immigration law."
+        },
+        {
+          "id": "imm-f-09",
+          "term": "ICE (Immigration and Customs Enforcement)",
+          "definition": "The U.S. federal agency responsible for enforcing immigration law inside the country, including arresting and deporting undocumented people."
+        },
+        {
+          "id": "imm-f-10",
+          "term": "USCIS (U.S. Citizenship and Immigration Services)",
+          "definition": "The federal agency that processes immigration applications, including green cards, visas, asylum claims, and naturalization."
+        }
+      ],
+      "quiz": [
+        {
+          "id": "imm-q1-01",
+          "question": "What is naturalization?",
+          "options": [
+            "Getting a visa to visit the U.S.",
+            "The legal process of becoming a U.S. citizen",
+            "Being deported from the U.S.",
+            "Applying for a green card"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "imm-q1-02",
+          "question": "Which agency processes immigration applications like green cards and asylum claims?",
+          "options": [
+            "ICE",
+            "FBI",
+            "USCIS",
+            "Department of Defense"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "imm-q1-03",
+          "question": "What is the difference between a green card and a visa?",
+          "options": [
+            "They are the same thing",
+            "A visa is permanent, a green card is temporary",
+            "A green card is permanent, a visa is temporary",
+            "Only citizens can get a green card"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "imm-q1-04",
+          "question": "Someone fled their home country because of violence and is asking the U.S. for protection. What are they applying for?",
+          "options": [
+            "A work visa",
+            "Naturalization",
+            "A green card",
+            "Asylum"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "imm-q1-05",
+          "question": "A person entered the U.S. on a student visa five years ago but never left after it expired. How would they be described?",
+          "options": [
+            "A green card holder",
+            "A naturalized citizen",
+            "Undocumented",
+            "An asylum seeker"
+          ],
+          "correctIndex": 2
+        }
+      ]
+    },
+    "level2": {
+      "title": "Why It's Contested",
+      "cards": [
+        {
+          "id": "imm-l2-01",
+          "title": "Security vs. Compassion",
+          "content": "The U.S. government has a responsibility to protect its citizens. Some people believe that stricter border control and deportation of undocumented immigrants makes communities safer. Others believe that most undocumented immigrants are hardworking people fleeing danger, and that deporting them causes more harm than good. Both sides care about safety — they just disagree about what safety looks like and who deserves protection."
+        },
+        {
+          "id": "imm-l2-02",
+          "title": "Economic Impact",
+          "content": "Immigration affects the economy in complex ways. Many immigrants fill jobs that keep industries like agriculture, construction, and healthcare running. Some economists argue immigrants create jobs and grow the economy. Others argue that an oversupply of workers drives down wages for American citizens, especially in lower-income jobs. The data on this is genuinely mixed — economists disagree, and the impact varies by region and industry."
+        },
+        {
+          "id": "imm-l2-03",
+          "title": "Rule of Law vs. Humanitarian Need",
+          "content": "The U.S. has a legal immigration system that requires people to wait years — sometimes decades — for approval. Some people believe that anyone who skips that line is breaking the law and should face consequences, regardless of their situation. Others argue that the legal system is so slow and inaccessible that many people have no realistic legal path, and that humanitarian need should take priority over legal technicalities. This tension — between following rules and responding to human suffering — is at the core of the immigration debate."
+        }
+      ]
+    },
+    "level3": {
+      "title": "What's Happening Now",
+      "cards": [
+        {
+          "id": "imm-l3-01",
+          "title": "The 2025 Deportation Surge",
+          "content": "In January 2025, the Trump administration launched what it described as the largest mass deportation operation in American history. ICE arrests increased significantly across the country, targeting people with and without criminal records. The administration used military resources to assist with enforcement and opened new detention facilities to house the increased number of people being held. Federal agencies carried out raids in major cities, at workplaces, and even outside immigration courtrooms where people were attending legally required hearings.",
+          "source": {
+            "label": "NPR — How the 2025 deportation operations reshaped immigration enforcement",
+            "url": "https://www.npr.org/tags/127842480/deportation"
+          }
+        },
+        {
+          "id": "imm-l3-02",
+          "title": "The Kilmar Abrego Garcia Case",
+          "content": "One of the most closely watched cases of 2025 involved Kilmar Abrego Garcia, a Maryland resident who was deported to a prison in El Salvador in March 2025 despite a court order that should have prevented it. The administration acknowledged it was an administrative error. The Supreme Court unanimously ruled the administration needed to facilitate his return. He was brought back to the U.S. in June 2025 but immediately faced criminal charges. His case became a symbol of the broader debate about whether the administration was following court orders in its immigration enforcement operations.",
+          "source": {
+            "label": "PBS NewsHour — Kilmar Abrego Garcia case timeline",
+            "url": "https://www.pbs.org/newshour/nation/after-mistaken-deportation-kilmar-abrego-garcia-now-fights-smuggling-charges"
+          }
+        },
+        {
+          "id": "imm-l3-03",
+          "title": "The Courts Push Back",
+          "content": "Federal judges across the country issued hundreds of orders challenging the administration's deportation operations throughout 2025 and into 2026. Courts blocked the use of the Alien Enemies Act of 1798 to carry out deportations, challenged mandatory detention policies, and ruled against deportations to third countries. The administration argued the courts were overstepping into an area that belongs to the executive branch. This set up a significant separation of powers conflict about how much authority federal courts have over immigration enforcement decisions made by the president.",
+          "source": {
+            "label": "Migration Policy Institute — Federal courts and Trump immigration policies",
+            "url": "https://www.migrationpolicy.org/article/trump-courts-immigration"
+          }
+        },
+        {
+          "id": "imm-l3-04",
+          "title": "The Board of Immigration Appeals",
+          "content": "A lesser-known but significant development involved the Board of Immigration Appeals, the administrative court that hears appeals of immigration judge decisions. The Trump administration reshaped the board by cutting its size nearly in half and appointing new judges aligned with its enforcement priorities. The board then issued rulings that significantly narrowed the legal options available to immigrants fighting deportation, including limiting access to immigration bonds and making it easier to deport people to countries other than their home country. Critics argued this allowed the administration to change immigration policy through administrative courts rather than through Congress.",
+          "source": {
+            "label": "NPR — How the Board of Immigration Appeals was reshaped",
+            "url": "https://www.npr.org/2026/03/20/nx-s1-5707535/trump-immigration-detention-appeals-board-deportation"
+          }
+        },
+        {
+          "id": "imm-l3-05",
+          "title": "Where Things Stand in 2026",
+          "content": "As of 2026, the administration announced plans to expand enforcement further, with new funding for ICE and Border Patrol secured through 2029. Legal battles continue in federal courts across the country. Congress has not passed any new comprehensive immigration legislation, meaning the entire debate is playing out through executive action and court challenges rather than through the normal legislative process. Reform advocates on both sides argue that the lack of congressional action is the root cause of the ongoing instability in immigration policy and that no executive enforcement approach can substitute for a permanent legislative solution.",
+          "source": {
+            "label": "NPR — Immigration policy and the role of Congress",
+            "url": "https://www.npr.org/tags/454465627/immigration-cases"
+          }
+        }
+      ],
+      "quiz": [
+        {
+          "id": "imm-q3-01",
+          "question": "What made the Kilmar Abrego Garcia case significant?",
+          "options": [
+            "He was the first person deported under the Alien Enemies Act",
+            "He was a U.S. citizen wrongly identified as undocumented",
+            "He was deported despite having a green card",
+            "He was deported despite a court order that should have prevented it, and the Supreme Court unanimously ruled the administration needed to facilitate his return"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "imm-q3-02",
+          "question": "What did the Trump administration argue when federal courts blocked its deportation operations?",
+          "options": [
+            "That the courts were misinterpreting the Voting Rights Act",
+            "That Congress had already approved the deportation operations",
+            "That the courts were overstepping into an area that belongs to the executive branch",
+            "That the deportations were protected under the First Amendment"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "imm-q3-03",
+          "question": "What is the Board of Immigration Appeals and why did it matter in 2025?",
+          "options": [
+            "It is the Supreme Court division that handles immigration cases",
+            "It is an independent body that reviews all deportation orders before they take effect",
+            "It is an administrative court that hears immigration appeals, which the administration reshaped by appointing new judges who then narrowed immigrants' legal options",
+            "It is a congressional committee that oversees ICE operations"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "imm-q3-04",
+          "question": "Why have reform advocates on both sides criticized Congress during this period?",
+          "options": [
+            "Because Congress passed legislation that made deportations easier",
+            "Because Congress blocked the administration from carrying out deportations",
+            "Because Congress eliminated the Board of Immigration Appeals",
+            "Because Congress has not passed any new comprehensive immigration legislation, leaving the entire debate to be resolved through executive action and court challenges"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "imm-q3-05",
+          "question": "Which of the following best describes the overall pattern of the 2025 immigration legal battles?",
+          "options": [
+            "The courts consistently sided with the administration on all deportation cases",
+            "Congress passed new legislation resolving the conflict between the courts and the administration",
+            "The Supreme Court ruled that all deportation operations were unconstitutional",
+            "Federal courts repeatedly blocked or slowed administration deportation operations, while the administration argued the courts were overstepping their authority, creating an ongoing separation of powers conflict"
+          ],
+          "correctIndex": 3
+        }
+      ]
+    }
+  },
+  "opinionBuilders": [
+    {
+      "id": "imm-ob-01",
+      "required": true,
+      "question": "Should the U.S. government make it easier for undocumented immigrants to become legal residents?",
+      "contextCards": [
+        {
+          "id": "imm-ob1-c01",
+          "title": "Who is undocumented?",
+          "content": "There are approximately 11 million undocumented immigrants currently living in the United States. About 45% of them entered legally on a visa and stayed after it expired. The rest entered without authorization. The majority have lived in the U.S. for more than 10 years. Many have U.S.-born children who are American citizens."
+        },
+        {
+          "id": "imm-ob1-c02",
+          "title": "The legal pathway problem",
+          "content": "For many undocumented immigrants, there is no realistic legal pathway to residency. The wait time for a green card can be 10 to 20 years depending on your home country. For some countries like Mexico and the Philippines, the backlog is so long that people who applied decades ago are still waiting. Some applicants die before their application is approved."
+        },
+        {
+          "id": "imm-ob1-c03",
+          "title": "The argument for stricter enforcement",
+          "content": "Some people argue that creating easier pathways for undocumented immigrants is unfair to the millions of people who followed the legal process and waited years for approval. They argue it sends a message that breaking immigration law has no consequences, which could encourage more unauthorized immigration in the future. This is sometimes called the rule of law argument."
+        },
+        {
+          "id": "imm-ob1-c04",
+          "title": "The argument for easier pathways",
+          "content": "Others argue that the U.S. economy depends on undocumented workers, many of whom pay taxes but receive no government benefits. They point out that deporting 11 million people would cost an estimated $300 billion and devastate industries like farming and construction. They argue that people who have built lives here for decades deserve a chance to stay legally."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: even if the legal pathway is reformed and made more accessible, a faster system creates a new problem. If the U.S. signals that it will regularize undocumented immigrants, some argue this encourages more unauthorized immigration in the future, because people believe they will eventually be able to stay legally. Critics call this a pull factor. They argue that as long as becoming legal is a realistic outcome for people who enter without authorization, the U.S. will continue to face large numbers of unauthorized crossings. How does your thinking account for that concern?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: for many of the 11 million undocumented people currently living in the U.S., there is no realistic legal pathway available to them at all. They are not jumping a line they could have waited in. The line either does not exist for them or has a 20-plus year wait. Many of them have lived here for decades, raised families, paid taxes, and built communities. Keeping them undocumented does not make them leave. It just keeps them in a permanent legal limbo with no rights or protections. How does your thinking account for that?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I still think it should be easier, but I understand that reform needs to include measures that address unauthorized immigration at the same time, otherwise it creates new problems.",
+          "I still think it should not be easier, but I understand that the current legal system is too slow and inaccessible for many people, and that problem needs to be fixed separately.",
+          "I used to think this was a simple yes or no question. Now I think the real issue is that the legal pathway itself is broken, and both sides are actually responding to that same problem in different ways.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position, name one thing from the other side that you think is a valid concern, and explain how your position accounts for that concern. There is no right answer. You are graded on whether you engaged with both sides."
+      }
+    },
+    {
+      "id": "imm-ob-02",
+      "required": false,
+      "question": "Should all undocumented immigrants currently living in the U.S. be deported?",
+      "contextCards": [
+        {
+          "id": "imm-ob2-c01",
+          "title": "What would this operation actually look like?",
+          "content": "The U.S. has never attempted a deportation operation at this scale. It would require a significant expansion of ICE agents, detention facilities, immigration courts, and deportation flights. The last large scale deportation effort in the 1950s removed around 1 million people, used tactics that are now widely considered a humanitarian failure, and still took years to carry out. Scaling that to 11 million people would require a level of federal mobilization not seen outside of wartime."
+        },
+        {
+          "id": "imm-ob2-c02",
+          "title": "What happens to American citizen children?",
+          "content": "Roughly 4.4 million undocumented immigrants live with at least one U.S. born child who is an American citizen. Those children have the legal right to stay in the U.S. A deportation policy would force families to choose between separating from their parents or leaving the only country they have ever known. About 200,000 undocumented immigrants are also immediate family members of active duty military personnel or veterans."
+        },
+        {
+          "id": "imm-ob2-c03",
+          "title": "The argument for full enforcement",
+          "content": "Some people argue that selective enforcement, deporting some people but not others, creates an inconsistent and unpredictable system. They argue that if the law says unauthorized presence is grounds for removal, then enforcing it fully is more fair and more honest than a patchwork approach that leaves millions in permanent uncertainty. From this perspective, a clear and consistently enforced policy, even a harsh one, is preferable to a system where no one knows what the rules actually are in practice."
+        },
+        {
+          "id": "imm-ob2-c04",
+          "title": "The argument against full enforcement",
+          "content": "Others argue that the distinction between a civil violation and a criminal one matters significantly when deciding on a proportionate response. Most undocumented immigrants are present in the U.S. due to a civil violation, not a criminal one. Critics of mass deportation argue that removing someone who has lived peacefully in a community for 20 years is not a proportionate response to that violation, and that enforcement resources should be focused on people who pose a genuine public safety risk rather than applied uniformly regardless of individual circumstances."
+        }
+      ],
+      "flipCards": {
+        "yes": "You started with yes. Here is something worth sitting with before your evolved take: a policy of full deportation would directly affect millions of American citizens, specifically the U.S. born children of undocumented parents. Some people who support deportation argue that exceptions should exist for cases involving citizen children or long term residents. Others argue that building exceptions into the policy undermines its consistency and creates new gray areas. It is a genuinely hard tension. How does your thinking account for it?",
+        "no": "You started with no. Here is something worth sitting with before your evolved take: if full deportation is not the answer, the question of what happens instead remains open. The current situation, where millions of people live without legal status indefinitely, is not stable either. It leaves people without legal protections and creates a permanent underclass with no pathway forward. Some people who oppose deportation support a pathway to legal status. Others support stronger enforcement going forward without removing people already here. How does your thinking account for what should happen instead?"
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "I think deportation policy needs to account for individual circumstances like family ties, length of residence, and whether a criminal record is involved, rather than applying a single rule to everyone.",
+          "I do not think full deportation is the right approach, but I understand that the current situation is not a stable long term solution either, and that a real alternative policy needs to address both enforcement and pathways forward.",
+          "I think the most honest question is not yes or no on deportation, but what a proportionate and consistently enforced immigration policy actually looks like in practice.",
+          "I changed my position after thinking about this. The argument on the other side was stronger than I expected."
+        ],
+        "bonusPrompt": "Write your own evolved take for bonus XP. Your response needs to do three things: state your position on deportation, name one specific concern from the other side that you think is valid, and explain how a real policy could address both your position and that concern. There is no right answer. You are graded on whether you engaged seriously with both sides."
+      }
+    }
+  ]
+}
