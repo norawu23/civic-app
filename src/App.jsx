@@ -1,8 +1,151 @@
 import { useState } from 'react'
+import { useProgress } from './hooks/useProgress'
 import HomeScreen from './screens/HomeScreen'
 import LearnScreen from './screens/LearnScreen'
-import OpinionScreen from './screens/OpinionScreen'
+import OpinionBuilderScreen from './screens/OpinionBuilderScreen'
+import OpinionHubScreen from './screens/OpinionHubScreen'
 import ProfileScreen from './screens/ProfileScreen'
+import LessonScreen from './screens/LessonScreen'
+import QuizScreen from './screens/QuizScreen'
+import Level2Screen from './screens/Level2Screen'
+import Level3Screen from './screens/Level3Screen'
+
+function LockedOpinionScreen({ flashcardsDone, quizDone, onNavigate }) {
+  return (
+    <div style={lockedStyles.screen}>
+      <div style={lockedStyles.header}>
+        <p style={lockedStyles.headerEyebrow}>What Do You Think?</p>
+        <p style={lockedStyles.headerTitle}>Opinion Builder</p>
+      </div>
+
+      <div style={lockedStyles.body}>
+        <div style={lockedStyles.lockCircle}>🔒</div>
+        <h2 style={lockedStyles.heading}>Finish Level 1 first</h2>
+        <p style={lockedStyles.sub}>
+          Complete the Immigration flashcards and quiz to unlock the Opinion Builder.
+        </p>
+
+        <div style={lockedStyles.checklist}>
+          <div style={lockedStyles.checkRow}>
+            <span style={{ ...lockedStyles.checkIcon, color: flashcardsDone ? '#16a34a' : '#9ca3af' }}>
+              {flashcardsDone ? '✓' : '○'}
+            </span>
+            <span style={{ ...lockedStyles.checkLabel, color: flashcardsDone ? '#111827' : '#6b7280' }}>
+              Immigration flashcards
+            </span>
+          </div>
+          <div style={lockedStyles.checkRow}>
+            <span style={{ ...lockedStyles.checkIcon, color: quizDone ? '#16a34a' : '#9ca3af' }}>
+              {quizDone ? '✓' : '○'}
+            </span>
+            <span style={{ ...lockedStyles.checkLabel, color: quizDone ? '#111827' : '#6b7280' }}>
+              Immigration Level 1 Quiz
+            </span>
+          </div>
+        </div>
+
+        <button style={lockedStyles.btn} onClick={() => onNavigate('lesson')}>
+          {flashcardsDone ? 'Go to quiz →' : 'Start lesson →'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+const lockedStyles = {
+  screen: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100%',
+    background: '#f5f7fa',
+    fontFamily: 'sans-serif',
+  },
+  header: {
+    background: '#1A3C5E',
+    padding: '1.25rem 1.25rem 1rem',
+  },
+  headerEyebrow: {
+    margin: '0 0 0.2rem',
+    fontSize: '0.7rem',
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+  },
+  headerTitle: {
+    margin: 0,
+    fontSize: '1rem',
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  body: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '2.5rem 1.5rem',
+    gap: '0.75rem',
+  },
+  lockCircle: {
+    fontSize: '3rem',
+    lineHeight: 1,
+    marginBottom: '0.5rem',
+  },
+  heading: {
+    margin: 0,
+    fontSize: '1.4rem',
+    fontWeight: '700',
+    color: '#1A3C5E',
+  },
+  sub: {
+    margin: '0 0 0.5rem',
+    fontSize: '0.9rem',
+    color: '#6b7280',
+    textAlign: 'center',
+    lineHeight: 1.55,
+    maxWidth: '280px',
+  },
+  checklist: {
+    width: '100%',
+    maxWidth: '280px',
+    background: '#ffffff',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    padding: '0.875rem 1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.625rem',
+    marginBottom: '0.5rem',
+  },
+  checkRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+  },
+  checkIcon: {
+    fontSize: '1rem',
+    fontWeight: '700',
+    width: '20px',
+    textAlign: 'center',
+    flexShrink: 0,
+  },
+  checkLabel: {
+    fontSize: '0.875rem',
+    fontWeight: '500',
+  },
+  btn: {
+    marginTop: '0.25rem',
+    padding: '0.875rem 2rem',
+    background: '#1A3C5E',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '12px',
+    fontSize: '0.95rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+  },
+}
 
 const TABS = [
   { id: 'home', label: 'Home' },
@@ -13,13 +156,128 @@ const TABS = [
 
 function App() {
   const [activeTab, setActiveTab] = useState('home')
+  const [currentScreen, setCurrentScreen] = useState(null) // null | 'lesson' | 'quiz' | 'level2' | 'ob2' | 'level3'
+
+  const { progress, completeFlashcards, completeQuiz, completeOpinionBuilder } = useProgress()
+
+  // Whether immigration level 1 flashcards are already done (used to fast-forward LessonScreen)
+  const imm1 = progress.topics.immigration?.levels?.['1'] ?? {}
+  const flashcardsDone = imm1.flashcardsComplete ?? false
+  const quizDone = imm1.quizComplete ?? false
+  const ob1Done = progress.opinionBuilders?.['imm-ob-01']?.completed ?? false
+
+  if (currentScreen === 'lesson') {
+    return (
+      <div style={styles.app}>
+        <LessonScreen
+          initialCompleted={flashcardsDone}
+          onFlashcardsComplete={() => completeFlashcards('immigration', 1)}
+          onBack={() => setCurrentScreen(null)}
+          onNavigate={setCurrentScreen}
+        />
+      </div>
+    )
+  }
+
+  if (currentScreen === 'quiz') {
+    return (
+      <div style={styles.app}>
+        <QuizScreen
+          onQuizComplete={(score, total) => completeQuiz('immigration', 1, score, total)}
+          onBack={() => setCurrentScreen('lesson')}
+          onHome={() => setCurrentScreen('level2')}
+        />
+      </div>
+    )
+  }
+
+  if (currentScreen === 'level2') {
+    return (
+      <div style={styles.app}>
+        <Level2Screen
+          onBack={() => setCurrentScreen(null)}
+          onComplete={() => { setCurrentScreen(null); setActiveTab('opinion') }}
+        />
+      </div>
+    )
+  }
+
+  if (currentScreen === 'ob2') {
+    return (
+      <div style={styles.app}>
+        <OpinionBuilderScreen
+          obIndex={1}
+          onOpinionComplete={(coldTake, xp) =>
+            completeOpinionBuilder('imm-ob-02', coldTake, xp)
+          }
+          onComplete={() => setCurrentScreen(null)}
+        />
+      </div>
+    )
+  }
+
+  if (currentScreen === 'level3') {
+    return (
+      <div style={styles.app}>
+        <Level3Screen
+          onBack={() => setCurrentScreen(null)}
+          onComplete={(score, total) => {
+            completeQuiz('immigration', 3, score, total)
+            setCurrentScreen(null)
+            setActiveTab('home')
+          }}
+        />
+      </div>
+    )
+  }
 
   const renderScreen = () => {
     switch (activeTab) {
-      case 'home': return <HomeScreen />
-      case 'learn': return <LearnScreen />
-      case 'opinion': return <OpinionScreen />
-      case 'profile': return <ProfileScreen />
+      case 'home':
+        return (
+          <HomeScreen
+            progress={progress}
+            onNavigate={setCurrentScreen}
+            onGoToLearn={() => setActiveTab('learn')}
+          />
+        )
+      case 'learn':
+        return (
+          <LearnScreen
+            progress={progress}
+            onNavigate={setCurrentScreen}
+          />
+        )
+      case 'opinion':
+        if (!quizDone) {
+          return (
+            <LockedOpinionScreen
+              flashcardsDone={flashcardsDone}
+              quizDone={quizDone}
+              onNavigate={setCurrentScreen}
+            />
+          )
+        }
+        if (ob1Done) {
+          return (
+            <OpinionHubScreen
+              ob1Progress={progress.opinionBuilders['imm-ob-01']}
+              ob2Progress={progress.opinionBuilders['imm-ob-02']}
+              onStartOB2={() => setCurrentScreen('ob2')}
+            />
+          )
+        }
+        return (
+          <OpinionBuilderScreen
+            obIndex={0}
+            onOpinionComplete={(coldTake, xp) =>
+              completeOpinionBuilder('imm-ob-01', coldTake, xp)
+            }
+            onComplete={() => setCurrentScreen('level3')}
+          />
+        )
+      case 'profile':
+        return <ProfileScreen />
     }
   }
 

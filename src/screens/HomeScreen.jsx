@@ -1,32 +1,74 @@
-const TOPICS = [
-  {
-    id: 'immigration',
-    icon: '🗽',
-    name: 'Immigration',
-    level: 2,
-    progress: 66,
-    locked: false,
-    badge: { label: 'Unlocked', color: '#16a34a', bg: '#dcfce7' },
-  },
-  {
-    id: 'taxes',
-    icon: '🧾',
-    name: 'Taxes',
-    level: 1,
-    progress: 33,
-    locked: false,
-    badge: null,
-  },
-  {
-    id: 'gerrymandering',
-    icon: '🗺️',
-    name: 'Gerrymandering',
-    level: 1,
-    progress: 0,
-    locked: true,
-    badge: null,
-  },
+// Static display config for each topic — icons/names won't change
+const TOPIC_CONFIG = [
+  { id: 'immigration', icon: '🗽', name: 'Immigration' },
+  { id: 'taxes',       icon: '🧾', name: 'Taxes'       },
+  { id: 'gerrymandering', icon: '🗺️', name: 'Gerrymandering' },
 ]
+
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
+// Derive the UI-facing topic list from raw progress state.
+// Immigration uses a 4-milestone model (L1 flashcards, L1 quiz, OB1, L3 quiz)
+// because its levels don't share a uniform flashcard+quiz structure.
+// Single-level topics keep the simple flashcards/quiz percentage.
+function deriveTopics(progress) {
+  const topicsState = progress.topics
+  const obs = progress.opinionBuilders ?? {}
+
+  return TOPIC_CONFIG.map(({ id, icon, name }) => {
+    const data = topicsState[id] ?? { unlocked: false, currentLevel: null, levels: {} }
+    const locked = !data.unlocked
+    const level = data.currentLevel ?? 1
+
+    let pct = 0
+    if (!locked) {
+      if (id === 'immigration') {
+        const l1 = data.levels?.['1'] ?? {}
+        const l3 = data.levels?.['3'] ?? {}
+        const ob1 = obs['imm-ob-01'] ?? {}
+        let done = 0
+        if (l1.flashcardsComplete) done++
+        if (l1.quizComplete) done++
+        if (ob1.completed) done++
+        if (l3.quizComplete) done++
+        pct = Math.round((done / 4) * 100)
+      } else {
+        const levelData = data.levels?.[String(level)] ?? {}
+        if (levelData.flashcardsComplete && levelData.quizComplete) pct = 100
+        else if (levelData.flashcardsComplete) pct = 50
+      }
+    }
+
+    // Show "Unlocked" badge for topics that aren't the default starter
+    const badge = (!locked && id !== 'immigration')
+      ? { label: 'Unlocked', color: '#16a34a', bg: '#dcfce7' }
+      : null
+
+    return { id, icon, name, level, progress: pct, locked, badge }
+  })
+}
+
+// Determine the CTA label based on immigration milestone progress.
+// Returns null when all milestones are complete (no CTA needed).
+function ctaLabel(topicsState, opinionBuilders) {
+  const imm = topicsState.immigration ?? {}
+  const l1 = imm.levels?.['1'] ?? {}
+  const l3 = imm.levels?.['3'] ?? {}
+  const ob1 = opinionBuilders?.['imm-ob-01'] ?? {}
+
+  if (l3.quizComplete) return null                       // all done
+  if (ob1.completed) return 'Continue → Level 3'
+  if (l1.quizComplete) return 'Continue → Level 2'
+  if (l1.flashcardsComplete) return 'Take the Level 1 Quiz'
+  return 'Start flashcards → Level 1'
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ProgressBar({ percent, locked }) {
   return (
@@ -44,7 +86,6 @@ function ProgressBar({ percent, locked }) {
 
 function TopicCard({ topic }) {
   const dimmed = topic.locked
-
   return (
     <div style={{ ...styles.card, opacity: dimmed ? 0.5 : 1 }}>
       <div style={styles.cardLeft}>
@@ -67,7 +108,9 @@ function TopicCard({ topic }) {
           <span style={{ ...styles.levelText, color: dimmed ? '#9ca3af' : '#185FA5' }}>
             Level {topic.level}
           </span>
-          <span style={styles.progressPercent}>{topic.locked ? 'Locked' : `${topic.progress}%`}</span>
+          <span style={styles.progressPercent}>
+            {topic.locked ? 'Locked' : `${topic.progress}%`}
+          </span>
         </div>
 
         <ProgressBar percent={topic.progress} locked={dimmed} />
@@ -76,12 +119,18 @@ function TopicCard({ topic }) {
   )
 }
 
-function HomeScreen() {
+// ─── Screen ───────────────────────────────────────────────────────────────────
+
+function HomeScreen({ progress, onNavigate, onGoToLearn }) {
+  const { user, topics: topicsState } = progress
+  const topics = deriveTopics(progress)
+  const cta = ctaLabel(topicsState, progress.opinionBuilders)
+
   return (
     <div style={styles.screen}>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.greeting}>Good morning</h1>
+        <h1 style={styles.greeting}>{greeting()}</h1>
         <p style={styles.subtext}>Keep your streak alive today</p>
       </div>
 
@@ -90,33 +139,36 @@ function HomeScreen() {
         <div style={styles.streakLeft}>
           <span style={styles.fireEmoji}>🔥</span>
           <div>
-            <p style={styles.streakTitle}>12-day streak</p>
+            <p style={styles.streakTitle}>{user.streak}-day streak</p>
             <p style={styles.streakSub}>Complete today's lesson to keep it</p>
           </div>
         </div>
         <div style={styles.xpBadge}>
-          <span style={styles.xpText}>480 XP</span>
+          <span style={styles.xpText}>{user.totalXP} XP</span>
         </div>
       </div>
 
-      {/* Topics section */}
+      {/* Topics */}
       <div style={styles.section}>
         <p style={styles.sectionTitle}>Your topics</p>
-
-        {TOPICS.map(topic => (
+        {topics.map(topic => (
           <TopicCard key={topic.id} topic={topic} />
         ))}
       </div>
 
-      {/* CTA button */}
-      <div style={styles.buttonRow}>
-        <button style={styles.ctaButton}>
-          Continue immigration &rarr; Level 2
-        </button>
-      </div>
+      {/* CTA — always routes to the Learn tab */}
+      {cta && (
+        <div style={styles.buttonRow}>
+          <button style={styles.ctaButton} onClick={onGoToLearn}>
+            {cta}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = {
   screen: {
@@ -126,8 +178,6 @@ const styles = {
     background: '#f5f7fa',
     paddingBottom: '1.5rem',
   },
-
-  /* Header */
   header: {
     background: '#1A3C5E',
     padding: '2rem 1.25rem 1.5rem',
@@ -144,8 +194,6 @@ const styles = {
     fontSize: '0.875rem',
     color: 'rgba(255,255,255,0.7)',
   },
-
-  /* Streak bar */
   streakBar: {
     display: 'flex',
     alignItems: 'center',
@@ -187,8 +235,6 @@ const styles = {
     color: '#ffffff',
     letterSpacing: '0.03em',
   },
-
-  /* Topics section */
   section: {
     padding: '0 1.25rem',
   },
@@ -200,8 +246,6 @@ const styles = {
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
   },
-
-  /* Cards */
   card: {
     display: 'flex',
     alignItems: 'center',
@@ -212,9 +256,7 @@ const styles = {
     padding: '1rem',
     marginBottom: '0.75rem',
   },
-  cardLeft: {
-    flexShrink: 0,
-  },
+  cardLeft: { flexShrink: 0 },
   iconBox: {
     width: '48px',
     height: '48px',
@@ -223,14 +265,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  icon: {
-    fontSize: '1.5rem',
-    lineHeight: 1,
-  },
-  cardBody: {
-    flex: 1,
-    minWidth: 0,
-  },
+  icon: { fontSize: '1.5rem', lineHeight: 1 },
+  cardBody: { flex: 1, minWidth: 0 },
   cardHeader: {
     display: 'flex',
     alignItems: 'center',
@@ -273,8 +309,6 @@ const styles = {
     borderRadius: '999px',
     transition: 'width 0.3s ease',
   },
-
-  /* CTA button */
   buttonRow: {
     padding: '1.25rem 1.25rem 0',
   },

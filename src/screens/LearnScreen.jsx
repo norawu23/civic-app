@@ -1,29 +1,258 @@
-function LearnScreen() {
+import data from '../data/immigration.json'
+
+const L1_CARD_COUNT = data.levels.level1.flashcards.length  // 10
+const L1_QUIZ_COUNT = data.levels.level1.quiz.length         // 5
+const L3_CARD_COUNT = data.levels.level3.cards.length        // 5
+const L3_QUIZ_COUNT = data.levels.level3.quiz.length         // 5
+
+// ─── Content card ─────────────────────────────────────────────────────────────
+
+function ContentCard({ icon, title, detail, complete, locked, score, total, actionLabel, onAction }) {
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Learn</h1>
-      <p style={styles.subtitle}>Explore civic topics</p>
+    <div style={{ ...styles.card, opacity: locked ? 0.5 : 1 }}>
+      <div style={{ ...styles.cardIconBox, background: locked ? '#e5e7eb' : '#EFF6FF' }}>
+        <span style={styles.cardIcon}>{locked ? '🔒' : icon}</span>
+      </div>
+
+      <div style={styles.cardBody}>
+        <div style={styles.cardTitleRow}>
+          <span style={styles.cardTitle}>{title}</span>
+          {complete && <span style={styles.doneBadge}>✓ Done</span>}
+        </div>
+        <p style={styles.cardDetail}>
+          {detail}
+          {complete && score != null ? ` · ${score}/${total}` : ''}
+        </p>
+      </div>
+
+      <button
+        style={{ ...styles.cardBtn, ...(locked ? styles.cardBtnDisabled : {}) }}
+        onClick={locked ? undefined : onAction}
+        disabled={locked}
+      >
+        {locked ? 'Locked' : actionLabel}
+      </button>
     </div>
   )
 }
 
+// ─── Screen ───────────────────────────────────────────────────────────────────
+
+function LearnScreen({ progress, onNavigate }) {
+  const imm = progress?.topics?.immigration ?? {}
+  const l1 = imm.levels?.['1'] ?? {}
+  const flashcardsDone = l1.flashcardsComplete ?? false
+  const quizDone = l1.quizComplete ?? false
+  const opinionUnlocked = quizDone
+  const ob1Done = progress?.opinionBuilders?.['imm-ob-01']?.completed ?? false
+  const l3 = imm.levels?.['3'] ?? {}
+  const l3Done = l3.quizComplete ?? false
+  const l3Score = l3.quizScore ?? null
+
+  return (
+    <div style={styles.screen}>
+      <div style={styles.header}>
+        <p style={styles.headerEyebrow}>Learn</p>
+        <p style={styles.headerTitle}>Immigration</p>
+      </div>
+
+      <div style={styles.body}>
+        {/* Level 1 */}
+        <p style={styles.sectionLabel}>Level 1 — How It Works</p>
+
+        <ContentCard
+          icon="🃏"
+          title="Flashcards"
+          detail={`${L1_CARD_COUNT} terms`}
+          complete={flashcardsDone}
+          locked={false}
+          actionLabel={flashcardsDone ? 'Review' : 'Start'}
+          onAction={() => onNavigate('lesson')}
+        />
+
+        <ContentCard
+          icon="📝"
+          title="Level 1 Quiz"
+          detail={`${L1_QUIZ_COUNT} questions`}
+          complete={quizDone}
+          locked={!flashcardsDone}
+          score={l1.quizScore}
+          total={L1_QUIZ_COUNT}
+          actionLabel={quizDone ? 'Review' : 'Take quiz'}
+          onAction={() => onNavigate('quiz')}
+        />
+
+        {/* Level 2 */}
+        <p style={{ ...styles.sectionLabel, marginTop: '0.5rem' }}>Level 2 — Opinion Builder</p>
+
+        <div style={{ ...styles.opinionCard, opacity: opinionUnlocked ? 1 : 0.5 }}>
+          <div style={{ ...styles.cardIconBox, background: opinionUnlocked ? '#EFF6FF' : '#e5e7eb' }}>
+            <span style={styles.cardIcon}>{opinionUnlocked ? '💬' : '🔒'}</span>
+          </div>
+          <div style={styles.cardBody}>
+            <span style={styles.cardTitle}>Opinion Builder</span>
+            <p style={styles.cardDetail}>
+              {opinionUnlocked
+                ? 'Available in the Opinion tab'
+                : 'Complete Level 1 to unlock'}
+            </p>
+          </div>
+          {opinionUnlocked && (
+            <span style={styles.opinionArrow}>→</span>
+          )}
+        </div>
+
+        {/* Level 3 */}
+        <p style={{ ...styles.sectionLabel, marginTop: '0.5rem' }}>Level 3 — Current Events</p>
+
+        <ContentCard
+          icon="📰"
+          title="Current Events"
+          detail={`${L3_CARD_COUNT} articles · ${L3_QUIZ_COUNT} questions`}
+          complete={l3Done}
+          locked={!ob1Done}
+          score={l3Done ? l3Score : null}
+          total={L3_QUIZ_COUNT}
+          actionLabel={l3Done ? 'Review' : 'Start'}
+          onAction={() => onNavigate('level3')}
+        />
+      </div>
+    </div>
+  )
+}
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
 const styles = {
-  container: {
-    flex: 1,
+  screen: {
     display: 'flex',
     flexDirection: 'column',
+    minHeight: '100%',
+    background: '#f5f7fa',
+    fontFamily: 'sans-serif',
+  },
+
+  /* Header */
+  header: {
+    background: '#1A3C5E',
+    padding: '1.5rem 1.25rem 1.25rem',
+  },
+  headerEyebrow: {
+    margin: '0 0 0.2rem',
+    fontSize: '0.7rem',
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+  },
+  headerTitle: {
+    margin: 0,
+    fontSize: '1.3rem',
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+
+  /* Body */
+  body: {
+    padding: '1.25rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.625rem',
+  },
+  sectionLabel: {
+    margin: '0.25rem 0 0.25rem',
+    fontSize: '0.7rem',
+    fontWeight: '700',
+    color: '#9ca3af',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+  },
+
+  /* Content cards */
+  card: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.875rem',
+    background: '#ffffff',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    padding: '0.875rem 0.875rem 0.875rem 1rem',
+  },
+  cardIconBox: {
+    flexShrink: 0,
+    width: '44px',
+    height: '44px',
+    borderRadius: '10px',
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
   },
-  title: {
-    fontSize: '2rem',
-    color: '#1A3C5E',
-    marginBottom: '0.5rem',
+  cardIcon: {
+    fontSize: '1.3rem',
+    lineHeight: 1,
   },
-  subtitle: {
-    fontSize: '1rem',
-    color: '#666',
+  cardBody: {
+    flex: 1,
+    minWidth: 0,
+  },
+  cardTitleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginBottom: '0.2rem',
+  },
+  cardTitle: {
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    color: '#111827',
+  },
+  doneBadge: {
+    fontSize: '0.65rem',
+    fontWeight: '700',
+    color: '#16a34a',
+    background: '#dcfce7',
+    padding: '0.15rem 0.4rem',
+    borderRadius: '20px',
+    letterSpacing: '0.02em',
+  },
+  cardDetail: {
+    margin: 0,
+    fontSize: '0.75rem',
+    color: '#9ca3af',
+  },
+  cardBtn: {
+    flexShrink: 0,
+    padding: '0.45rem 0.875rem',
+    background: '#185FA5',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  cardBtnDisabled: {
+    background: '#e5e7eb',
+    color: '#9ca3af',
+    cursor: 'default',
+  },
+
+  /* Opinion Builder teaser */
+  opinionCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.875rem',
+    background: '#ffffff',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    padding: '0.875rem 0.875rem 0.875rem 1rem',
+  },
+  opinionArrow: {
+    flexShrink: 0,
+    fontSize: '1.1rem',
+    color: '#9ca3af',
+    paddingRight: '0.25rem',
   },
 }
 
