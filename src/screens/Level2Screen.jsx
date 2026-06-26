@@ -106,8 +106,8 @@ const styles = {
     gap: '0.5rem',
   },
   backBtn: {
-    width: '40px',
-    height: '40px',
+    width: '44px',
+    height: '44px',
     flexShrink: 0,
     background: 'rgba(255,255,255,0.15)',
     border: 'none',

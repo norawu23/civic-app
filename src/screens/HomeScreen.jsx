@@ -205,13 +205,19 @@ const styles = {
   screen: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100%',
+    flex: 1,
+    overflowY: 'auto',
+    minHeight: 0,
     background: '#f5f7fa',
     paddingBottom: '1.5rem',
   },
   header: {
     background: '#1A3C5E',
     padding: '2rem 1.25rem 1.5rem',
+    position: 'sticky',
+    top: 0,
+    zIndex: 10,
+    flexShrink: 0,
   },
   greeting: {
     margin: 0,

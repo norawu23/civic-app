@@ -352,7 +352,9 @@ const styles = {
   screen: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100%',
+    flex: 1,
+    overflow: 'hidden',
+    minHeight: 0,
     background: '#f5f7fa',
     fontFamily: 'sans-serif',
   },
@@ -361,6 +363,7 @@ const styles = {
   header: {
     background: '#1A3C5E',
     padding: '1.5rem 1.25rem 1.25rem',
+    flexShrink: 0,
   },
   headerRow: {
     display: 'flex',
@@ -400,6 +403,8 @@ const styles = {
   /* Auth layout */
   authBody: {
     flex: 1,
+    overflowY: 'auto',
+    minHeight: 0,
     display: 'flex',
     flexDirection: 'column',
     padding: '1.5rem 1.25rem',
@@ -529,6 +534,9 @@ const styles = {
 
   /* Profile layout */
   profileBody: {
+    flex: 1,
+    overflowY: 'auto',
+    minHeight: 0,
     padding: '1.25rem',
     display: 'flex',
     flexDirection: 'column',

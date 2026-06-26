@@ -58,13 +58,16 @@ const lockedStyles = {
   screen: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100%',
+    flex: 1,
+    overflow: 'hidden',
+    minHeight: 0,
     background: '#f5f7fa',
     fontFamily: 'sans-serif',
   },
   header: {
     background: '#1A3C5E',
     padding: '1.25rem 1.25rem 1rem',
+    flexShrink: 0,
   },
   headerEyebrow: {
     margin: '0 0 0.2rem',
@@ -88,6 +91,8 @@ const lockedStyles = {
     justifyContent: 'center',
     padding: '2.5rem 1.5rem',
     gap: '0.75rem',
+    overflowY: 'auto',
+    minHeight: 0,
   },
   lockCircle: {
     fontSize: '3rem',
@@ -358,20 +363,25 @@ const styles = {
   app: {
     display: 'flex',
     flexDirection: 'column',
-    height: '100vh',
+    height: '100%',
     maxWidth: '480px',
     margin: '0 auto',
     fontFamily: 'sans-serif',
+    background: '#f5f7fa',
   },
   main: {
     flex: 1,
-    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
     background: '#f5f7fa',
   },
   nav: {
     display: 'flex',
     backgroundColor: '#1A3C5E',
-    padding: '0.5rem 0',
+    paddingTop: '0.5rem',
+    paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
+    flexShrink: 0,
   },
   navButton: {
     flex: 1,
@@ -383,6 +393,7 @@ const styles = {
     padding: '0.6rem 0.25rem',
     cursor: 'pointer',
     letterSpacing: '0.02em',
+    minHeight: '44px',
   },
   navButtonActive: {
     color: '#ffffff',
