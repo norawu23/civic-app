@@ -11,6 +11,8 @@ import LessonScreen from './screens/LessonScreen'
 import QuizScreen from './screens/QuizScreen'
 import Level2Screen from './screens/Level2Screen'
 import Level3Screen from './screens/Level3Screen'
+import WelcomeScreen from './screens/WelcomeScreen'
+import SaveProgressModal from './screens/SaveProgressModal'
 
 function LockedOpinionScreen({ topicTitle, flashcardsDone, quizDone, onNavigate }) {
   return (
@@ -165,6 +167,8 @@ function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [currentScreen, setCurrentScreen] = useState(null) // null | 'lesson' | 'quiz' | 'level2' | 'ob2' | 'level3'
   const [activeTopic, setActiveTopic] = useState('immigration')
+  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('hasSeenWelcome'))
+  const [showSaveModal, setShowSaveModal] = useState(false)
 
   const { user, signUp, signIn, signOut } = useAuth()
   const { progress, completeFlashcards, completeQuiz, completeOpinionBuilder } = useProgress(user)
@@ -201,6 +205,24 @@ function App() {
     if (tl1.quizComplete) { setCurrentScreen(null); setActiveTab('opinion'); return }
     if (tl1.flashcardsComplete) { setCurrentScreen('quiz'); return }
     setCurrentScreen('lesson')
+  }
+
+  if (showWelcome) {
+    return (
+      <div style={styles.app}>
+        <WelcomeScreen
+          onCreateAccount={() => {
+            localStorage.setItem('hasSeenWelcome', '1')
+            setShowWelcome(false)
+            setActiveTab('profile')
+          }}
+          onContinueAsGuest={() => {
+            localStorage.setItem('hasSeenWelcome', '1')
+            setShowWelcome(false)
+          }}
+        />
+      </div>
+    )
   }
 
   if (currentScreen === 'lesson') {
@@ -319,7 +341,13 @@ function App() {
             onOpinionComplete={(coldTake, xp, evolvedTake) =>
               completeOpinionBuilder(ob1Id, coldTake, xp, evolvedTake)
             }
-            onComplete={() => setCurrentScreen('level3')}
+            onComplete={() => {
+              setCurrentScreen('level3')
+              if (!user && !localStorage.getItem('hasSeenSaveModal')) {
+                localStorage.setItem('hasSeenSaveModal', '1')
+                setShowSaveModal(true)
+              }
+            }}
           />
         )
       case 'profile':
@@ -355,6 +383,16 @@ function App() {
           </button>
         ))}
       </nav>
+
+      {showSaveModal && (
+        <SaveProgressModal
+          onCreateAccount={() => {
+            setShowSaveModal(false)
+            setActiveTab('profile')
+          }}
+          onDismiss={() => setShowSaveModal(false)}
+        />
+      )}
     </div>
   )
 }
@@ -368,6 +406,7 @@ const styles = {
     margin: '0 auto',
     fontFamily: 'sans-serif',
     background: '#f5f7fa',
+    position: 'relative',
   },
   main: {
     flex: 1,
