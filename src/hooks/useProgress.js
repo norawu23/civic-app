@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { supabase } from '../lib/supabase'
 
 const STORAGE_KEY = 'civic_progress'
 
 // ─── Static config ──────────────────────────────────────────────────────────
 
-// How many levels each topic has (drives unlock-next-level logic)
 const TOPIC_LEVEL_COUNTS = {
   immigration: 3,
   taxes: 3,
@@ -13,19 +13,17 @@ const TOPIC_LEVEL_COUNTS = {
   climateChange: 3,
 }
 
-// Order in which topics unlock when the previous topic's final level is done
 const TOPIC_UNLOCK_ORDER = ['immigration', 'taxes', 'gerrymandering', 'gunRights', 'climateChange']
 
-// XP awarded for each action
 const XP = {
   flashcards: 50,
   quiz: 50,
   quizPerfectBonus: 25,
 }
 
-// ─── Default state for brand-new users ──────────────────────────────────────
+// ─── Default state (exported so useAuth can seed Supabase on signup) ─────────
 
-const DEFAULT_STATE = {
+export const DEFAULT_PROGRESS = {
   user: {
     totalXP: 0,
     streak: 1,
@@ -39,26 +37,10 @@ const DEFAULT_STATE = {
         '1': { flashcardsComplete: false, quizComplete: false, quizScore: null },
       },
     },
-    taxes: {
-      unlocked: false,
-      currentLevel: null,
-      levels: {},
-    },
-    gerrymandering: {
-      unlocked: false,
-      currentLevel: null,
-      levels: {},
-    },
-    gunRights: {
-      unlocked: false,
-      currentLevel: null,
-      levels: {},
-    },
-    climateChange: {
-      unlocked: false,
-      currentLevel: null,
-      levels: {},
-    },
+    taxes:         { unlocked: false, currentLevel: null, levels: {} },
+    gerrymandering: { unlocked: false, currentLevel: null, levels: {} },
+    gunRights:     { unlocked: false, currentLevel: null, levels: {} },
+    climateChange:  { unlocked: false, currentLevel: null, levels: {} },
   },
   opinionBuilders: {
     'imm-ob-01': { completed: false },
@@ -107,56 +89,94 @@ function applyStreakCheck(state) {
   const yesterday = localDateStr(-1)
   const { lastLoginDate, streak } = state.user
 
-  if (lastLoginDate === today) return state // already checked in today
+  if (lastLoginDate === today) return state
 
   const newStreak = lastLoginDate === yesterday ? streak + 1 : 1
-
   return {
     ...state,
     user: { ...state.user, streak: newStreak, lastLoginDate: today },
   }
 }
 
+async function saveToSupabase(userId, progressData) {
+  const { error } = await supabase
+    .from('progress')
+    .upsert(
+      { user_id: userId, progress_data: progressData, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' },
+    )
+  if (error) {
+    console.warn('[CIVIC] Supabase save failed, falling back to localStorage', error)
+    saveToStorage(progressData)
+  }
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
-export function useProgress() {
+// user: the Supabase auth user object (or null when logged out)
+export function useProgress(user) {
   const [progress, setProgress] = useState(() => {
     const stored = loadFromStorage()
-    const base = stored ?? DEFAULT_STATE
+    const base = stored ?? DEFAULT_PROGRESS
     const checked = applyStreakCheck(base)
-    // Persist right away if streak changed (or on first ever load)
     if (!stored || checked !== base) saveToStorage(checked)
     return checked
   })
 
-  // Atomic update: apply an updater fn, save, and return new state
+  // Keep a ref so the update callback always has the current user without
+  // needing to be recreated every time user changes.
+  const userRef = useRef(user)
+  useEffect(() => { userRef.current = user }, [user])
+
+  // Load from Supabase on login, reset to localStorage on logout.
+  useEffect(() => {
+    if (!user) {
+      const stored = loadFromStorage()
+      const base = stored ?? DEFAULT_PROGRESS
+      setProgress(applyStreakCheck(base))
+      return
+    }
+
+    supabase
+      .from('progress')
+      .select('progress_data')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (error || !data?.progress_data) return
+        const checked = applyStreakCheck(data.progress_data)
+        setProgress(checked)
+        if (checked !== data.progress_data) {
+          saveToSupabase(user.id, checked)
+        }
+      })
+  }, [user?.id])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Atomic update: apply updater, persist, return new state.
   const update = useCallback((updater) => {
     setProgress(prev => {
       const next = updater(prev)
-      if (next !== prev) saveToStorage(next)
+      if (next === prev) return prev
+      if (userRef.current) {
+        saveToSupabase(userRef.current.id, next)
+      } else {
+        saveToStorage(next)
+      }
       return next
     })
   }, [])
 
   // ── completeFlashcards ─────────────────────────────────────────────────────
-  // Idempotent. Awards 50 XP the first time.
+
   const completeFlashcards = useCallback((topicId, level) => {
-    console.log('[CIVIC] completeFlashcards called', { topicId, level })
     update(prev => {
       const levelKey = String(level)
       const topicData = prev.topics[topicId]
-      if (!topicData) {
-        console.warn('[CIVIC] completeFlashcards: topic not found', topicId)
-        return prev
-      }
+      if (!topicData) return prev
 
       const levelData = topicData.levels[levelKey] || {}
-      if (levelData.flashcardsComplete) {
-        console.log('[CIVIC] completeFlashcards: already done, skipping')
-        return prev
-      }
+      if (levelData.flashcardsComplete) return prev
 
-      console.log('[CIVIC] completeFlashcards: marking done, +50 XP')
       return {
         ...prev,
         user: { ...prev.user, totalXP: prev.user.totalXP + XP.flashcards },
@@ -175,23 +195,15 @@ export function useProgress() {
   }, [update])
 
   // ── completeQuiz ───────────────────────────────────────────────────────────
-  // Idempotent. Awards 50 XP (+25 bonus for perfect score).
-  // Advances currentLevel and unlocks the next level or the next topic.
+
   const completeQuiz = useCallback((topicId, level, score, total) => {
-    console.log('[CIVIC] completeQuiz called', { topicId, level, score, total })
     update(prev => {
       const levelKey = String(level)
       const topicData = prev.topics[topicId]
-      if (!topicData) {
-        console.warn('[CIVIC] completeQuiz: topic not found', topicId)
-        return prev
-      }
+      if (!topicData) return prev
 
       const levelData = topicData.levels[levelKey] || {}
-      if (levelData.quizComplete) {
-        console.log('[CIVIC] completeQuiz: already done, skipping')
-        return prev
-      }
+      if (levelData.quizComplete) return prev
 
       const isPerfect = score === total
       const xpGained = XP.quiz + (isPerfect ? XP.quizPerfectBonus : 0)
@@ -203,7 +215,6 @@ export function useProgress() {
       const topicIdx = TOPIC_UNLOCK_ORDER.indexOf(topicId)
       const nextTopicId = !hasNextLevel ? TOPIC_UNLOCK_ORDER[topicIdx + 1] : null
 
-      // Update the current topic
       const updatedTopicLevels = {
         ...topicData.levels,
         [levelKey]: { ...levelData, quizComplete: true, quizScore: score },
@@ -225,7 +236,6 @@ export function useProgress() {
         },
       }
 
-      // Unlock the next topic if this was the final level
       if (nextTopicId && updatedTopics[nextTopicId] && !updatedTopics[nextTopicId].unlocked) {
         updatedTopics[nextTopicId] = {
           ...updatedTopics[nextTopicId],
@@ -237,7 +247,6 @@ export function useProgress() {
         }
       }
 
-      console.log('[CIVIC] completeQuiz: marking done', { xpGained, hasNextLevel, nextTopicId })
       return {
         ...prev,
         user: { ...prev.user, totalXP: prev.user.totalXP + xpGained },
@@ -247,22 +256,18 @@ export function useProgress() {
   }, [update])
 
   // ── completeOpinionBuilder ─────────────────────────────────────────────────
-  // Idempotent. Awards the provided XP (100 standard / 200 bonus) once.
-  const completeOpinionBuilder = useCallback((obId, coldTake, xp) => {
-    console.log('[CIVIC] completeOpinionBuilder called', { obId, coldTake, xp })
-    update(prev => {
-      if (prev.opinionBuilders[obId]?.completed) {
-        console.log('[CIVIC] completeOpinionBuilder: already done, skipping')
-        return prev
-      }
+  // evolvedTake: the text the user selected or wrote in the evolved take step
 
-      console.log('[CIVIC] completeOpinionBuilder: marking done', { obId, xp })
+  const completeOpinionBuilder = useCallback((obId, coldTake, xp, evolvedTake = '') => {
+    update(prev => {
+      if (prev.opinionBuilders[obId]?.completed) return prev
+
       return {
         ...prev,
         user: { ...prev.user, totalXP: prev.user.totalXP + xp },
         opinionBuilders: {
           ...prev.opinionBuilders,
-          [obId]: { completed: true, coldTake, xpEarned: xp },
+          [obId]: { completed: true, coldTake, xpEarned: xp, evolvedTake },
         },
       }
     })

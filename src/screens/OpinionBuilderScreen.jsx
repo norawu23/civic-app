@@ -251,8 +251,11 @@ function OpinionBuilderScreen({ topicId, obIndex = 0, onComplete, onOpinionCompl
 
   const handleComplete = () => {
     const xp = bonusText.length >= 50 ? 200 : 100
+    const evolvedText = bonusText.length >= 50
+      ? bonusText
+      : (selected !== null ? ob.evolvedTake.standardOptions[selected] : '')
     setXpEarned(xp)
-    onOpinionComplete?.(coldTake, xp)
+    onOpinionComplete?.(coldTake, xp, evolvedText)
     next()
   }
 

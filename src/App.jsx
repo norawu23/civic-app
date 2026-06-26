@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAuth } from './hooks/useAuth'
 import { useProgress } from './hooks/useProgress'
 import { TOPICS } from './data/topics.js'
 import HomeScreen from './screens/HomeScreen'
@@ -160,7 +161,8 @@ function App() {
   const [currentScreen, setCurrentScreen] = useState(null) // null | 'lesson' | 'quiz' | 'level2' | 'ob2' | 'level3'
   const [activeTopic, setActiveTopic] = useState('immigration')
 
-  const { progress, completeFlashcards, completeQuiz, completeOpinionBuilder } = useProgress()
+  const { user, signUp, signIn, signOut } = useAuth()
+  const { progress, completeFlashcards, completeQuiz, completeOpinionBuilder } = useProgress(user)
 
   // Derive topic-specific values from the active topic
   const topicStaticData = TOPICS[activeTopic]
@@ -241,8 +243,8 @@ function App() {
         <OpinionBuilderScreen
           topicId={activeTopic}
           obIndex={1}
-          onOpinionComplete={(coldTake, xp) =>
-            completeOpinionBuilder(ob2Id, coldTake, xp)
+          onOpinionComplete={(coldTake, xp, evolvedTake) =>
+            completeOpinionBuilder(ob2Id, coldTake, xp, evolvedTake)
           }
           onComplete={() => setCurrentScreen(null)}
         />
@@ -309,14 +311,22 @@ function App() {
           <OpinionBuilderScreen
             topicId={activeTopic}
             obIndex={0}
-            onOpinionComplete={(coldTake, xp) =>
-              completeOpinionBuilder(ob1Id, coldTake, xp)
+            onOpinionComplete={(coldTake, xp, evolvedTake) =>
+              completeOpinionBuilder(ob1Id, coldTake, xp, evolvedTake)
             }
             onComplete={() => setCurrentScreen('level3')}
           />
         )
       case 'profile':
-        return <ProfileScreen />
+        return (
+          <ProfileScreen
+            user={user}
+            progress={progress}
+            signUp={signUp}
+            signIn={signIn}
+            signOut={signOut}
+          />
+        )
     }
   }
 
