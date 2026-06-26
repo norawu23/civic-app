@@ -1,8 +1,5 @@
 import { useState } from 'react'
-import data from '../data/immigration.json'
-
-const CARDS = data.levels.level2.cards
-const SUBTITLE = data.levels.level2.title // "Why It's Contested"
+import { TOPICS } from '../data/topics.js'
 
 // ─── Progress pips ────────────────────────────────────────────────────────────
 
@@ -22,13 +19,13 @@ function ProgressPips({ total, current }) {
 
 // ─── Completion screen ────────────────────────────────────────────────────────
 
-function CompletionScreen({ onContinue }) {
+function CompletionScreen({ topicTitle, onContinue }) {
   return (
     <div style={styles.completionWrap}>
       <div style={styles.unlockCircle}>🔓</div>
       <h2 style={styles.unlockTitle}>Opinion Builder Unlocked</h2>
       <p style={styles.unlockSub}>
-        You've explored the key perspectives on immigration. Now it's time to build your own view.
+        You've explored the key perspectives on {topicTitle}. Now it's time to build your own view.
       </p>
       <button style={styles.opinionBtn} onClick={onContinue}>
         Go to Opinion Builder →
@@ -39,12 +36,16 @@ function CompletionScreen({ onContinue }) {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-function Level2Screen({ onBack, onComplete }) {
+function Level2Screen({ topicId, onBack, onComplete }) {
+  const cards = TOPICS[topicId].levels.level2.cards
+  const subtitle = TOPICS[topicId].levels.level2.title
+  const topicTitle = TOPICS[topicId].title
+
   const [index, setIndex] = useState(0)
   const [done, setDone] = useState(false)
 
-  const card = CARDS[index]
-  const isLast = index === CARDS.length - 1
+  const card = cards[index]
+  const isLast = index === cards.length - 1
 
   const handleNext = () => {
     if (isLast) setDone(true)
@@ -57,20 +58,20 @@ function Level2Screen({ onBack, onComplete }) {
       <div style={styles.header}>
         <button style={styles.backBtn} onClick={onBack}>←</button>
         <div style={styles.headerMid}>
-          <span style={styles.headerTitle}>Immigration · Level 2</span>
-          {!done && <ProgressPips total={CARDS.length} current={index} />}
+          <span style={styles.headerTitle}>{topicTitle} · Level 2</span>
+          {!done && <ProgressPips total={cards.length} current={index} />}
         </div>
         <div style={{ width: '40px', flexShrink: 0 }} />
       </div>
 
       {done ? (
-        <CompletionScreen onContinue={onComplete} />
+        <CompletionScreen topicTitle={topicTitle} onContinue={onComplete} />
       ) : (
         <div style={styles.body}>
           {/* Card — key forces remount on index change, resetting scroll */}
           <div key={index} style={styles.card}>
             <p style={styles.cardEyebrow}>
-              {index + 1} of {CARDS.length} &middot; {SUBTITLE}
+              {index + 1} of {cards.length} &middot; {subtitle}
             </p>
             <h2 style={styles.cardTitle}>{card.title}</h2>
             <p style={styles.cardContent}>{card.content}</p>

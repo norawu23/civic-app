@@ -1,9 +1,4 @@
-import data from '../data/immigration.json'
-
-const L1_CARD_COUNT = data.levels.level1.flashcards.length  // 10
-const L1_QUIZ_COUNT = data.levels.level1.quiz.length         // 5
-const L3_CARD_COUNT = data.levels.level3.cards.length        // 5
-const L3_QUIZ_COUNT = data.levels.level3.quiz.length         // 5
+import { TOPICS } from '../data/topics.js'
 
 // ─── Content card ─────────────────────────────────────────────────────────────
 
@@ -38,14 +33,22 @@ function ContentCard({ icon, title, detail, complete, locked, score, total, acti
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-function LearnScreen({ progress, onNavigate }) {
-  const imm = progress?.topics?.immigration ?? {}
-  const l1 = imm.levels?.['1'] ?? {}
+function LearnScreen({ topicId, progress, onNavigate }) {
+  const data = TOPICS[topicId]
+  const topicTitle = data.title
+  const l1CardCount = data.levels.level1.flashcards.length
+  const l1QuizCount = data.levels.level1.quiz.length
+  const l3CardCount = data.levels.level3.cards.length
+  const l3QuizCount = data.levels.level3.quiz.length
+  const ob1Id = data.opinionBuilders[0]?.id
+
+  const topicProgress = progress?.topics?.[topicId] ?? {}
+  const l1 = topicProgress.levels?.['1'] ?? {}
   const flashcardsDone = l1.flashcardsComplete ?? false
   const quizDone = l1.quizComplete ?? false
   const opinionUnlocked = quizDone
-  const ob1Done = progress?.opinionBuilders?.['imm-ob-01']?.completed ?? false
-  const l3 = imm.levels?.['3'] ?? {}
+  const ob1Done = ob1Id ? (progress?.opinionBuilders?.[ob1Id]?.completed ?? false) : false
+  const l3 = topicProgress.levels?.['3'] ?? {}
   const l3Done = l3.quizComplete ?? false
   const l3Score = l3.quizScore ?? null
 
@@ -53,7 +56,7 @@ function LearnScreen({ progress, onNavigate }) {
     <div style={styles.screen}>
       <div style={styles.header}>
         <p style={styles.headerEyebrow}>Learn</p>
-        <p style={styles.headerTitle}>Immigration</p>
+        <p style={styles.headerTitle}>{topicTitle}</p>
       </div>
 
       <div style={styles.body}>
@@ -63,7 +66,7 @@ function LearnScreen({ progress, onNavigate }) {
         <ContentCard
           icon="🃏"
           title="Flashcards"
-          detail={`${L1_CARD_COUNT} terms`}
+          detail={`${l1CardCount} terms`}
           complete={flashcardsDone}
           locked={false}
           actionLabel={flashcardsDone ? 'Review' : 'Start'}
@@ -73,11 +76,11 @@ function LearnScreen({ progress, onNavigate }) {
         <ContentCard
           icon="📝"
           title="Level 1 Quiz"
-          detail={`${L1_QUIZ_COUNT} questions`}
+          detail={`${l1QuizCount} questions`}
           complete={quizDone}
           locked={!flashcardsDone}
           score={l1.quizScore}
-          total={L1_QUIZ_COUNT}
+          total={l1QuizCount}
           actionLabel={quizDone ? 'Review' : 'Take quiz'}
           onAction={() => onNavigate('quiz')}
         />
@@ -108,11 +111,11 @@ function LearnScreen({ progress, onNavigate }) {
         <ContentCard
           icon="📰"
           title="Current Events"
-          detail={`${L3_CARD_COUNT} articles · ${L3_QUIZ_COUNT} questions`}
+          detail={`${l3CardCount} articles · ${l3QuizCount} questions`}
           complete={l3Done}
           locked={!ob1Done}
           score={l3Done ? l3Score : null}
-          total={L3_QUIZ_COUNT}
+          total={l3QuizCount}
           actionLabel={l3Done ? 'Review' : 'Start'}
           onAction={() => onNavigate('level3')}
         />

@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import data from '../data/immigration.json'
-
-const QUESTIONS = data.levels.level1.quiz
+import { TOPICS } from '../data/topics.js'
 
 function scoreMessage(score, total) {
   const pct = score / total
@@ -47,15 +45,18 @@ function ResultsScreen({ score, total, onReview, onContinue }) {
   )
 }
 
-function QuizScreen({ onBack, onHome, onQuizComplete }) {
+function QuizScreen({ topicId, onBack, onHome, onQuizComplete }) {
+  const questions = TOPICS[topicId].levels.level1.quiz
+  const topicTitle = TOPICS[topicId].title
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
 
-  const question = QUESTIONS[currentIndex]
+  const question = questions[currentIndex]
   const revealed = selectedIndex !== null
-  const isLast = currentIndex === QUESTIONS.length - 1
+  const isLast = currentIndex === questions.length - 1
 
   const handleSelect = (idx) => {
     if (revealed) return
@@ -67,7 +68,7 @@ function QuizScreen({ onBack, onHome, onQuizComplete }) {
 
   const handleNext = () => {
     if (isLast) {
-      onQuizComplete?.(score, QUESTIONS.length)
+      onQuizComplete?.(score, questions.length)
       setFinished(true)
     } else {
       setCurrentIndex(i => i + 1)
@@ -90,7 +91,7 @@ function QuizScreen({ onBack, onHome, onQuizComplete }) {
     return { ...styles.bullet, ...styles.bulletDimmed }
   }
 
-  const progressWidth = `${(currentIndex / QUESTIONS.length) * 100}%`
+  const progressWidth = `${(currentIndex / questions.length) * 100}%`
 
   return (
     <div style={styles.screen}>
@@ -98,10 +99,10 @@ function QuizScreen({ onBack, onHome, onQuizComplete }) {
       <div style={styles.header}>
         <button style={styles.backBtn} onClick={onBack}>←</button>
         <div style={styles.headerMid}>
-          <span style={styles.headerTitle}>Immigration · Level 1 Quiz</span>
+          <span style={styles.headerTitle}>{topicTitle} · Level 1 Quiz</span>
           {!finished && (
             <span style={styles.questionCount}>
-              Question {currentIndex + 1} of {QUESTIONS.length}
+              Question {currentIndex + 1} of {questions.length}
             </span>
           )}
         </div>
@@ -111,7 +112,7 @@ function QuizScreen({ onBack, onHome, onQuizComplete }) {
       {finished ? (
         <ResultsScreen
           score={score}
-          total={QUESTIONS.length}
+          total={questions.length}
           onReview={onBack}
           onContinue={onHome}
         />

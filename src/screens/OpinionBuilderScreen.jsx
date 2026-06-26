@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import data from '../data/immigration.json'
+import { TOPICS } from '../data/topics.js'
 
 const TOTAL_STEPS = 8
 // 0: Cold Take | 1-4: Context Cards | 5: Flip Card | 6: Evolved Take | 7: Completion
@@ -232,8 +232,9 @@ function CompletionStep({ ob, coldTake, selected, bonusText, xpEarned, onBack })
 
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 
-function OpinionBuilderScreen({ obIndex = 0, onComplete, onOpinionComplete }) {
-  const ob = data.opinionBuilders[obIndex]
+function OpinionBuilderScreen({ topicId, obIndex = 0, onComplete, onOpinionComplete }) {
+  const ob = TOPICS[topicId].opinionBuilders[obIndex]
+  const topicTitle = TOPICS[topicId].title
 
   const [step, setStep] = useState(0)
   const [coldTake, setColdTake] = useState(null)
@@ -295,7 +296,7 @@ function OpinionBuilderScreen({ obIndex = 0, onComplete, onOpinionComplete }) {
     <div style={styles.screen}>
       <div style={styles.header}>
         <p style={styles.headerEyebrow}>What Do You Think?</p>
-        <p style={styles.headerTitle}>Immigration · Opinion Builder {obIndex + 1}</p>
+        <p style={styles.headerTitle}>{topicTitle} · Opinion Builder {obIndex + 1}</p>
         <StepProgress step={step} />
       </div>
 

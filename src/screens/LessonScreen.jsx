@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import data from '../data/immigration.json'
-
-const ALL_CARDS = data.levels.level1.flashcards
+import { TOPICS } from '../data/topics.js'
 
 function ProgressPips({ total, completedCount }) {
   return (
@@ -43,13 +41,13 @@ function FlipCard({ card, isFlipped, onFlip }) {
   )
 }
 
-function CompletionScreen({ onContinueToQuiz }) {
+function CompletionScreen({ cardCount, onContinueToQuiz }) {
   return (
     <div style={styles.completionWrap}>
       <div style={styles.checkCircle}>✓</div>
       <h2 style={styles.niceWork}>Nice work!</h2>
       <p style={styles.completionSub}>
-        You've mastered all {ALL_CARDS.length} flashcards
+        You've mastered all {cardCount} flashcards
       </p>
       <button style={styles.quizButton} onClick={onContinueToQuiz}>
         Continue to Quiz
@@ -58,8 +56,11 @@ function CompletionScreen({ onContinueToQuiz }) {
   )
 }
 
-function LessonScreen({ onBack, onNavigate, onFlashcardsComplete, initialCompleted = false }) {
-  const [queue, setQueue] = useState([...ALL_CARDS])
+function LessonScreen({ topicId, onBack, onNavigate, onFlashcardsComplete, initialCompleted = false }) {
+  const allCards = TOPICS[topicId].levels.level1.flashcards
+  const topicTitle = TOPICS[topicId].title
+
+  const [queue, setQueue] = useState([...allCards])
   const [gotItCount, setGotItCount] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
   const [completed, setCompleted] = useState(initialCompleted)
@@ -105,18 +106,21 @@ function LessonScreen({ onBack, onNavigate, onFlashcardsComplete, initialComplet
       <div style={styles.header}>
         <button style={styles.backBtn} onClick={onBack}>←</button>
         <div style={styles.headerMid}>
-          <span style={styles.headerTitle}>Immigration · Level 1</span>
-          <ProgressPips total={ALL_CARDS.length} completedCount={gotItCount} />
+          <span style={styles.headerTitle}>{topicTitle} · Level 1</span>
+          <ProgressPips total={allCards.length} completedCount={gotItCount} />
         </div>
         <div style={{ width: '40px', flexShrink: 0 }} />
       </div>
 
       {completed ? (
-        <CompletionScreen onContinueToQuiz={() => onNavigate('quiz')} />
+        <CompletionScreen
+          cardCount={allCards.length}
+          onContinueToQuiz={() => onNavigate('quiz')}
+        />
       ) : (
         <div style={styles.body}>
           <p style={styles.cardCountLabel}>
-            {gotItCount} of {ALL_CARDS.length} learned
+            {gotItCount} of {allCards.length} learned
           </p>
 
           <FlipCard

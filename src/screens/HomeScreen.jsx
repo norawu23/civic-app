@@ -1,8 +1,13 @@
-// Static display config for each topic — icons/names won't change
+import { useState } from 'react'
+import { TOPICS } from '../data/topics.js'
+
+// Static display config — icons/names for all topics including those without data yet
 const TOPIC_CONFIG = [
-  { id: 'immigration', icon: '🗽', name: 'Immigration' },
-  { id: 'taxes',       icon: '🧾', name: 'Taxes'       },
-  { id: 'gerrymandering', icon: '🗺️', name: 'Gerrymandering' },
+  { id: 'immigration',   icon: '🗽', name: 'Immigration'    },
+  { id: 'taxes',         icon: '💰', name: 'Taxes'          },
+  { id: 'gerrymandering', icon: '🗳️', name: 'Gerrymandering' },
+  { id: 'gunRights',     icon: '⚖️', name: 'Gun Rights'     },
+  { id: 'climateChange', icon: '🌍', name: 'Climate Change'  },
 ]
 
 function greeting() {
@@ -13,9 +18,7 @@ function greeting() {
 }
 
 // Derive the UI-facing topic list from raw progress state.
-// Immigration uses a 4-milestone model (L1 flashcards, L1 quiz, OB1, L3 quiz)
-// because its levels don't share a uniform flashcard+quiz structure.
-// Single-level topics keep the simple flashcards/quiz percentage.
+// Uses a 4-milestone model (L1 flashcards, L1 quiz, OB1, L3 quiz) for all 3-level topics.
 function deriveTopics(progress) {
   const topicsState = progress.topics
   const obs = progress.opinionBuilders ?? {}
@@ -27,24 +30,18 @@ function deriveTopics(progress) {
 
     let pct = 0
     if (!locked) {
-      if (id === 'immigration') {
-        const l1 = data.levels?.['1'] ?? {}
-        const l3 = data.levels?.['3'] ?? {}
-        const ob1 = obs['imm-ob-01'] ?? {}
-        let done = 0
-        if (l1.flashcardsComplete) done++
-        if (l1.quizComplete) done++
-        if (ob1.completed) done++
-        if (l3.quizComplete) done++
-        pct = Math.round((done / 4) * 100)
-      } else {
-        const levelData = data.levels?.[String(level)] ?? {}
-        if (levelData.flashcardsComplete && levelData.quizComplete) pct = 100
-        else if (levelData.flashcardsComplete) pct = 50
-      }
+      const ob1Id = TOPICS[id]?.opinionBuilders?.[0]?.id
+      const l1 = data.levels?.['1'] ?? {}
+      const l3 = data.levels?.['3'] ?? {}
+      const ob1Done = ob1Id ? (obs[ob1Id]?.completed ?? false) : false
+      let done = 0
+      if (l1.flashcardsComplete) done++
+      if (l1.quizComplete) done++
+      if (ob1Done) done++
+      if (l3.quizComplete) done++
+      pct = Math.round((done / 4) * 100)
     }
 
-    // Show "Unlocked" badge for topics that aren't the default starter
     const badge = (!locked && id !== 'immigration')
       ? { label: 'Unlocked', color: '#16a34a', bg: '#dcfce7' }
       : null
@@ -53,19 +50,27 @@ function deriveTopics(progress) {
   })
 }
 
-// Determine the CTA label based on immigration milestone progress.
-// Returns null when all milestones are complete (no CTA needed).
-function ctaLabel(topicsState, opinionBuilders) {
-  const imm = topicsState.immigration ?? {}
-  const l1 = imm.levels?.['1'] ?? {}
-  const l3 = imm.levels?.['3'] ?? {}
-  const ob1 = opinionBuilders?.['imm-ob-01'] ?? {}
+// Returns the CTA label + target topicId for the first incomplete unlocked topic,
+// or null if everything is done.
+function ctaInfo(topicsState, opinionBuilders) {
+  for (const { id } of TOPIC_CONFIG) {
+    const topicData = topicsState[id] ?? {}
+    if (!topicData.unlocked) continue
 
-  if (l3.quizComplete) return null                       // all done
-  if (ob1.completed) return 'Continue → Level 3'
-  if (l1.quizComplete) return 'Continue → Level 2'
-  if (l1.flashcardsComplete) return 'Take the Level 1 Quiz'
-  return 'Start flashcards → Level 1'
+    const l1 = topicData.levels?.['1'] ?? {}
+    const l3 = topicData.levels?.['3'] ?? {}
+    const ob1Id = TOPICS[id]?.opinionBuilders?.[0]?.id
+    const ob1Done = ob1Id ? (opinionBuilders?.[ob1Id]?.completed ?? false) : false
+    const title = TOPICS[id]?.title ?? id
+
+    if (l3.quizComplete) continue  // this topic is done — try the next
+
+    if (ob1Done) return { label: `Continue ${title} → Level 3`, topicId: id }
+    if (l1.quizComplete) return { label: `Continue ${title} → Level 2`, topicId: id }
+    if (l1.flashcardsComplete) return { label: `Take the ${title} Level 1 Quiz`, topicId: id }
+    return { label: `Start ${title} flashcards → Level 1`, topicId: id }
+  }
+  return null
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -84,12 +89,29 @@ function ProgressBar({ percent, locked }) {
   )
 }
 
-function TopicCard({ topic }) {
+function TopicCard({ topic, isActive, onTap }) {
+  const [pressed, setPressed] = useState(false)
   const dimmed = topic.locked
   return (
-    <div style={{ ...styles.card, opacity: dimmed ? 0.5 : 1 }}>
+    <div
+      style={{
+        ...styles.card,
+        opacity: dimmed ? 0.5 : 1,
+        cursor: dimmed ? 'default' : 'pointer',
+        border: isActive && !dimmed ? '2px solid #185FA5' : '1px solid #e5e7eb',
+        background: isActive && !dimmed ? '#f0f7ff' : '#ffffff',
+        transform: pressed && !dimmed ? 'scale(0.97)' : 'scale(1)',
+        transition: 'transform 0.12s ease, border-color 0.15s, background 0.15s',
+      }}
+      onClick={!dimmed ? onTap : undefined}
+      onMouseDown={!dimmed ? () => setPressed(true) : undefined}
+      onMouseUp={!dimmed ? () => setPressed(false) : undefined}
+      onMouseLeave={!dimmed ? () => setPressed(false) : undefined}
+      onTouchStart={!dimmed ? () => setPressed(true) : undefined}
+      onTouchEnd={!dimmed ? () => setPressed(false) : undefined}
+    >
       <div style={styles.cardLeft}>
-        <div style={{ ...styles.iconBox, background: dimmed ? '#e5e7eb' : '#EFF6FF' }}>
+        <div style={{ ...styles.iconBox, background: dimmed ? '#e5e7eb' : (isActive ? '#dbeafe' : '#EFF6FF') }}>
           <span style={styles.icon}>{dimmed ? '🔒' : topic.icon}</span>
         </div>
       </div>
@@ -115,16 +137,20 @@ function TopicCard({ topic }) {
 
         <ProgressBar percent={topic.progress} locked={dimmed} />
       </div>
+
+      {isActive && !dimmed && (
+        <span style={styles.activeArrow}>›</span>
+      )}
     </div>
   )
 }
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-function HomeScreen({ progress, onNavigate, onGoToLearn }) {
+function HomeScreen({ progress, onTopicSelect, activeTopic }) {
   const { user, topics: topicsState } = progress
   const topics = deriveTopics(progress)
-  const cta = ctaLabel(topicsState, progress.opinionBuilders)
+  const cta = ctaInfo(topicsState, progress.opinionBuilders)
 
   return (
     <div style={styles.screen}>
@@ -152,15 +178,20 @@ function HomeScreen({ progress, onNavigate, onGoToLearn }) {
       <div style={styles.section}>
         <p style={styles.sectionTitle}>Your topics</p>
         {topics.map(topic => (
-          <TopicCard key={topic.id} topic={topic} />
+          <TopicCard
+            key={topic.id}
+            topic={topic}
+            isActive={topic.id === activeTopic}
+            onTap={() => onTopicSelect(topic.id)}
+          />
         ))}
       </div>
 
-      {/* CTA — always routes to the Learn tab */}
+      {/* CTA — navigates directly to the right screen for the next actionable topic */}
       {cta && (
         <div style={styles.buttonRow}>
-          <button style={styles.ctaButton} onClick={onGoToLearn}>
-            {cta}
+          <button style={styles.ctaButton} onClick={() => onTopicSelect(cta.topicId)}>
+            {cta.label}
           </button>
         </div>
       )}
@@ -308,6 +339,14 @@ const styles = {
     height: '100%',
     borderRadius: '999px',
     transition: 'width 0.3s ease',
+  },
+  activeArrow: {
+    flexShrink: 0,
+    fontSize: '1.4rem',
+    color: '#185FA5',
+    fontWeight: '700',
+    lineHeight: 1,
+    paddingRight: '0.125rem',
   },
   buttonRow: {
     padding: '1.25rem 1.25rem 0',

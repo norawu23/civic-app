@@ -1,9 +1,5 @@
 import { useState } from 'react'
-import data from '../data/immigration.json'
-
-const CARDS = data.levels.level3.cards
-const QUESTIONS = data.levels.level3.quiz
-const SUBTITLE = data.levels.level3.title // "What's Happening Now"
+import { TOPICS } from '../data/topics.js'
 
 // ─── Progress pips (cards phase) ─────────────────────────────────────────────
 
@@ -23,13 +19,13 @@ function ProgressPips({ total, current }) {
 
 // ─── Completion screen ────────────────────────────────────────────────────────
 
-function CompletionScreen({ score, total, onComplete }) {
+function CompletionScreen({ topicTitle, score, total, onComplete }) {
   const pct = score / total
   const isStrong = pct >= 0.8
 
   const message =
     pct === 1
-      ? "Perfect score! You've fully mastered current immigration events."
+      ? "Perfect score! You've fully mastered the current events."
       : pct >= 0.8
       ? "Strong work! You have a solid grasp of what's happening now."
       : pct >= 0.6
@@ -53,7 +49,7 @@ function CompletionScreen({ score, total, onComplete }) {
         </span>
       </div>
 
-      <h2 style={styles.completionTitle}>Immigration Complete!</h2>
+      <h2 style={styles.completionTitle}>{topicTitle} Complete!</h2>
       <p style={styles.completionSub}>
         You scored {score} out of {total} on the current events quiz.
       </p>
@@ -68,7 +64,12 @@ function CompletionScreen({ score, total, onComplete }) {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-function Level3Screen({ onBack, onComplete }) {
+function Level3Screen({ topicId, onBack, onComplete }) {
+  const cards = TOPICS[topicId].levels.level3.cards
+  const questions = TOPICS[topicId].levels.level3.quiz
+  const subtitle = TOPICS[topicId].levels.level3.title
+  const topicTitle = TOPICS[topicId].title
+
   const [phase, setPhase] = useState('cards') // 'cards' | 'quiz' | 'done'
   const [cardIndex, setCardIndex] = useState(0)
   const [quizIndex, setQuizIndex] = useState(0)
@@ -76,8 +77,8 @@ function Level3Screen({ onBack, onComplete }) {
   const [score, setScore] = useState(0)
 
   // ── Card logic ──
-  const card = CARDS[cardIndex]
-  const isLastCard = cardIndex === CARDS.length - 1
+  const card = cards[cardIndex]
+  const isLastCard = cardIndex === cards.length - 1
 
   const handleNextCard = () => {
     if (isLastCard) setPhase('quiz')
@@ -85,9 +86,9 @@ function Level3Screen({ onBack, onComplete }) {
   }
 
   // ── Quiz logic ──
-  const question = QUESTIONS[quizIndex]
+  const question = questions[quizIndex]
   const revealed = selectedIndex !== null
-  const isLastQuestion = quizIndex === QUESTIONS.length - 1
+  const isLastQuestion = quizIndex === questions.length - 1
 
   const handleSelect = (idx) => {
     if (revealed) return
@@ -124,9 +125,10 @@ function Level3Screen({ onBack, onComplete }) {
     return (
       <div style={styles.screen}>
         <CompletionScreen
+          topicTitle={topicTitle}
           score={score}
-          total={QUESTIONS.length}
-          onComplete={() => onComplete(score, QUESTIONS.length)}
+          total={questions.length}
+          onComplete={() => onComplete(score, questions.length)}
         />
       </div>
     )
@@ -141,7 +143,7 @@ function Level3Screen({ onBack, onComplete }) {
           onClick={
             phase === 'cards'
               ? onBack
-              : () => { setPhase('cards'); setCardIndex(CARDS.length - 1); setSelectedIndex(null) }
+              : () => { setPhase('cards'); setCardIndex(cards.length - 1); setSelectedIndex(null) }
           }
         >
           ←
@@ -150,14 +152,14 @@ function Level3Screen({ onBack, onComplete }) {
         <div style={styles.headerMid}>
           {phase === 'cards' ? (
             <>
-              <span style={styles.headerTitle}>Immigration · Level 3</span>
-              <ProgressPips total={CARDS.length} current={cardIndex} />
+              <span style={styles.headerTitle}>{topicTitle} · Level 3</span>
+              <ProgressPips total={cards.length} current={cardIndex} />
             </>
           ) : (
             <>
               <span style={styles.headerTitle}>Level 3 Quiz</span>
               <span style={styles.questionCount}>
-                Question {quizIndex + 1} of {QUESTIONS.length}
+                Question {quizIndex + 1} of {questions.length}
               </span>
             </>
           )}
@@ -171,7 +173,7 @@ function Level3Screen({ onBack, onComplete }) {
         <div style={styles.body}>
           <div key={cardIndex} style={styles.card}>
             <p style={styles.cardEyebrow}>
-              {cardIndex + 1} of {CARDS.length} &middot; {SUBTITLE}
+              {cardIndex + 1} of {cards.length} &middot; {subtitle}
             </p>
             <h2 style={styles.cardTitle}>{card.title}</h2>
             <p style={styles.cardContent}>{card.content}</p>
@@ -198,7 +200,7 @@ function Level3Screen({ onBack, onComplete }) {
             <div
               style={{
                 ...styles.progressFill,
-                width: `${(quizIndex / QUESTIONS.length) * 100}%`,
+                width: `${(quizIndex / questions.length) * 100}%`,
               }}
             />
           </div>

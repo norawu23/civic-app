@@ -1,7 +1,4 @@
-import data from '../data/immigration.json'
-
-const ob1 = data.opinionBuilders[0]
-const ob2 = data.opinionBuilders[1]
+import { TOPICS } from '../data/topics.js'
 
 function ColdTakePill({ value }) {
   const isYes = value === 'yes'
@@ -19,14 +16,17 @@ function ColdTakePill({ value }) {
   )
 }
 
-function OpinionHubScreen({ ob1Progress, ob2Progress, onStartOB2 }) {
+function OpinionHubScreen({ topicId, ob1Progress, ob2Progress, onStartOB2 }) {
+  const ob1 = TOPICS[topicId].opinionBuilders[0]
+  const ob2 = TOPICS[topicId].opinionBuilders[1]
+  const topicTitle = TOPICS[topicId].title
   const ob2Done = ob2Progress?.completed ?? false
 
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
         <p style={styles.headerEyebrow}>What Do You Think?</p>
-        <p style={styles.headerTitle}>Immigration · Opinion Builders</p>
+        <p style={styles.headerTitle}>{topicTitle} · Opinion Builders</p>
       </div>
 
       <div style={styles.body}>

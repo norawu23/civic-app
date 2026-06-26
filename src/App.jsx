@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useProgress } from './hooks/useProgress'
+import { TOPICS } from './data/topics.js'
 import HomeScreen from './screens/HomeScreen'
 import LearnScreen from './screens/LearnScreen'
 import OpinionBuilderScreen from './screens/OpinionBuilderScreen'
@@ -10,7 +11,7 @@ import QuizScreen from './screens/QuizScreen'
 import Level2Screen from './screens/Level2Screen'
 import Level3Screen from './screens/Level3Screen'
 
-function LockedOpinionScreen({ flashcardsDone, quizDone, onNavigate }) {
+function LockedOpinionScreen({ topicTitle, flashcardsDone, quizDone, onNavigate }) {
   return (
     <div style={lockedStyles.screen}>
       <div style={lockedStyles.header}>
@@ -22,7 +23,7 @@ function LockedOpinionScreen({ flashcardsDone, quizDone, onNavigate }) {
         <div style={lockedStyles.lockCircle}>🔒</div>
         <h2 style={lockedStyles.heading}>Finish Level 1 first</h2>
         <p style={lockedStyles.sub}>
-          Complete the Immigration flashcards and quiz to unlock the Opinion Builder.
+          Complete the {topicTitle} flashcards and quiz to unlock the Opinion Builder.
         </p>
 
         <div style={lockedStyles.checklist}>
@@ -31,7 +32,7 @@ function LockedOpinionScreen({ flashcardsDone, quizDone, onNavigate }) {
               {flashcardsDone ? '✓' : '○'}
             </span>
             <span style={{ ...lockedStyles.checkLabel, color: flashcardsDone ? '#111827' : '#6b7280' }}>
-              Immigration flashcards
+              {topicTitle} flashcards
             </span>
           </div>
           <div style={lockedStyles.checkRow}>
@@ -39,7 +40,7 @@ function LockedOpinionScreen({ flashcardsDone, quizDone, onNavigate }) {
               {quizDone ? '✓' : '○'}
             </span>
             <span style={{ ...lockedStyles.checkLabel, color: quizDone ? '#111827' : '#6b7280' }}>
-              Immigration Level 1 Quiz
+              {topicTitle} Level 1 Quiz
             </span>
           </div>
         </div>
@@ -157,21 +158,51 @@ const TABS = [
 function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [currentScreen, setCurrentScreen] = useState(null) // null | 'lesson' | 'quiz' | 'level2' | 'ob2' | 'level3'
+  const [activeTopic, setActiveTopic] = useState('immigration')
 
   const { progress, completeFlashcards, completeQuiz, completeOpinionBuilder } = useProgress()
 
-  // Whether immigration level 1 flashcards are already done (used to fast-forward LessonScreen)
-  const imm1 = progress.topics.immigration?.levels?.['1'] ?? {}
-  const flashcardsDone = imm1.flashcardsComplete ?? false
-  const quizDone = imm1.quizComplete ?? false
-  const ob1Done = progress.opinionBuilders?.['imm-ob-01']?.completed ?? false
+  // Derive topic-specific values from the active topic
+  const topicStaticData = TOPICS[activeTopic]
+  const topicTitle = topicStaticData?.title ?? activeTopic
+  const ob1Id = topicStaticData?.opinionBuilders?.[0]?.id
+  const ob2Id = topicStaticData?.opinionBuilders?.[1]?.id
+
+  const topicProgress = progress.topics[activeTopic] ?? {}
+  const l1Progress = topicProgress.levels?.['1'] ?? {}
+  const flashcardsDone = l1Progress.flashcardsComplete ?? false
+  const quizDone = l1Progress.quizComplete ?? false
+  const ob1Done = ob1Id ? (progress.opinionBuilders?.[ob1Id]?.completed ?? false) : false
+
+  // Navigate to the right screen based on where the user is in the chosen topic's curriculum
+  const handleTopicSelect = (topicId) => {
+    const topicData = progress.topics[topicId]
+    if (!topicData?.unlocked) return
+
+    const staticData = TOPICS[topicId]
+    const topicOb1Id = staticData?.opinionBuilders?.[0]?.id
+    const tl1 = topicData.levels?.['1'] ?? {}
+    const tl3 = topicData.levels?.['3'] ?? {}
+    const topicOb1Done = topicOb1Id
+      ? (progress.opinionBuilders?.[topicOb1Id]?.completed ?? false)
+      : false
+
+    setActiveTopic(topicId)
+
+    if (tl3.quizComplete) return  // all done — stay on Home
+    if (topicOb1Done) { setCurrentScreen('level3'); return }
+    if (tl1.quizComplete) { setCurrentScreen(null); setActiveTab('opinion'); return }
+    if (tl1.flashcardsComplete) { setCurrentScreen('quiz'); return }
+    setCurrentScreen('lesson')
+  }
 
   if (currentScreen === 'lesson') {
     return (
       <div style={styles.app}>
         <LessonScreen
+          topicId={activeTopic}
           initialCompleted={flashcardsDone}
-          onFlashcardsComplete={() => completeFlashcards('immigration', 1)}
+          onFlashcardsComplete={() => completeFlashcards(activeTopic, 1)}
           onBack={() => setCurrentScreen(null)}
           onNavigate={setCurrentScreen}
         />
@@ -183,7 +214,8 @@ function App() {
     return (
       <div style={styles.app}>
         <QuizScreen
-          onQuizComplete={(score, total) => completeQuiz('immigration', 1, score, total)}
+          topicId={activeTopic}
+          onQuizComplete={(score, total) => completeQuiz(activeTopic, 1, score, total)}
           onBack={() => setCurrentScreen('lesson')}
           onHome={() => setCurrentScreen('level2')}
         />
@@ -195,6 +227,7 @@ function App() {
     return (
       <div style={styles.app}>
         <Level2Screen
+          topicId={activeTopic}
           onBack={() => setCurrentScreen(null)}
           onComplete={() => { setCurrentScreen(null); setActiveTab('opinion') }}
         />
@@ -206,9 +239,10 @@ function App() {
     return (
       <div style={styles.app}>
         <OpinionBuilderScreen
+          topicId={activeTopic}
           obIndex={1}
           onOpinionComplete={(coldTake, xp) =>
-            completeOpinionBuilder('imm-ob-02', coldTake, xp)
+            completeOpinionBuilder(ob2Id, coldTake, xp)
           }
           onComplete={() => setCurrentScreen(null)}
         />
@@ -220,9 +254,10 @@ function App() {
     return (
       <div style={styles.app}>
         <Level3Screen
+          topicId={activeTopic}
           onBack={() => setCurrentScreen(null)}
           onComplete={(score, total) => {
-            completeQuiz('immigration', 3, score, total)
+            completeQuiz(activeTopic, 3, score, total)
             setCurrentScreen(null)
             setActiveTab('home')
           }}
@@ -237,13 +272,14 @@ function App() {
         return (
           <HomeScreen
             progress={progress}
-            onNavigate={setCurrentScreen}
-            onGoToLearn={() => setActiveTab('learn')}
+            onTopicSelect={handleTopicSelect}
+            activeTopic={activeTopic}
           />
         )
       case 'learn':
         return (
           <LearnScreen
+            topicId={activeTopic}
             progress={progress}
             onNavigate={setCurrentScreen}
           />
@@ -252,6 +288,7 @@ function App() {
         if (!quizDone) {
           return (
             <LockedOpinionScreen
+              topicTitle={topicTitle}
               flashcardsDone={flashcardsDone}
               quizDone={quizDone}
               onNavigate={setCurrentScreen}
@@ -261,17 +298,19 @@ function App() {
         if (ob1Done) {
           return (
             <OpinionHubScreen
-              ob1Progress={progress.opinionBuilders['imm-ob-01']}
-              ob2Progress={progress.opinionBuilders['imm-ob-02']}
+              topicId={activeTopic}
+              ob1Progress={progress.opinionBuilders[ob1Id]}
+              ob2Progress={progress.opinionBuilders[ob2Id]}
               onStartOB2={() => setCurrentScreen('ob2')}
             />
           )
         }
         return (
           <OpinionBuilderScreen
+            topicId={activeTopic}
             obIndex={0}
             onOpinionComplete={(coldTake, xp) =>
-              completeOpinionBuilder('imm-ob-01', coldTake, xp)
+              completeOpinionBuilder(ob1Id, coldTake, xp)
             }
             onComplete={() => setCurrentScreen('level3')}
           />

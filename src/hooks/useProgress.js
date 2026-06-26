@@ -7,12 +7,14 @@ const STORAGE_KEY = 'civic_progress'
 // How many levels each topic has (drives unlock-next-level logic)
 const TOPIC_LEVEL_COUNTS = {
   immigration: 3,
-  taxes: 1,
-  gerrymandering: 1,
+  taxes: 3,
+  gerrymandering: 3,
+  gunRights: 3,
+  climateChange: 3,
 }
 
 // Order in which topics unlock when the previous topic's final level is done
-const TOPIC_UNLOCK_ORDER = ['immigration', 'taxes', 'gerrymandering']
+const TOPIC_UNLOCK_ORDER = ['immigration', 'taxes', 'gerrymandering', 'gunRights', 'climateChange']
 
 // XP awarded for each action
 const XP = {
@@ -47,10 +49,28 @@ const DEFAULT_STATE = {
       currentLevel: null,
       levels: {},
     },
+    gunRights: {
+      unlocked: false,
+      currentLevel: null,
+      levels: {},
+    },
+    climateChange: {
+      unlocked: false,
+      currentLevel: null,
+      levels: {},
+    },
   },
   opinionBuilders: {
     'imm-ob-01': { completed: false },
     'imm-ob-02': { completed: false },
+    'tax-ob-01': { completed: false },
+    'tax-ob-02': { completed: false },
+    'ger-ob-01': { completed: false },
+    'ger-ob-02': { completed: false },
+    'gun-ob-01': { completed: false },
+    'gun-ob-02': { completed: false },
+    'cli-ob-01': { completed: false },
+    'cli-ob-02': { completed: false },
   },
 }
 
