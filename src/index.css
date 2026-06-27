@@ -33,3 +33,29 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* ── Design tokens ──────────────────────────────────────────── */
+:root {
+  --color-navy:           #1A3C5E;
+  --color-blue:           #185FA5;
+  --color-gold:           #F5A623;
+  --color-green:          #4CAF50;
+  --color-coral:          #FF6B6B;
+  --color-bg:             #F8F9FA;
+  --color-card:           #FFFFFF;
+  --color-text:           #1A1A1A;
+  --color-text-secondary: #666666;
+}
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes streakBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%       { transform: translateY(-4px) rotate(-8deg); }
+  65%       { transform: translateY(-2px) rotate(5deg); }
+}
+
+@keyframes xpPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}

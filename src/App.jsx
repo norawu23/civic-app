@@ -379,6 +379,10 @@ function App() {
               ...(activeTab === tab.id ? styles.navButtonActive : {}),
             }}
           >
+            <span style={{
+              ...styles.navDot,
+              opacity: activeTab === tab.id ? 1 : 0,
+            }} />
             {tab.label}
           </button>
         ))}
@@ -417,8 +421,8 @@ const styles = {
   },
   nav: {
     display: 'flex',
-    backgroundColor: '#1A3C5E',
-    paddingTop: '0.5rem',
+    backgroundColor: 'var(--color-navy)',
+    paddingTop: '0.375rem',
     paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
     flexShrink: 0,
   },
@@ -426,17 +430,30 @@ const styles = {
     flex: 1,
     background: 'none',
     border: 'none',
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: '0.85rem',
+    color: 'rgba(255, 255, 255, 0.55)',
+    fontSize: '0.8rem',
     fontWeight: '500',
-    padding: '0.6rem 0.25rem',
+    padding: '0.375rem 0.25rem 0.5rem',
     cursor: 'pointer',
     letterSpacing: '0.02em',
     minHeight: '44px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '4px',
   },
   navButtonActive: {
     color: '#ffffff',
-    borderTop: '2px solid #ffffff',
+    fontWeight: '600',
+  },
+  navDot: {
+    width: '5px',
+    height: '5px',
+    background: 'var(--color-blue)',
+    borderRadius: '50%',
+    flexShrink: 0,
+    transition: 'opacity 0.15s',
   },
 }
 
