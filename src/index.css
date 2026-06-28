@@ -59,3 +59,35 @@ body {
   40%  { transform: scale(1.22); }
   100% { transform: scale(1); }
 }
+
+@keyframes civBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes civWaveRotate {
+  0%, 100% { transform: rotate(-20deg); }
+  50%      { transform: rotate(20deg); }
+}
+
+@keyframes civWiggle {
+  0%        { transform: rotate(0deg); }
+  10%       { transform: rotate(-8deg); }
+  20%       { transform: rotate(8deg); }
+  30%       { transform: rotate(-8deg); }
+  40%       { transform: rotate(8deg); }
+  50%       { transform: rotate(-8deg); }
+  60%       { transform: rotate(8deg); }
+  70%, 100% { transform: rotate(0deg); }
+}
+
+@keyframes civHeadShake {
+  0%        { transform: translateX(0); }
+  10%       { transform: translateX(-6px); }
+  20%       { transform: translateX(6px); }
+  30%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  50%       { transform: translateX(-6px); }
+  60%       { transform: translateX(6px); }
+  70%, 100% { transform: translateX(0); }
+}

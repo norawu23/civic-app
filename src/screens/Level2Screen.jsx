@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TOPICS } from '../data/topics.js'
+import CivBear from '../components/CivBear.jsx'
 
 // ─── Progress pips ────────────────────────────────────────────────────────────
 
@@ -22,8 +23,8 @@ function ProgressPips({ total, current }) {
 function CompletionScreen({ topicTitle, onContinue }) {
   return (
     <div style={styles.completionWrap}>
-      <div style={styles.unlockCircle}>🔓</div>
-      <h2 style={styles.unlockTitle}>Opinion Builder Unlocked</h2>
+      <CivBear mood="excited" size={120} />
+      <h2 style={styles.unlockTitle}>Opinion Builder unlocked!</h2>
       <p style={styles.unlockSub}>
         You've explored the key perspectives on {topicTitle}. Now it's time to build your own view.
       </p>
@@ -208,11 +209,6 @@ const styles = {
     justifyContent: 'center',
     padding: '2.5rem 1.5rem',
     gap: '0.875rem',
-  },
-  unlockCircle: {
-    fontSize: '3.5rem',
-    lineHeight: 1,
-    marginBottom: '0.25rem',
   },
   unlockTitle: {
     margin: 0,

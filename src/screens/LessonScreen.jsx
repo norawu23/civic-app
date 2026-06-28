@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TOPICS } from '../data/topics.js'
+import CivBear from '../components/CivBear.jsx'
 
 function ProgressPips({ total, completedCount }) {
   return (
@@ -49,6 +50,12 @@ function CompletionScreen({ cardCount, onContinueToQuiz }) {
       <p style={styles.completionSub}>
         You've mastered all {cardCount} flashcards
       </p>
+
+      <div style={styles.civRow}>
+        <CivBear mood="excited" size={90} />
+        <p style={styles.civText}>Ready for the quiz?</p>
+      </div>
+
       <button style={styles.quizButton} onClick={onContinueToQuiz}>
         Continue to Quiz
       </button>
@@ -356,6 +363,19 @@ const styles = {
     fontSize: '0.9rem',
     color: 'var(--color-text-secondary)',
     textAlign: 'center',
+  },
+  civRow: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginTop: '1.25rem',
+  },
+  civText: {
+    margin: 0,
+    fontSize: '0.95rem',
+    fontWeight: '600',
+    color: 'var(--color-navy)',
   },
   quizButton: {
     marginTop: '1.25rem',

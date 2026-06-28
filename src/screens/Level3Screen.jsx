@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TOPICS } from '../data/topics.js'
+import CivBear from '../components/CivBear.jsx'
 
 // ─── Progress pips (cards phase) ─────────────────────────────────────────────
 
@@ -34,6 +35,7 @@ function CompletionScreen({ topicTitle, score, total, onComplete }) {
 
   return (
     <div style={styles.completionWrap}>
+      <CivBear mood="trophy" size={140} />
       <div
         style={{
           ...styles.scoreCircle,

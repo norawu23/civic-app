@@ -1,10 +1,10 @@
+import CivBear from '../components/CivBear.jsx'
+
 function WelcomeScreen({ onCreateAccount, onContinueAsGuest }) {
   return (
     <div style={styles.screen}>
       <div style={styles.hero}>
-        <div style={styles.iconBox}>
-          <span style={styles.iconText}>CIVIC</span>
-        </div>
+        <CivBear mood="wave" size={180} />
         <p style={styles.tagline}>
           Learn civics. Form your own opinions. 5 minutes a day.
         </p>
@@ -40,22 +40,6 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     gap: '2rem',
-  },
-  iconBox: {
-    width: '96px',
-    height: '96px',
-    background: '#185FA5',
-    borderRadius: '22px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 12px 40px rgba(0,0,0,0.3)',
-  },
-  iconText: {
-    color: '#ffffff',
-    fontSize: '1.3rem',
-    fontWeight: '800',
-    letterSpacing: '0.14em',
   },
   tagline: {
     margin: 0,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { TOPICS } from '../data/topics.js'
+import CivBear from '../components/CivBear.jsx'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -296,10 +297,11 @@ function ProfileView({ user, progress, signOut }) {
             <span style={styles.avatarEmoji}>{AVATAR_MAP[profile?.avatar_id] ?? '🦅'}</span>
             <span style={styles.avatarEditHint}>tap to change</span>
           </button>
-          <div>
+          <div style={styles.identityText}>
             <p style={styles.username}>{profile?.username ?? user.email?.split('@')[0]}</p>
             {memberSince && <p style={styles.memberSince}>Member since {memberSince}</p>}
           </div>
+          <CivBear mood="wave" size={60} style={styles.identityCiv} />
         </div>
 
         {/* Stats */}
@@ -553,6 +555,13 @@ const styles = {
     borderRadius: '16px',
     padding: '1.125rem 1.25rem',
     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+  },
+  identityText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  identityCiv: {
+    flexShrink: 0,
   },
   avatarBtn: {
     display: 'flex',

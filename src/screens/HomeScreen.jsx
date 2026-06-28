@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { TOPICS } from '../data/topics.js'
+import CivBear from '../components/CivBear.jsx'
 
 // Static display config — icons/names for all topics including those without data yet
 const TOPIC_CONFIG = [
@@ -181,17 +182,20 @@ function HomeScreen({ progress, onTopicSelect, activeTopic }) {
       </div>
 
       {/* Streak bar */}
-      <div style={styles.streakBar}>
-        <div style={styles.streakLeft}>
-          <span style={styles.fireEmoji}>🔥</span>
-          <div>
-            <p style={styles.streakTitle}>{user.streak}-day streak</p>
-            <p style={styles.streakSub}>Complete today's lesson to keep it</p>
+      <div style={styles.streakRow}>
+        <div style={styles.streakBar}>
+          <div style={styles.streakLeft}>
+            <span style={styles.fireEmoji}>🔥</span>
+            <div>
+              <p style={styles.streakTitle}>{user.streak}-day streak</p>
+              <p style={styles.streakSub}>Complete today's lesson to keep it</p>
+            </div>
+          </div>
+          <div style={{ ...styles.xpBadge, transform: xpAnimating ? 'scale(1.2)' : 'scale(1)' }}>
+            <span style={styles.xpText}>⭐ {user.totalXP} XP</span>
           </div>
         </div>
-        <div style={{ ...styles.xpBadge, transform: xpAnimating ? 'scale(1.2)' : 'scale(1)' }}>
-          <span style={styles.xpText}>⭐ {user.totalXP} XP</span>
-        </div>
+        {user.streak >= 2 && <CivBear mood="excited" size={80} />}
       </div>
 
       {/* Topics */}
@@ -251,11 +255,17 @@ const styles = {
     fontSize: '0.875rem',
     color: 'rgba(255,255,255,0.7)',
   },
+  streakRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    margin: '1.25rem 1.25rem 0',
+  },
   streakBar: {
+    flex: 1,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: '1.25rem 1.25rem 0',
     padding: '1rem 1.125rem',
     background: 'var(--color-card)',
     border: '1px solid #e9ecef',

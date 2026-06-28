@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TOPICS } from '../data/topics.js'
+import CivBear from '../components/CivBear.jsx'
 
 function scoreMessage(score, total) {
   const pct = score / total
@@ -53,6 +54,7 @@ function QuizScreen({ topicId, onBack, onHome, onQuizComplete }) {
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
+  const [showEncourage, setShowEncourage] = useState(false)
 
   const question = questions[currentIndex]
   const revealed = selectedIndex !== null
@@ -63,8 +65,16 @@ function QuizScreen({ topicId, onBack, onHome, onQuizComplete }) {
     setSelectedIndex(idx)
     if (idx === question.correctIndex) {
       setScore(s => s + 1)
+    } else {
+      setShowEncourage(true)
     }
   }
+
+  useEffect(() => {
+    if (!showEncourage) return
+    const t = setTimeout(() => setShowEncourage(false), 2000)
+    return () => clearTimeout(t)
+  }, [showEncourage])
 
   const handleNext = () => {
     if (isLast) {
@@ -73,6 +83,7 @@ function QuizScreen({ topicId, onBack, onHome, onQuizComplete }) {
     } else {
       setCurrentIndex(i => i + 1)
       setSelectedIndex(null)
+      setShowEncourage(false)
     }
   }
 
@@ -125,6 +136,17 @@ function QuizScreen({ topicId, onBack, onHome, onQuizComplete }) {
 
           {/* Question */}
           <p style={styles.questionText}>{question.question}</p>
+
+          {/* Encouragement mascot on wrong answer */}
+          <div
+            style={{
+              ...styles.encourageWrap,
+              opacity: showEncourage ? 1 : 0,
+              pointerEvents: 'none',
+            }}
+          >
+            <CivBear mood="encourage" size={100} />
+          </div>
 
           {/* Options */}
           <div style={styles.optionsList}>
@@ -215,6 +237,16 @@ const styles = {
     flexDirection: 'column',
     padding: '0 1.25rem 1.75rem',
     overflow: 'auto',
+    position: 'relative',
+  },
+
+  /* Encouragement mascot overlay */
+  encourageWrap: {
+    position: 'absolute',
+    top: '-6px',
+    right: '0.25rem',
+    zIndex: 5,
+    transition: 'opacity 0.4s ease',
   },
 
   /* Progress strip */
