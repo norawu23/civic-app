@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from './hooks/useAuth'
 import { useProgress } from './hooks/useProgress'
 import { TOPICS } from './data/topics.js'
@@ -13,6 +13,7 @@ import Level2Screen from './screens/Level2Screen'
 import Level3Screen from './screens/Level3Screen'
 import WelcomeScreen from './screens/WelcomeScreen'
 import SaveProgressModal from './screens/SaveProgressModal'
+import AdminScreen from './screens/AdminScreen'
 
 function LockedOpinionScreen({ topicTitle, flashcardsDone, quizDone, onNavigate }) {
   return (
@@ -170,7 +171,7 @@ function App() {
   const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('hasSeenWelcome'))
   const [showSaveModal, setShowSaveModal] = useState(false)
 
-  const { user, signUp, signIn, signOut } = useAuth()
+  const { user, isAdmin, signUp, signIn, signOut } = useAuth()
   const { progress, completeFlashcards, completeQuiz, completeOpinionBuilder } = useProgress(user)
 
   // Derive topic-specific values from the active topic
@@ -205,6 +206,22 @@ function App() {
     if (tl1.quizComplete) { setCurrentScreen(null); setActiveTab('opinion'); return }
     if (tl1.flashcardsComplete) { setCurrentScreen('quiz'); return }
     setCurrentScreen('lesson')
+  }
+
+  // Silently redirect anyone who somehow reaches the admin screen without the flag.
+  useEffect(() => {
+    if (currentScreen === 'admin' && !isAdmin) {
+      setCurrentScreen(null)
+      setActiveTab('home')
+    }
+  }, [currentScreen, isAdmin])
+
+  if (currentScreen === 'admin' && isAdmin) {
+    return (
+      <div style={styles.app}>
+        <AdminScreen isAdmin={isAdmin} onBack={() => setCurrentScreen(null)} />
+      </div>
+    )
   }
 
   if (showWelcome) {
@@ -358,6 +375,8 @@ function App() {
             signUp={signUp}
             signIn={signIn}
             signOut={signOut}
+            isAdmin={isAdmin}
+            onOpenAdmin={() => setCurrentScreen('admin')}
           />
         )
     }

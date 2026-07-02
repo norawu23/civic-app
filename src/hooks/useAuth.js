@@ -4,6 +4,7 @@ import { DEFAULT_PROGRESS } from './useProgress'
 
 export function useAuth() {
   const [user, setUser] = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -19,6 +20,28 @@ export function useAuth() {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  // Look up the admin flag whenever the signed-in user changes (and clear
+  // it immediately on sign-out, rather than waiting on a stale value).
+  useEffect(() => {
+    if (!user) {
+      setIsAdmin(false)
+      return
+    }
+
+    let cancelled = false
+    supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (cancelled) return
+        setIsAdmin(!error && data?.is_admin === true)
+      })
+
+    return () => { cancelled = true }
+  }, [user?.id])
 
   const signUp = useCallback(async (email, password, username) => {
     const { data, error } = await supabase.auth.signUp({ email, password })
@@ -50,5 +73,5 @@ export function useAuth() {
     if (error) throw error
   }, [])
 
-  return { user, loading, signUp, signIn, signOut }
+  return { user, isAdmin, loading, signUp, signIn, signOut }
 }

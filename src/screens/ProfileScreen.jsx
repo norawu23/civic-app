@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { TOPICS } from '../data/topics.js'
 import CivBear from '../components/CivBear.jsx'
@@ -238,10 +238,25 @@ function EvolvedTakeCard({ take }) {
 
 // ─── Logged-in profile view ───────────────────────────────────────────────────
 
-function ProfileView({ user, progress, signOut }) {
+function ProfileView({ user, progress, signOut, isAdmin, onOpenAdmin }) {
   const [profile, setProfile] = useState(null)
   const [avatarOpen, setAvatarOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
+
+  // Triple-tap the username to open the admin screen (admin users only).
+  const tapCount = useRef(0)
+  const tapTimer = useRef(null)
+  const handleUsernameTap = () => {
+    if (!isAdmin) return
+    tapCount.current += 1
+    clearTimeout(tapTimer.current)
+    if (tapCount.current >= 3) {
+      tapCount.current = 0
+      onOpenAdmin?.()
+      return
+    }
+    tapTimer.current = setTimeout(() => { tapCount.current = 0 }, 600)
+  }
 
   useEffect(() => {
     supabase
@@ -293,12 +308,12 @@ function ProfileView({ user, progress, signOut }) {
       <div style={styles.profileBody}>
         {/* Avatar + identity */}
         <div style={styles.identitySection}>
-          <button style={styles.avatarBtn} onClick={() => setAvatarOpen(true)}>
+          <div style={styles.avatarWrap} onClick={() => setAvatarOpen(true)}>
             <span style={styles.avatarEmoji}>{AVATAR_MAP[profile?.avatar_id] ?? '🦅'}</span>
-            <span style={styles.avatarEditHint}>tap to change</span>
-          </button>
+            <span style={styles.avatarPencil}>✏️</span>
+          </div>
           <div style={styles.identityText}>
-            <p style={styles.username}>{profile?.username ?? user.email?.split('@')[0]}</p>
+            <p style={styles.username} onClick={handleUsernameTap}>{profile?.username ?? user.email?.split('@')[0]}</p>
             {memberSince && <p style={styles.memberSince}>Member since {memberSince}</p>}
           </div>
           <CivBear mood="wave" size={60} style={styles.identityCiv} />
@@ -341,11 +356,19 @@ function ProfileView({ user, progress, signOut }) {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-function ProfileScreen({ user, progress, signUp, signIn, signOut }) {
+function ProfileScreen({ user, progress, signUp, signIn, signOut, isAdmin, onOpenAdmin }) {
   if (!user) {
     return <AuthScreen signUp={signUp} signIn={signIn} />
   }
-  return <ProfileView user={user} progress={progress} signOut={signOut} />
+  return (
+    <ProfileView
+      user={user}
+      progress={progress}
+      signOut={signOut}
+      isAdmin={isAdmin}
+      onOpenAdmin={onOpenAdmin}
+    />
+  )
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
@@ -563,31 +586,36 @@ const styles = {
   identityCiv: {
     flexShrink: 0,
   },
-  avatarBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '0.25rem',
-    background: '#EFF6FF',
-    border: '2px solid #bfdbfe',
-    borderRadius: '50%',
+  avatarWrap: {
+    position: 'relative',
     width: '68px',
     height: '68px',
+    borderRadius: '50%',
+    background: '#EFF6FF',
+    border: '2px solid #bfdbfe',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     cursor: 'pointer',
     flexShrink: 0,
-    justifyContent: 'center',
-    padding: 0,
   },
   avatarEmoji: {
     fontSize: '2rem',
     lineHeight: 1,
   },
-  avatarEditHint: {
-    fontSize: '0.5rem',
-    color: 'var(--color-blue)',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: '0.04em',
+  avatarPencil: {
+    position: 'absolute',
+    bottom: '0px',
+    right: '0px',
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    background: 'var(--color-blue)',
+    border: '2px solid var(--color-card)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '0.6rem',
     lineHeight: 1,
   },
   username: {
