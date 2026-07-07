@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "content:validate": "node scripts/content/validate.mjs",
+    "content:lint": "node scripts/content/lint-sources.mjs",
+    "content:seed": "node scripts/content/seed.mjs",
+    "content:test": "node scripts/content/run-tests.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

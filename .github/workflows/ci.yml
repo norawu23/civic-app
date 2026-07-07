@@ -112,3 +112,89 @@ jobs:
 
       - name: Nuance rubric calibration harness (golden set vs reference scorer)
         run: node tests/nuance/calibration.test.js
+
+  # ── content ───────────────────────────────────────────────────────────────
+  # H1 scope note: this job is owned by H1 (docs/specs/H1-content-pipeline.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — `content` job
+  # only)"). Do not fold other chunks' work into it.
+  #
+  # validate -> lint -> seed against a shadow DB, in that order (spec DoD).
+  # Later chunks whose jobs read quiz_answer_keys/topics_catalog (B1's RPC
+  # tests) should declare `needs: [content]` on their own job once added.
+  #
+  # factcheck.org handling (operator, D-007): `content:lint` correctly ERRORS
+  # on factcheck.org (a real known D-004 violation H2–H5 will replace). But a
+  # permanently-red job would block every other chunk's merge for weeks under
+  # "all red = no merge". So the lint step is advisory (continue-on-error) and
+  # the job only REDS on lint errors ON OR AFTER the content-compliance
+  # deadline (end of week 4). Before then the violation is loudly annotated
+  # but non-blocking — same forcing-function pattern as E1's provisional gate.
+  content:
+    runs-on: ubuntu-latest
+    env:
+      CONTENT_COMPLIANCE_DEADLINE: '2026-07-31'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Content pipeline test suite (fixtures — validator/linter/seeder)
+        run: npm run content:test
+
+      - name: Validate content schema (must pass on all 5 files unmodified — D-004)
+        run: npm run content:validate
+
+      - name: Lint source tiers (advisory until the compliance deadline — factcheck.org, D-004/D-007)
+        id: lint
+        continue-on-error: true
+        run: npm run content:lint
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Initialise a throwaway Supabase project (shadow DB for seeding)
+        run: |
+          mkdir -p ci-shadow-content
+          cp -r supabase ci-shadow-content/supabase
+          (cd ci-shadow-content && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-content && supabase db start
+
+      - name: Seed content into the shadow DB, twice (idempotency at the DB level)
+        run: |
+          DB_URL=$(cd ci-shadow-content && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          node scripts/content/seed.mjs > /tmp/content-seed.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/content-seed.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/content-seed.sql
+
+      - name: Assert row counts (5 topics_catalog, 10 quiz_answer_keys)
+        run: |
+          DB_URL=$(cd ci-shadow-content && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CATALOG_COUNT=$(psql "$DB_URL" -t -A -c "select count(*) from public.topics_catalog;")
+          ANSWERKEY_COUNT=$(psql "$DB_URL" -t -A -c "select count(*) from public.quiz_answer_keys;")
+          echo "topics_catalog rows: $CATALOG_COUNT"
+          echo "quiz_answer_keys rows: $ANSWERKEY_COUNT"
+          test "$CATALOG_COUNT" = "5" || { echo "FAIL: expected 5 topics_catalog rows, got $CATALOG_COUNT"; exit 1; }
+          test "$ANSWERKEY_COUNT" = "10" || { echo "FAIL: expected 10 quiz_answer_keys rows, got $ANSWERKEY_COUNT"; exit 1; }
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-content && supabase stop --no-backup || true
+
+      - name: Red the job on source-tier errors only at/after the compliance deadline (D-007)
+        if: steps.lint.outcome == 'failure'
+        run: |
+          TODAY=$(date -u +%F)
+          if [[ "$TODAY" > "$CONTENT_COMPLIANCE_DEADLINE" || "$TODAY" == "$CONTENT_COMPLIANCE_DEADLINE" ]]; then
+            echo "::error::content:lint errors persist on/after the $CONTENT_COMPLIANCE_DEADLINE content-compliance deadline (factcheck.org, D-004). Reddening."
+            exit 1
+          fi
+          echo "::warning::content:lint reported errors (expected: factcheck.org, D-004). Tracked and NON-blocking until $CONTENT_COMPLIANCE_DEADLINE (D-007); H2–H5 replace the citation before then."
