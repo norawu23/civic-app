@@ -87,3 +87,13 @@ Interface changes and ambiguity rulings, per BUILD_PLAN §1 escalation protocol.
 **Security note:** the prod DB password was shared in-session and should be **rotated** (Supabase dashboard → Database → Reset password) after week-2 repair. Only read-only `--schema-only` operations were performed against prod; no writes.
 
 **Provenance:** operator finding during A1 completion; the repair executes against prod only in week 2 per BUILD_PLAN §3a (backup first).
+
+---
+
+## D-007 — Content-lint CI gating is deadline-based, not immediate (2026-07-07)
+
+**Context:** H1's `content:lint` correctly ERRORS on `factcheck.org` (the known D-004 source-tier violation). The H1 builder wired the `content` CI job to red immediately on that error. But factcheck.org is not replaced until H2 (Taxes) and H5 (Climate Change) run their compliance passes across weeks 1–4 — so an immediately-red content job would violate "all red = no merge" (§2) and **block every other chunk's merge (C2, D*, B*, …) for ~3 weeks**.
+
+**Decision (operator, CI-gating policy):** the `content` job's lint step is advisory (`continue-on-error`), and the job only REDS on lint errors **on or after a content-compliance deadline of 2026-07-31** (end of week 4, matching the H2–H5 cadence). Before the deadline the violation is emitted as a loud GitHub `::warning::` annotation but is non-blocking. This is the same forcing-function pattern as E1's provisional-fixture gate: visible now, hard-failing at the deadline. Implemented purely in `.github/workflows/ci.yml` (env `CONTENT_COMPLIANCE_DEADLINE`); H1's linter is unchanged (its detection is correct — `npm run content:lint` still exits 1 locally, which is the right signal for a human).
+
+**Consequence for the H-track:** H2 and H5 MUST remove every factcheck.org citation (replacing with tier-1/2 sources) before 2026-07-31, or CI turns red and blocks merges from that date. This deadline is now a hard H-track constraint, not just a review nicety.
