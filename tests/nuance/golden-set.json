@@ -1,0 +1,312 @@
+{
+  "_comment": "20 golden-set fixtures for the nuance scoring calibration harness (docs/specs/E1-rubric-golden-set.md). Every fixture is builder-authored and PROVISIONAL: the operator hand-scores the finals Jul 11-12 and removes the `provisional` flag as part of that pass. See docs/NUANCE_RUBRIC.md for the full rubric these fixtures exercise. Rules transcribed verbatim from ARCHITECTURE.md §5.1.3.",
+  "_schema": {
+    "id": "string, unique, gs-NN",
+    "answers": "array of {question_id, response_type: 'tap'|'complicated'|'structured', position?, other_side?} — the exact nuance_sessions.answers jsonb shape",
+    "expected_score": "int — sum of per-question scores this fixture must produce",
+    "rationale": "one-line why this expected_score is correct under the rubric",
+    "provisional": "true for every builder-authored fixture; the operator's Jul 11-12 pass replaces content and deletes this key/sets it false"
+  },
+  "fixtures": [
+    {
+      "id": "gs-01",
+      "answers": [
+        { "question_id": "q1", "response_type": "tap", "position": "yes" }
+      ],
+      "expected_score": 1,
+      "rationale": "Bare Yes tap scores 1 point per the rubric's first rule.",
+      "provisional": true
+    },
+    {
+      "id": "gs-02",
+      "answers": [
+        { "question_id": "q1", "response_type": "tap", "position": "no" }
+      ],
+      "expected_score": 1,
+      "rationale": "Bare No tap scores 1 point — same rule as gs-01, opposite direction, to prove the scorer doesn't special-case yes vs no.",
+      "provisional": true
+    },
+    {
+      "id": "gs-03",
+      "answers": [
+        { "question_id": "q1", "response_type": "complicated" }
+      ],
+      "expected_score": 2,
+      "rationale": "\"It's complicated\" tap scores 2 points per the rubric's second rule. Required by spec DoD (\"complicated tap\").",
+      "provisional": true
+    },
+    {
+      "id": "gs-04",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "Term limits would force out good leaders along with bad ones over time.",
+          "other_side": "Career politicians build up expertise that new people simply cannot match."
+        }
+      ],
+      "expected_score": 3,
+      "rationale": "Clean 3-point case: both fields well over 40 chars (73 and 76) and clearly distinct in content (trigram similarity ~0.03, far below the 0.55 near-duplicate threshold).",
+      "provisional": true
+    },
+    {
+      "id": "gs-05",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "Curfews unfairly limit teenage freedom.",
+          "other_side": "Some teens break curfew but most families already follow reasonable house rules."
+        }
+      ],
+      "expected_score": 2,
+      "rationale": "40-char boundary, fails side: position is exactly 39 chars (one under the >=40 minimum), so the structured attempt falls back to the 2-point tier even though other_side is long and clearly not a duplicate. Isolates the char-count rule from the trigram rule.",
+      "provisional": true
+    },
+    {
+      "id": "gs-06",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "Curfews unfairly limits teenage freedom.",
+          "other_side": "Some teens break curfew but most families already follow reasonable house rules."
+        }
+      ],
+      "expected_score": 3,
+      "rationale": "40-char boundary, passes side: position is exactly 40 chars (meets the >=40 minimum exactly), other_side is long and distinct (trigram similarity ~0.11) -> qualifies for 3. Same companion other_side as gs-05/gs-07 so length is the only variable changing across the three.",
+      "provisional": true
+    },
+    {
+      "id": "gs-07",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "A curfew unfairly limits teenage freedom.",
+          "other_side": "Some teens break curfew but most families already follow reasonable house rules."
+        }
+      ],
+      "expected_score": 3,
+      "rationale": "40-char boundary, one-over side: position is exactly 41 chars, comfortably past the minimum -> qualifies for 3. Completes the 39/40/41 boundary triad required by the spec DoD.",
+      "provisional": true
+    },
+    {
+      "id": "gs-08",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "I think city curfews for teenagers do more harm than good in most neighborhoods.",
+          "other_side": ""
+        }
+      ],
+      "expected_score": 2,
+      "rationale": "Empty other_side on a structured attempt: position alone is not \"both sides\" (spec DoD explicitly requires this case to score 2, not 3), even though position itself is long and thoughtful.",
+      "provisional": true
+    },
+    {
+      "id": "gs-09",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "Term limits would force accountability into the political system by requiring new leadership after a set number of years in office; supporters say this prevents career politicians from entrenching themselves.",
+          "other_side": "Term limits would force accountability into the political system by requiring new leadership after a set number of years in office; critics say this wastes valuable experience right when officials finally understand the job."
+        }
+      ],
+      "expected_score": 2,
+      "rationale": "Near-duplicate pair JUST ABOVE the proposed trigram threshold (similarity 0.5683 > 0.55): both fields share a long common clause, differing only in the final claim. Both fields individually exceed 40 chars, but the near-duplicate rule caps this at 2 points. See docs/NUANCE_RUBRIC.md 'Trigram threshold' for the full derivation.",
+      "provisional": true
+    },
+    {
+      "id": "gs-10",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "Term limits would force accountability into the political system by requiring new leadership after some years; supporters say this prevents career politicians from entrenching themselves.",
+          "other_side": "Term limits would force accountability into the political system by requiring new leadership after some years; critics say this wastes valuable experience right when officials finally understand the job."
+        }
+      ],
+      "expected_score": 3,
+      "rationale": "Near-duplicate boundary pair JUST BELOW the proposed trigram threshold (similarity 0.5297 < 0.55): same construction as gs-09 with a shorter shared clause, tuned so the pair falls just under the line and legitimately qualifies for 3. gs-09/gs-10 together are the boundary demonstration required by the spec DoD.",
+      "provisional": true
+    },
+    {
+      "id": "gs-11",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "asdkfj alsdkfj alskdjf laskjdf laksjdf laksjdlfkzz qq",
+          "other_side": "zzzxcv mnbvcxz poiuytre qwaszx mmm nnn kkk jjj hhh gg"
+        }
+      ],
+      "expected_score": 3,
+      "rationale": "DOCUMENTED LIMITATION: gibberish/keyboard-mash text that happens to clear both the 40-char minimum and the trigram near-duplicate check scores 3 mechanically, because the scorer makes no quality judgment (only structure). This is by design (ARCHITECTURE §5.1.3): the `excluded` flag + 10% admin spot-check (N6/N8), not the scorer, is the intended backstop for low-effort text. Required by spec DoD ('gibberish that mechanically scores 3').",
+      "provisional": true
+    },
+    {
+      "id": "gs-12",
+      "answers": [
+        { "question_id": "q1", "response_type": "tap", "position": "yes" },
+        { "question_id": "q2", "response_type": "complicated" },
+        {
+          "question_id": "q3",
+          "response_type": "structured",
+          "position": "Charter schools should be funded the same as traditional public schools per pupil.",
+          "other_side": "Diverting funds to charters can strip resources from the public schools most students still attend."
+        },
+        { "question_id": "q4", "response_type": "tap", "position": "no" },
+        { "question_id": "q5", "response_type": "complicated" }
+      ],
+      "expected_score": 9,
+      "rationale": "Realistic 5-question baseline session with a mix of response types: sums to 1 + 2 + 3 + 1 + 2 = 9. Exercises score() summing across a multi-question answers array, not just a single question.",
+      "provisional": true
+    },
+    {
+      "id": "gs-13",
+      "answers": [
+        { "question_id": "q1", "response_type": "tap", "position": "yes" },
+        { "question_id": "q2", "response_type": "tap", "position": "no" },
+        { "question_id": "q3", "response_type": "tap", "position": "yes" },
+        { "question_id": "q4", "response_type": "tap", "position": "yes" },
+        { "question_id": "q5", "response_type": "tap", "position": "no" }
+      ],
+      "expected_score": 5,
+      "rationale": "Floor of the 5-question baseline: all five questions answered with a bare Yes/No tap -> 1 point each, total 5 (the minimum possible session score).",
+      "provisional": true
+    },
+    {
+      "id": "gs-14",
+      "answers": [
+        {
+          "question_id": "q1", "response_type": "structured",
+          "position": "Standardized testing gives an objective, comparable measure of student learning across schools.",
+          "other_side": "Standardized tests often measure test-taking skill and access to prep resources more than real learning."
+        },
+        {
+          "question_id": "q2", "response_type": "structured",
+          "position": "Voting should be mandatory to make elected government reflect the entire population, not just motivated voters.",
+          "other_side": "Compelling people to vote can produce careless or random ballots from people who would rather not participate."
+        },
+        {
+          "question_id": "q3", "response_type": "structured",
+          "position": "A four-day work week would improve wellbeing without much loss in real output for most jobs.",
+          "other_side": "Many employers believe a four-day week would simply compress the same workload into more stressful days."
+        },
+        {
+          "question_id": "q4", "response_type": "structured",
+          "position": "Social media platforms should verify the identity of every account to reduce harassment and bots.",
+          "other_side": "Mandatory ID verification would endanger whistleblowers, abuse survivors, and other users who need anonymity."
+        },
+        {
+          "question_id": "q5", "response_type": "structured",
+          "position": "Cities should prioritize bike lanes over car lanes on most downtown streets.",
+          "other_side": "Removing car lanes downtown can hurt small businesses and residents who depend on driving."
+        }
+      ],
+      "expected_score": 15,
+      "rationale": "Ceiling of the 5-question baseline: all five questions answered with a qualifying structured response (each pair well over 40 chars and clearly non-duplicate) -> 3 points each, total 15 (the maximum possible session score).",
+      "provisional": true
+    },
+    {
+      "id": "gs-15",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "",
+          "other_side": "Renewable subsidies help new technologies reach the scale where they can compete on price alone."
+        }
+      ],
+      "expected_score": 2,
+      "rationale": "Symmetric case to gs-08: empty position with a long other_side still falls back to 2. Confirms the rule is 'both fields', not 'other_side specifically' or 'position specifically'.",
+      "provisional": true
+    },
+    {
+      "id": "gs-16",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "",
+          "other_side": ""
+        }
+      ],
+      "expected_score": 2,
+      "rationale": "A 'structured' response_type submitted with both fields empty (e.g. user opened the structured form and closed it without typing) still scores 2, same as any other failed structured attempt -- never 1, since the response_type recorded is 'structured', not 'tap'.",
+      "provisional": true
+    },
+    {
+      "id": "gs-17",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "Zoning laws restrict what property owners can build on their own land without city approval.",
+          "other_side": "Zoning laws restrict what property owners can build on their own land without city approval."
+        }
+      ],
+      "expected_score": 2,
+      "rationale": "Literal copy-paste: other_side is byte-identical to position (trigram similarity = 1.0, the obvious extreme of the near-duplicate rule). Both fields are long, but this is definitionally not 'both sides' -> 2 points.",
+      "provisional": true
+    },
+    {
+      "id": "gs-18",
+      "answers": [
+        {
+          "question_id": "q1",
+          "response_type": "structured",
+          "position": "🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂",
+          "other_side": "This is a plain sentence over forty characters long for comparison."
+        }
+      ],
+      "expected_score": 3,
+      "rationale": "UNICODE EDGE CASE (flagged ambiguous, see handoff): position is 40 emoji code points (U+1F642, each a UTF-16 surrogate pair). reference-scorer counts by code point (Array.from) so this reads as exactly 40 chars and qualifies. Whether Postgres char_length()/pg_trgm agree on code-point counting for astral characters is unverified against a real B4 implementation -- see handoff ambiguous-fixture list.",
+      "provisional": true
+    },
+    {
+      "id": "gs-19",
+      "answers": [
+        { "question_id": "q1", "response_type": "tap", "position": "yes" },
+        { "question_id": "q2", "response_type": "complicated" },
+        {
+          "question_id": "q3",
+          "response_type": "structured",
+          "position": "Universal basic income could reduce poverty without the stigma attached to targeted welfare programs.",
+          "other_side": "Funding a universal basic income at a meaningful level would require large tax increases or cuts elsewhere."
+        },
+        { "question_id": "q4", "response_type": "tap", "position": "no" },
+        { "question_id": "q5", "response_type": "complicated" }
+      ],
+      "expected_score": 9,
+      "rationale": "A day-30 session (as opposed to baseline) with the same mixed-type shape as gs-12, scoring identically (9). Confirms score() depends only on `answers`, never on `kind`/`elapsed_days` -- those are session metadata, not scoring inputs.",
+      "provisional": true
+    },
+    {
+      "id": "gs-20",
+      "answers": [
+        { "question_id": "q1", "response_type": "complicated" },
+        {
+          "question_id": "q2",
+          "response_type": "structured",
+          "position": "Homework beyond a modest amount does little to improve learning for most students.",
+          "other_side": "Regular homework builds study habits and gives teachers a window into which students are struggling."
+        },
+        {
+          "question_id": "q3",
+          "response_type": "structured",
+          "position": "Homework beyond a modest amount does little to improve learning for most students in any grade.",
+          "other_side": "Homework beyond a modest amount does little to help learning for most students in any grade level."
+        },
+        { "question_id": "q4", "response_type": "tap", "position": "yes" },
+        { "question_id": "q5", "response_type": "complicated" }
+      ],
+      "expected_score": 10,
+      "rationale": "Realistic 5-question session mixing a qualifying structured pair (q2, 3 pts) with a near-duplicate structured pair (q3: near-paraphrase of itself, clearly a near-duplicate at similarity well above 0.55, 2 pts) alongside taps/complicated -- exercises the near-duplicate rule inside a multi-question sum: 2 + 3 + 2 + 1 + 2 = 10.",
+      "provisional": true
+    }
+  ]
+}
