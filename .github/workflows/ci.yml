@@ -82,3 +82,33 @@ jobs:
 
       - name: Negative test (fake column must red the gate)
         run: node tests/column-refs-negative.test.mjs
+
+  # ── calibration ──────────────────────────────────────────────────────────
+  # E1 scope note: this job is owned by E1 (docs/specs/E1-rubric-golden-set.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — `calibration` job
+  # only)"). Do not fold other chunks' work into this job.
+  #
+  # Runs the nuance-scoring golden-set calibration harness: 20 hand-modeled
+  # fixtures (tests/nuance/golden-set.json) scored by the reference
+  # implementation (tests/nuance/reference-scorer.mjs) and compared to each
+  # fixture's expected_score. This is the calibration gate B4's SQL scoring
+  # function must pass before merge (blocks B4 merge per the spec header).
+  #
+  # CALIBRATION_TARGET=reference runs now (zero-dep, no DB needed).
+  # CALIBRATION_TARGET=rpc is wired but SKIPPED until B4 lands
+  # rpc.submit_nuance_session — flip this env var to `rpc` once B4 merges
+  # (see the TODO in tests/nuance/calibration.test.js); rpc mode then becomes
+  # the required CI mode per the spec's "Interfaces exposed".
+  calibration:
+    runs-on: ubuntu-latest
+    env:
+      CALIBRATION_TARGET: reference
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Nuance rubric calibration harness (golden set vs reference scorer)
+        run: node tests/nuance/calibration.test.js
