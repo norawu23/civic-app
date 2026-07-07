@@ -1,0 +1,84 @@
+name: CI
+
+# A1 scope note: this workflow file is owned by A1 ONLY for the `migrations`
+# and `column-refs` jobs below (docs/specs/A1-migration-squash.md in-scope
+# list). Other chunks (lint, content validation, Vitest, db test, build,
+# Playwright — ARCHITECTURE §7) append their own jobs to this file; do not
+# fold their work into the two jobs here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # ── migrations-from-empty ────────────────────────────────────────────────
+  # Provisions a clean shadow DB, applies supabase/migrations/ from empty,
+  # and runs the deny-all smoke + xp_awards seed assertions against it.
+  # Red on any failure (ARCHITECTURE §2.1.3 / §6, spec DoD item 5).
+  migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # `supabase db start` needs a config.toml. A1 does not check one into
+      # the repo (out of scope + would collide with other chunks), so we
+      # generate a throwaway one here for the shadow DB. Migrations in
+      # supabase/migrations/ are applied automatically on start.
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow
+          cp -r supabase ci-shadow/supabase
+          # `supabase init` refuses if config.toml already exists; it won't.
+          (cd ci-shadow && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: |
+          cd ci-shadow
+          supabase db start
+          # `db start` applies supabase/migrations/*.sql in order from empty.
+          # A non-zero exit above already reds the job; this is the
+          # migrations-from-empty gate itself.
+
+      - name: xp_awards seed assertion (text-level, no DB needed)
+        run: node tests/xp-awards-seed.test.mjs
+
+      - name: Deny-all smoke (anon + authed SELECT denied under default-deny)
+        run: |
+          cd ci-shadow
+          # Point the smoke test at the started shadow stack. It self-skips
+          # if Docker/psql are missing, but on ubuntu-latest both are present,
+          # so it genuinely runs here.
+          node ../tests/deny-all-smoke.test.mjs
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow && supabase stop --no-backup || true
+
+  # ── column-refs ──────────────────────────────────────────────────────────
+  # Greps src/ for supabase-js table/column references and fails on any
+  # reference to a table/column absent from 0001_schema.sql (spec DoD item
+  # 6). Also runs the negative test proving the gate reddens on a fake column.
+  column-refs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Column-reference gate (src/ vs 0001 DDL)
+        run: node scripts/check-column-refs.mjs
+
+      - name: Negative test (fake column must red the gate)
+        run: node tests/column-refs-negative.test.mjs
