@@ -1,0 +1,19 @@
+# check-column-refs allowlist
+#
+# One "table.column" per line. Entries here are KNOWN, ACCEPTED false
+# positives against supabase/migrations/0001_schema.sql — not columns that
+# should be added to the schema. Every entry must be commented with why.
+#
+# Format: table.column  (comments after '#'; blank lines ignored)
+
+# The currently-deployed legacy client (src/hooks/useAuth.js,
+# src/hooks/useProgress.js, src/screens/AdminScreen.jsx) still writes/reads
+# the pre-0001 `progress` shape: a separate `user_id` FK column and a
+# `progress_data` jsonb blob. 0001's `progress` table has no `user_id`
+# column (id IS the auth.users FK) and no `progress_data` column (typed
+# columns instead). This is D-002's accepted, disclosed breakage window:
+# these direct writes/reads fail against the post-repair schema until the
+# new client ships at P1-1 (~Jul 14 -> ~Aug 11). Remove these two lines when
+# the legacy client's data layer is replaced (C-series / P1-1), not before.
+progress.user_id
+progress.progress_data
