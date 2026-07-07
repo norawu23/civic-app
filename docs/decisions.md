@@ -66,3 +66,24 @@ Interface changes and ambiguity rulings, per BUILD_PLAN §1 escalation protocol.
 4. **E1 trigram threshold set by proposal-and-ratify.** The E1 builder proposes a concrete near-duplicate threshold with boundary fixtures on both sides; the operator ratifies the number during the Jul 11–12 hand-scoring session; B4 implements the identical threshold in SQL (`pg_trgm`). The ratified value becomes part of the frozen rubric — changing it post-freeze is a decisions.md event.
 
 **Architecture impact:** none — all four operate below the level of ARCHITECTURE §2/§3 interfaces. The Jul 10 freeze ratification incorporates 1–3; 4 lands with the rubric on Jul 13.
+
+---
+
+## D-006 — Real prod schema differs from all assumptions; repair authored + rehearsed (2026-07-07)
+
+**Context:** the owner supplied the live prod connection string; the operator took a read-only schema-only `pg_dump` (prod is Postgres **17.6**). Live prod does **not** match `001_init.sql` (the stale repo migration) **nor** the A1 builder's `repair_prod.sql` skeleton, which was authored against that stale file. This is the single most important finding of the A1 chunk and validates BUILD_PLAN §2.1's insistence on deriving the repair from a live dump, not from the repo.
+
+**Actual prod state (public schema):**
+- `profiles` — 5 rows (internal/test accounts). Already has `avatar_id int` (NOT the emoji `avatar text` the skeleton assumed). Columns nullable, no length/range checks, no `birth_year`, no `needs_profile_completion`.
+- `progress` — **0 rows**. Already `id = auth.users` PK (no surrogate key, no `progress_data` jsonb blob the skeleton assumed). `last_login_date` is `text`. Missing six v3 columns incl. `tz_offset_minutes`.
+- `evolved_takes` — **0 rows**. `id` is `uuid` (target: `bigint identity`); missing `is_custom`/`is_imported`.
+- 11 legacy direct-write RLS policies. Missing entirely: `nuance_sessions`, `xp_awards`, `quiz_answer_keys`, `topics_catalog`, `events`.
+
+**Decision:**
+1. `repair_prod.sql` re-authored by the operator from the real dump. Strategy: drop+recreate all three legacy tables (profiles' 5 rows preserved via backup+reinsert — recreation is required to match 0001's column *order*, which ALTER cannot achieve); create the 5 missing tables + `xp_awards` seed + indexes. Legacy policies fall with their tables → 0001's zero-policy default-deny (the D-002 legacy-write break, by design).
+2. **Rehearsed locally to the empty-diff gate:** real prod dump → apply repair → `pg_dump` diff vs a fresh 0001 shadow = **empty** (exit-criterion 3 satisfied in rehearsal; re-run against real prod in week 2).
+3. **Overlength-username repair (flagged, owner to ratify):** one of the 5 accounts has a 21-char username (an email address), violating 0001's 3–20 check. The repair rewrites any such username to the email local-part where it fits (identity-preserving) else a deterministic `user_<id-prefix>` placeholder, and sets `needs_profile_completion=true`. The specific account identity is **deliberately kept out of version control** (it is real user PII); it was surfaced to the owner directly in-session for ratification. If it is a real beta tester whose display name matters, the owner may contact them or choose a different handle before the week-2 run.
+
+**Security note:** the prod DB password was shared in-session and should be **rotated** (Supabase dashboard → Database → Reset password) after week-2 repair. Only read-only `--schema-only` operations were performed against prod; no writes.
+
+**Provenance:** operator finding during A1 completion; the repair executes against prod only in week 2 per BUILD_PLAN §3a (backup first).

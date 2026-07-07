@@ -1,179 +1,183 @@
--- repair_prod.sql
--- ============================================================================
--- ONE-TIME, HAND-REVIEWED reconciliation of the live prod DB to the v3.1 P0
--- schema in supabase/migrations/0001_schema.sql.
+-- repair_prod.sql — one-time, hand-reviewed reconciliation of LIVE PROD to 0001_schema.sql
+-- =============================================================================
+-- Authored by the operator 2026-07-07 from a real schema-only pg_dump of prod
+-- (Postgres 17.6) + read-only data inspection. This SUPERSEDES the builder's
+-- A1 skeleton, which was written against the stale repo migration 001_init.sql
+-- and assumed transforms (`avatar` text emoji, `progress_data` jsonb blob) that
+-- DO NOT EXIST in real prod.
 --
--- STATUS: SKELETON — awaiting the operator-supplied schema-only pg_dump of
--- live prod (docs/specs/A1-migration-squash.md "Interfaces consumed":
--- "operator provides day 1; builders never hold prod credentials — §3a").
--- That dump has not been delivered as of this build. Per the operator's
--- explicit authorization for this chunk, this file is being shipped as a
--- documented skeleton: the transaction wrapper + a TODO list of the
--- transformations already knowable from the repo, NOT a finished script.
--- Do not run this file against prod. Do not treat any TODO below as
--- mechanically resolved — each is a placeholder for work that requires the
--- real dump.
+-- ACTUAL prod state at authoring time (public schema only):
+--   profiles       — 5 rows (internal/test accounts). Columns: id, username,
+--                    avatar_id int default 1, created_at, is_admin. NULLABLE
+--                    username/avatar_id/is_admin/created_at; no length/range
+--                    checks; no birth_year; no needs_profile_completion.
+--   progress       — 0 rows. Already id=auth.users PK (no surrogate key, no
+--                    progress_data blob). last_login_date is TEXT. Missing:
+--                    streak_freezes, streak_freeze_awarded_at, tz_offset_minutes,
+--                    imported_from_guest, schema_version, updated_at.
+--   evolved_takes  — 0 rows. id is UUID (target: bigint identity); missing
+--                    is_custom, is_imported; no unique(user_id,opinion_builder_id).
+--   + 9 legacy direct-write RLS policies (target 0001 = ZERO policies).
+--   MISSING entirely: nuance_sessions, xp_awards, quiz_answer_keys,
+--                     topics_catalog, events.
 --
--- Runbook (BUILD_PLAN §3a, owner: the operator — builders never hold prod
--- credentials):
---   1. Full pg_dump backup of prod, stored off-platform.
---   2. Apply this repair in a single transaction (already wrapped below).
---   3. Run scripts/schema-diff.sh against the repaired prod and the CI
---      0001 shadow DB — empty diff required (modulo comments/ownership).
---   4. On any failure, restore from the step-1 dump and reopen A1.
+-- STRATEGY: profiles has data → ALTER in place. progress + evolved_takes are
+-- empty → drop & recreate exactly per 0001 (guarantees id-type/column match).
+-- Create the 5 missing tables + indexes. Drop all legacy policies to reach
+-- 0001's default-deny (zero-policy) state — this is the D-002 legacy-client
+-- write break, by design.
 --
--- Known source shape (from the deleted supabase/migrations/001_init.sql —
--- this is what prod is assumed to look like today; CONFIRM against the real
--- dump before relying on any of it):
+-- ⚠ OPERATOR-RATIFY BEFORE RUNNING (flagged decision, see §1 below):
+--   One of the 5 existing accounts has a 21-char username (an email address)
+--   that violates 0001's 3–20 check. This script rewrites any such username to
+--   the email local-part where that fits (identity-preserving), else a
+--   deterministic placeholder, and sets needs_profile_completion=true so the
+--   user is re-prompted. Confirm this is acceptable, or supply an alternative,
+--   before execution. (The specific account is recorded in decisions.md D-006,
+--   not here, to keep user PII out of version control.)
 --
---   profiles (
---     id         uuid primary key references auth.users on delete cascade,
---     username   text not null,
---     avatar     text not null default '🦅',
---     created_at timestamptz not null default now()
---   )
---   -- policies: profiles_select / profiles_insert / profiles_update (own row)
---
---   progress (
---     id            uuid primary key default gen_random_uuid(),
---     user_id       uuid unique not null references auth.users on delete cascade,
---     progress_data jsonb not null,
---     updated_at    timestamptz not null default now()
---   )
---   -- policies: progress_select / progress_insert / progress_update (own row)
---
--- Target shape: supabase/migrations/0001_schema.sql (profiles, progress,
--- evolved_takes, nuance_sessions, xp_awards, quiz_answer_keys,
--- topics_catalog, events — all RLS-enabled, zero policies).
--- ============================================================================
+-- ⚠ This script is NOT auto-run. Per BUILD_PLAN §3a it runs against prod ONCE,
+--   by the operator, in week 2, AFTER: (1) a full pg_dump backup stored
+--   off-platform, (2) A1/0001 merged + CI-green. On any failure: restore.
+--   Rehearsed locally against the real prod dump → empty diff vs 0001 shadow.
+-- =============================================================================
+
+-- NOTE: all three legacy tables are dropped & recreated (profiles' 5 rows are
+-- preserved via a backup + reinsert). Dropping the tables also removes their 11
+-- legacy direct-write policies, reaching 0001's zero-policy default-deny state —
+-- so no explicit DROP POLICY is needed. Recreating profiles (rather than ALTER)
+-- is what makes the post-repair column ORDER match 0001 exactly (Postgres cannot
+-- reorder columns in place), yielding a byte-empty schema diff.
 
 begin;
 
--- ----------------------------------------------------------------------------
--- TODO(profiles): add missing columns to bring the existing table to 0001
--- shape. Mechanical, low-risk given the known source shape above:
---   * ALTER TABLE profiles ADD COLUMN is_admin boolean NOT NULL DEFAULT false;
---   * ALTER TABLE profiles ADD COLUMN birth_year int
---       CHECK (birth_year BETWEEN 1900 AND 2100);   -- NULL for all existing rows (legacy re-prompt, ARCHITECTURE §2.1.5)
---   * ALTER TABLE profiles ADD COLUMN needs_profile_completion boolean NOT NULL DEFAULT false;
---   * ALTER TABLE profiles ADD COLUMN avatar_id int NOT NULL DEFAULT 1
---       CHECK (avatar_id BETWEEN 1 AND 6);
---   * ALTER TABLE profiles ADD CONSTRAINT profiles_username_len
---       CHECK (char_length(username) BETWEEN 3 AND 20);   -- CONFIRM no existing usernames violate this before adding NOT VALID / validating
---   * ALTER TABLE profiles ADD CONSTRAINT profiles_username_key UNIQUE (username);  -- CONFIRM no duplicate usernames exist in the dump first
---
--- TODO(profiles.avatar → avatar_id): `avatar text default '🦅'` must map to
--- `avatar_id int 1..6`. NO MECHANICAL ANSWER without the real dump: we do
--- not know how many distinct avatar text values exist in prod today (the
--- deleted 001_init.sql only ever wrote the single default '🦅' via the
--- client's hardcoded insert — but the real dump may show otherwise, e.g.
--- hand-edited rows). ESCALATED per BUILD_PLAN §1 — do not silently default
--- every row to avatar_id=1 without confirming against the dump's actual
--- distinct avatar values. Once confirmed, the UPDATE will look like:
---   -- UPDATE profiles SET avatar_id = CASE avatar
---   --   WHEN '🦅' THEN 1
---   --   -- ... remaining mapping entries, once known ...
---   --   ELSE 1  -- CONFIRM this fallback is acceptable, or escalate further
---   -- END;
---   -- ALTER TABLE profiles DROP COLUMN avatar;
--- ----------------------------------------------------------------------------
+-- ── 1. profiles: preserve 5 rows → drop → recreate per 0001 → reinsert ──────────
+-- Backup applies the flagged username repair inline (see header §ratify): the one
+-- overlength/invalid username is rewritten to the email local-part where that fits
+-- (else a deterministic placeholder), and that row is flagged needs_profile_completion.
+create temp table _profiles_backup on commit drop as
+  select id,
+         case when username is null or char_length(username) not between 3 and 20 then
+                case when char_length(split_part(username, '@', 1)) between 3 and 20
+                     then split_part(username, '@', 1)
+                     else 'user_' || left(replace(id::text, '-', ''), 12) end
+              else username end                                                as username,
+         coalesce(avatar_id, 1)                                               as avatar_id,
+         coalesce(is_admin, false)                                            as is_admin,
+         coalesce(created_at, now())                                          as created_at,
+         (username is null or char_length(username) not between 3 and 20)     as needs_profile_completion
+    from public.profiles;
 
+drop table public.profiles cascade;
+create table public.profiles (
+  id                        uuid primary key references auth.users on delete cascade,
+  username                  text not null unique check (char_length(username) between 3 and 20),
+  avatar_id                 int not null default 1 check (avatar_id between 1 and 6),
+  is_admin                  boolean not null default false,
+  birth_year                int check (birth_year between 1900 and 2100),
+  needs_profile_completion  boolean not null default false,
+  created_at                timestamptz not null default now()
+);
+alter table public.profiles enable row level security;
+insert into public.profiles (id, username, avatar_id, is_admin, birth_year, needs_profile_completion, created_at)
+  select id, username, avatar_id, is_admin, null, needs_profile_completion, created_at
+    from _profiles_backup;
 
--- ----------------------------------------------------------------------------
--- TODO(progress): the legacy table is keyed and shaped completely differently
--- from 0001 and cannot be fixed with ALTER TABLE alone:
---   legacy: id uuid PK (surrogate, gen_random_uuid()), user_id uuid UNIQUE FK,
---           progress_data jsonb blob, updated_at
---   0001:   id uuid PK = auth.users FK directly (no separate user_id column),
---           typed columns (total_xp, streak, last_login_date, streak_freezes,
---           streak_freeze_awarded_at, tz_offset_minutes, imported_from_guest,
---           topics jsonb, opinion_builders jsonb, schema_version, updated_at)
---
--- Mechanical shell (column-by-column values from progress_data need the
--- real dump to confirm the jsonb key paths actually present in prod rows —
--- the shape assumed below is DEFAULT_PROGRESS from src/hooks/useProgress.js,
--- but prod rows may be stale/partial and need defensive coalescing):
---   -- ALTER TABLE progress ADD COLUMN new_id uuid;              -- staging column
---   -- UPDATE progress SET new_id = user_id;
---   -- ALTER TABLE progress ADD COLUMN total_xp int;
---   -- ALTER TABLE progress ADD COLUMN streak int;
---   -- ALTER TABLE progress ADD COLUMN last_login_date date;
---   -- ALTER TABLE progress ADD COLUMN streak_freezes int;
---   -- ALTER TABLE progress ADD COLUMN streak_freeze_awarded_at date;
---   -- ALTER TABLE progress ADD COLUMN tz_offset_minutes int;
---   -- ALTER TABLE progress ADD COLUMN imported_from_guest boolean;
---   -- ALTER TABLE progress ADD COLUMN topics jsonb;
---   -- ALTER TABLE progress ADD COLUMN opinion_builders jsonb;
---   -- ALTER TABLE progress ADD COLUMN schema_version int;
---   -- UPDATE progress SET
---   --   total_xp         = COALESCE((progress_data->'user'->>'totalXP')::int, 0),
---   --   streak           = COALESCE((progress_data->'user'->>'streak')::int, 1),
---   --   last_login_date  = (progress_data->'user'->>'lastLoginDate')::date,
---   --   streak_freezes   = 0,
---   --   tz_offset_minutes = 0,
---   --   imported_from_guest = false,
---   --   topics           = COALESCE(progress_data->'topics', '{}'::jsonb),
---   --   opinion_builders = COALESCE(progress_data->'opinionBuilders', '{}'::jsonb),
---   --   schema_version   = 2;
---   -- NO MECHANICAL ANSWER without the dump for: whether any prod row's
---   -- progress_data is missing keys entirely, has a shape older than
---   -- DEFAULT_PROGRESS, or has a NULL/malformed value — ESCALATED, do not
---   -- silently coalesce past what's listed above without confirming the
---   -- dump's actual jsonb shapes first.
---   -- Then, in a single pass once columns are populated and verified:
---   -- ALTER TABLE progress DROP CONSTRAINT progress_user_id_key;  -- drop old UNIQUE
---   -- ALTER TABLE progress DROP CONSTRAINT progress_pkey;         -- drop old surrogate PK
---   -- ALTER TABLE progress DROP COLUMN id;
---   -- ALTER TABLE progress DROP COLUMN user_id;
---   -- ALTER TABLE progress DROP COLUMN progress_data;
---   -- ALTER TABLE progress RENAME COLUMN new_id TO id;
---   -- ALTER TABLE progress ADD PRIMARY KEY (id);
---   -- ALTER TABLE progress ADD FOREIGN KEY (id) REFERENCES auth.users ON DELETE CASCADE;
---   -- ALTER TABLE progress ALTER COLUMN total_xp SET NOT NULL, SET DEFAULT 0;
---   -- ... (repeat NOT NULL/DEFAULT/CHECK for the remaining typed columns per 0001)
--- ----------------------------------------------------------------------------
+-- ── 2. progress: empty → drop & recreate exactly per 0001 ───────────────────────
+drop table public.progress cascade;
+create table public.progress (
+  id                        uuid primary key references auth.users on delete cascade,
+  total_xp                  int not null default 0 check (total_xp >= 0),
+  streak                    int not null default 1 check (streak >= 0),
+  last_login_date           date,
+  streak_freezes            int not null default 0 check (streak_freezes between 0 and 1),
+  streak_freeze_awarded_at  date,
+  tz_offset_minutes         int not null default 0 check (tz_offset_minutes between -840 and 840),
+  imported_from_guest       boolean not null default false,
+  topics                    jsonb not null default '{}',
+  opinion_builders          jsonb not null default '{}',
+  schema_version            int not null default 2,
+  updated_at                timestamptz not null default now()
+);
+alter table public.progress enable row level security;
 
+-- ── 3. evolved_takes: empty → drop & recreate exactly per 0001 ──────────────────
+drop table public.evolved_takes cascade;
+create table public.evolved_takes (
+  id                  bigint generated always as identity primary key,
+  user_id             uuid not null references auth.users on delete cascade,
+  topic_id            text not null,
+  opinion_builder_id  text not null,
+  cold_take           text not null check (cold_take in ('yes','no')),
+  evolved_take        text not null,
+  is_custom           boolean not null default false,
+  is_imported         boolean not null default false,
+  xp_earned           int not null,
+  created_at          timestamptz not null default now(),
+  unique (user_id, opinion_builder_id)
+);
+alter table public.evolved_takes enable row level security;
 
--- ----------------------------------------------------------------------------
--- TODO(new tables): these do not exist in prod at all yet and can be created
--- verbatim from 0001_schema.sql once the dump confirms they're absent
--- (mechanical — no transformation needed, just CREATE TABLE + seed):
---   * evolved_takes
---   * nuance_sessions
---   * xp_awards        (+ seed rows, identical to 0001)
---   * quiz_answer_keys (left empty — H1 seeds it)
---   * topics_catalog   (left empty — H1 seeds it)
---   * events
--- ----------------------------------------------------------------------------
+-- ── 4. Missing tables (create exactly per 0001) ─────────────────────────────────
+create table public.nuance_sessions (
+  id            bigint generated always as identity primary key,
+  user_id       uuid references auth.users on delete cascade,
+  anon_id       text,
+  kind          text not null check (kind in ('baseline','day30')),
+  answers       jsonb not null,
+  score         int not null,
+  elapsed_days  int,
+  excluded      boolean not null default false,
+  created_at    timestamptz not null default now(),
+  constraint nuance_sessions_identity_check check (user_id is not null or anon_id is not null),
+  unique nulls not distinct (user_id, anon_id, kind)
+);
+alter table public.nuance_sessions enable row level security;
 
+create table public.xp_awards (
+  action  text primary key,
+  xp      int not null
+);
+alter table public.xp_awards enable row level security;
+insert into public.xp_awards (action, xp) values
+  ('flashcards',            50),
+  ('quiz',                  50),
+  ('quiz_perfect_bonus',    25),
+  ('opinion_builder',      100),
+  ('opinion_builder_bonus', 200);
 
--- ----------------------------------------------------------------------------
--- TODO(RLS / policies): 0001 mandates RLS enabled + ZERO policies (default
--- deny) on every table. The legacy prod policies grant direct own-row
--- read/write and must be dropped as part of this repair (mechanical, given
--- the known source shape above — CONFIRM policy names against the real dump,
--- they may differ if hand-edited):
---   -- DROP POLICY IF EXISTS profiles_select on profiles;
---   -- DROP POLICY IF EXISTS profiles_insert on profiles;
---   -- DROP POLICY IF EXISTS profiles_update on profiles;
---   -- DROP POLICY IF EXISTS progress_select on progress;
---   -- DROP POLICY IF EXISTS progress_insert on progress;
---   -- DROP POLICY IF EXISTS progress_update on progress;
---   -- (RLS is very likely already enabled on both tables per 001_init.sql —
---   --  CONFIRM, then ALTER TABLE ... ENABLE ROW LEVEL SECURITY is a no-op if so)
---
--- NOTE (D-002, accepted): dropping these policies breaks the legacy deployed
--- client's direct progress/evolved_takes writes until the new client ships
--- at P1-1. This is a known, accepted, disclosed consequence of this repair —
--- not something this file needs to work around.
--- ----------------------------------------------------------------------------
+create table public.quiz_answer_keys (
+  topic_id  text not null,
+  level     int not null,
+  answers   int[] not null,
+  primary key (topic_id, level)
+);
+alter table public.quiz_answer_keys enable row level security;
+
+create table public.topics_catalog (
+  topic_id     text primary key,
+  position     int not null,
+  level_count  int not null
+);
+alter table public.topics_catalog enable row level security;
+
+create table public.events (
+  id          bigint generated always as identity primary key,
+  user_id     uuid,
+  anon_id     text,
+  name        text not null,
+  props       jsonb,
+  created_at  timestamptz not null default now()
+);
+alter table public.events enable row level security;
+
+-- ── 5. Indexes (match 0001) ─────────────────────────────────────────────────────
+create index events_user_id_idx on public.events (user_id) where user_id is not null;
+create index events_anon_id_idx on public.events (anon_id) where anon_id is not null;
+create index nuance_sessions_anon_id_idx on public.nuance_sessions (anon_id) where anon_id is not null;
 
 commit;
 
--- ============================================================================
--- After this file is filled in and run (per the runbook above), operator
--- runs: supabase migration repair --status applied 0001
--- to mark prod as being at 0001, then scripts/schema-diff.sh must show an
--- empty diff between prod and the CI 0001 shadow DB before this repair is
--- considered done (spec DoD item 4 / ARCHITECTURE §2.1.5 N4).
--- ============================================================================
+-- After this runs green against prod, mark prod at migration 0001:
+--   supabase migration repair --status applied 0001
+-- then run scripts/schema-diff.sh <prod-conn> <ci-shadow-conn> → must be empty.
