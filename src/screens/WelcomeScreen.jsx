@@ -1,4 +1,5 @@
 import CivBear from '../components/CivBear.jsx'
+import InstallPrompt from '../components/InstallPrompt.jsx'
 
 function WelcomeScreen({ onCreateAccount, onContinueAsGuest }) {
   return (
@@ -9,6 +10,8 @@ function WelcomeScreen({ onCreateAccount, onContinueAsGuest }) {
           Learn civics. Form your own opinions. 5 minutes a day.
         </p>
       </div>
+
+      <InstallPrompt />
 
       <div style={styles.actions}>
         <button style={styles.primaryBtn} onClick={onCreateAccount}>
