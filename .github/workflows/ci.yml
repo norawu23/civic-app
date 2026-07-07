@@ -82,3 +82,84 @@ jobs:
 
       - name: Negative test (fake column must red the gate)
         run: node tests/column-refs-negative.test.mjs
+
+  # ── content ───────────────────────────────────────────────────────────────
+  # H1 scope note: this job is owned by H1 (docs/specs/H1-content-pipeline.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — `content` job
+  # only)"). Do not fold other chunks' work into it.
+  #
+  # validate -> lint -> seed against a shadow DB, in that order (spec DoD).
+  # Later chunks whose jobs read quiz_answer_keys/topics_catalog (B1's RPC
+  # tests) should declare `needs: [content]` on their own job once added —
+  # this job doesn't/can't declare a forward `needs` on jobs that don't exist
+  # yet in this file.
+  #
+  # IMPORTANT — this job is EXPECTED to be red right now: `content:lint`
+  # flags factcheck.org, a real, known source-tier violation in existing
+  # content (D-004). H1's job is to flag it, not fix it — H2–H5 replace the
+  # citation. The `lint` step below is allowed to fail without aborting the
+  # rest of the job (so seeding still runs and is verified), but the job as
+  # a whole still reds via the final "Fail the job if lint found errors" step.
+  content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Content pipeline test suite (fixtures — validator/linter/seeder)
+        run: npm run content:test
+
+      - name: Validate content schema (must pass on all 5 files unmodified — D-004)
+        run: npm run content:validate
+
+      - name: Lint source tiers (expected red right now — factcheck.org, D-004)
+        id: lint
+        continue-on-error: true
+        run: npm run content:lint
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Initialise a throwaway Supabase project (shadow DB for seeding)
+        run: |
+          mkdir -p ci-shadow-content
+          cp -r supabase ci-shadow-content/supabase
+          (cd ci-shadow-content && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-content && supabase db start
+
+      - name: Seed content into the shadow DB, twice (idempotency at the DB level)
+        run: |
+          DB_URL=$(cd ci-shadow-content && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          node scripts/content/seed.mjs > /tmp/content-seed.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/content-seed.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/content-seed.sql
+
+      - name: Assert row counts (5 topics_catalog, 10 quiz_answer_keys)
+        run: |
+          DB_URL=$(cd ci-shadow-content && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CATALOG_COUNT=$(psql "$DB_URL" -t -A -c "select count(*) from public.topics_catalog;")
+          ANSWERKEY_COUNT=$(psql "$DB_URL" -t -A -c "select count(*) from public.quiz_answer_keys;")
+          echo "topics_catalog rows: $CATALOG_COUNT"
+          echo "quiz_answer_keys rows: $ANSWERKEY_COUNT"
+          test "$CATALOG_COUNT" = "5" || { echo "FAIL: expected 5 topics_catalog rows, got $CATALOG_COUNT"; exit 1; }
+          test "$ANSWERKEY_COUNT" = "10" || { echo "FAIL: expected 10 quiz_answer_keys rows, got $ANSWERKEY_COUNT"; exit 1; }
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-content && supabase stop --no-backup || true
+
+      - name: Fail the job if the source-tier lint found errors
+        if: steps.lint.outcome == 'failure'
+        run: |
+          echo "content:lint reported errors above (expected: factcheck.org, D-004). Reddening this job intentionally until H2-H5 replace the citation."
+          exit 1

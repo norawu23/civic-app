@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+import { TOPIC_UNLOCK_ORDER } from '../data/registry.js'
 
 const STORAGE_KEY = 'civic_progress'
 
@@ -13,7 +14,9 @@ const TOPIC_LEVEL_COUNTS = {
   climateChange: 3,
 }
 
-const TOPIC_UNLOCK_ORDER = ['immigration', 'taxes', 'gerrymandering', 'gunRights', 'climateChange']
+// TOPIC_UNLOCK_ORDER now lives in src/data/registry.js (H1, D-005 §3) —
+// single source, also consumed by scripts/content/seed.mjs for
+// topics_catalog.position and (later) by C2 for DEFAULT_PROGRESS generation.
 
 const XP = {
   flashcards: 50,

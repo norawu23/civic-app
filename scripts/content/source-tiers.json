@@ -1,0 +1,18 @@
+{
+  "_draft_note": "OPERATOR-OWNED DATA — DRAFT, NOT RATIFIED. Seeded 2026-07-07 by H1 from the domains actually cited across the five src/data/*.json files (grep of every levels.level3.cards[].source.url). Bucketed here into obvious tier1/tier2/denied per the H1 spec's instructions; the operator rules on final placement (H1 handoff, item 2). 'denied' is an extension beyond the spec's documented {tier1,tier2} shape, added so the known FactCheck.org tier violation (D-004) produces a CI-red ERROR rather than a soft WARN — see H1 handoff for the reasoning and an escalation asking the operator to ratify (or reject) this third bucket.",
+  "tier1": [
+    "apnews.com",
+    "npr.org",
+    "pbs.org"
+  ],
+  "tier2": [
+    "scotusblog.com",
+    "stateline.org",
+    "thehill.com",
+    "constitutioncenter.org",
+    "migrationpolicy.org"
+  ],
+  "denied": [
+    "factcheck.org"
+  ]
+}

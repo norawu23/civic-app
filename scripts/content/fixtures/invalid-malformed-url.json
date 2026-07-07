@@ -1,0 +1,119 @@
+{
+  "topic": "fixtureTopic",
+  "title": "Fixture Topic",
+  "icon": "\ud83e\uddea",
+  "levels": {
+    "level1": {
+      "title": "How It Works",
+      "flashcards": [
+        {
+          "id": "fx-f-01",
+          "term": "Term One",
+          "definition": "Definition one."
+        }
+      ],
+      "quiz": [
+        {
+          "id": "fx-q1-01",
+          "question": "What is the answer?",
+          "options": [
+            "Wrong A",
+            "Wrong B",
+            "Right C",
+            "Wrong D"
+          ],
+          "correctIndex": 2
+        }
+      ]
+    },
+    "level2": {
+      "title": "Why It's Contested",
+      "cards": [
+        {
+          "id": "fx-l2-01",
+          "title": "Card One",
+          "content": "Content one."
+        }
+      ]
+    },
+    "level3": {
+      "title": "What's Happening Now",
+      "cards": [
+        {
+          "id": "fx-l3-01",
+          "title": "L3 Card One",
+          "content": "L3 content one.",
+          "source": {
+            "label": "Fixture Source",
+            "url": "not-a-valid-url"
+          }
+        }
+      ],
+      "quiz": [
+        {
+          "id": "fx-q3-01",
+          "question": "What happened?",
+          "options": [
+            "Wrong A",
+            "Right B",
+            "Wrong C",
+            "Wrong D"
+          ],
+          "correctIndex": 1
+        }
+      ]
+    }
+  },
+  "opinionBuilders": [
+    {
+      "id": "fx-ob-01",
+      "required": true,
+      "question": "Should fixtures exist?",
+      "contextCards": [
+        {
+          "id": "fx-ob1-c01",
+          "title": "Context One",
+          "content": "Context content one."
+        }
+      ],
+      "flipCards": {
+        "yes": "Yes flip text.",
+        "no": "No flip text."
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "bonusPrompt": "Write your own take."
+      }
+    },
+    {
+      "id": "fx-ob-02",
+      "required": false,
+      "question": "Should optional fixtures exist too?",
+      "contextCards": [
+        {
+          "id": "fx-ob2-c01",
+          "title": "Context Two",
+          "content": "Context content two."
+        }
+      ],
+      "flipCards": {
+        "yes": "Yes flip text 2.",
+        "no": "No flip text 2."
+      },
+      "evolvedTake": {
+        "standardOptions": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "bonusPrompt": "Write your own take, again."
+      }
+    }
+  ]
+}
