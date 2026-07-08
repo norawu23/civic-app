@@ -130,6 +130,35 @@ try {
   })
   check('exactly-14-by-year-diff signup is allowed (boundary is < 14, not <= 14)', okResult.status === 0, okResult.stderr)
 
+  // ── F1 (review): present-but-non-integer birth_year FAILS CLOSED ──────────
+  // A birth_year that is present but does not parse to an integer must abort
+  // the signup (RAISE) — never degrade to NULL, which would skip the under-13
+  // gate and admit the account. Each form must reject AND persist zero rows.
+  const nonIntForms = [
+    ['2013.5', 'nonint-decimal'],
+    ['2013abc', 'nonint-alpha'],
+    ['0x7DD', 'nonint-hex'],
+    ['2_013', 'nonint-underscore'],
+  ]
+  let nonIntIdx = 0
+  for (const [by, label] of nonIntForms) {
+    const id = `cccccccc-0000-0000-0000-00000000010${nonIntIdx++}`
+    const email = `${label}@example.com`
+    const r = insertAuthUser(dbUrl, { id, email, metadata: { username: `u_${label}`.slice(0, 20), birth_year: by } })
+    check(`F1 non-integer birth_year "${by}" rejected (fail closed)`, r.status !== 0, r.stdout)
+    const u = queryOne(dbUrl, `select count(*) from auth.users where email = '${email}';`)
+    check(`F1 non-integer birth_year "${by}": zero auth.users rows persisted`, u === '0', u)
+    const p = queryOne(dbUrl, `select count(*) from public.profiles where id = '${id}';`)
+    check(`F1 non-integer birth_year "${by}": zero profiles rows persisted`, p === '0', p)
+  }
+  // Whitespace-padded integer must still be accepted (int cast trims it).
+  const paddedId = 'cccccccc-0000-0000-0000-000000000110'
+  const paddedResult = insertAuthUser(dbUrl, {
+    id: paddedId, email: 'padded@example.com',
+    metadata: { username: 'padded_ok', birth_year: ' 2000 ' },
+  })
+  check('F1 whitespace-padded integer " 2000 " still accepted', paddedResult.status === 0, paddedResult.stderr)
+
   // ── Collision fallback ─────────────────────────────────────────────────────
   const collisionId = 'eeeeeeee-0000-0000-0000-000000000005'
   const collisionResult = insertAuthUser(dbUrl, {
@@ -146,6 +175,30 @@ try {
     check('collision fallback: placeholder satisfies 3-20 CHECK', lenOk === 't', row)
     const progressCount2 = queryOne(dbUrl, `select count(*) from public.progress where id = '${collisionId}';`)
     check('collision fallback: progress row still inserted', progressCount2 === '1', progressCount2)
+  }
+
+  // F2 (review): the placeholder derives from only the first 15 hex of the id,
+  // so a pre-squatted matching placeholder could collide on the username UNIQUE
+  // index. The fallback must retry with fresh entropy, never strand the auth row.
+  // Victim id below derives placeholder 'user_111111112222333'; squat it first.
+  const squatResult = insertAuthUser(dbUrl, {
+    id: '99999999-0000-0000-0000-000000000009', email: 'squatter@example.com',
+    metadata: { username: 'user_111111112222333', birth_year: '2000' },
+  })
+  check('F2 squatter (holds the victim placeholder) created', squatResult.status === 0, squatResult.stderr)
+  const victimId = '11111111-2222-3333-4444-555555555555'
+  const victimResult = insertAuthUser(dbUrl, {
+    id: victimId, email: 'victim@example.com', metadata: { username: '', birth_year: '2000' },
+  })
+  check('F2 placeholder-collision victim still created (not stranded)', victimResult.status === 0, victimResult.stderr)
+  if (victimResult.status === 0) {
+    const row = queryOne(dbUrl, `select username, needs_profile_completion, char_length(username) <= 20 from public.profiles where id = '${victimId}';`)
+    const [vUser, vNpc, vLenOk] = row.split('|')
+    check('F2 victim got a DIFFERENT placeholder (retry with fresh entropy)', vUser !== 'user_111111112222333' && vUser.startsWith('user_'), row)
+    check('F2 victim needs_profile_completion=true', vNpc === 't', row)
+    check('F2 victim placeholder within 20-char CHECK', vLenOk === 't', row)
+    const vProg = queryOne(dbUrl, `select count(*) from public.progress where id = '${victimId}';`)
+    check('F2 victim progress row inserted', vProg === '1', vProg)
   }
 
   // ── Missing-metadata fallback ───────────────────────────────────────────────
@@ -172,6 +225,22 @@ try {
   if (blankResult.status === 0) {
     const row = queryOne(dbUrl, `select needs_profile_completion from public.profiles where id = '${blankId}';`)
     check('blank-username fallback: needs_profile_completion=true', row === 't', row)
+  }
+
+  // F3 (review): a whitespace-only username ('   ') is effectively blank and
+  // must take the fallback path, NOT be stored as a real username. Non-empty
+  // names are otherwise not trimmed (exact-match freeze) — only empty-after-trim changes.
+  const wsId = '11111111-1111-1111-1111-000000000008'
+  const wsResult = insertAuthUser(dbUrl, {
+    id: wsId, email: 'whitespace@example.com',
+    metadata: { username: '   ', birth_year: '2000' },
+  })
+  check('whitespace-only username signup still succeeds', wsResult.status === 0, wsResult.stderr)
+  if (wsResult.status === 0) {
+    const row = queryOne(dbUrl, `select username, needs_profile_completion from public.profiles where id = '${wsId}';`)
+    const [wsUsername, wsNpc] = row.split('|')
+    check('whitespace-only username: placeholder assigned, not stored verbatim', wsUsername.startsWith('user_') && wsUsername !== '   ', row)
+    check('whitespace-only username: needs_profile_completion=true', wsNpc === 't', row)
   }
 
   // ── Placeholder length on a real UUID (max-hex-density case) ──────────────

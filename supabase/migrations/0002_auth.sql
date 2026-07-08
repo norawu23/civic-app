@@ -46,9 +46,11 @@ grant execute on function public.username_available(text) to anon, authenticated
 --
 -- Reads new.raw_user_meta_data->>'username' and ->>'birth_year' (the
 -- signup metadata contract: supabase.auth.signUp({ options: { data: {
--- username, birth_year } } })). birth_year arrives as a JSON string, so the
--- numeric cast below is defensive (invalid/non-numeric -> treated as
--- absent, never a hard error).
+-- username, birth_year } } })). birth_year arrives as a JSON string. It is
+-- FAIL-CLOSED: a genuinely absent/empty birth_year proceeds as NULL, but a
+-- birth_year that is PRESENT yet does not parse to an integer aborts the
+-- signup (RAISE) rather than degrading to NULL — otherwise a non-integer
+-- like "2013.5" would silently skip the under-13 gate (review F1, D-009).
 
 create or replace function public.handle_new_user()
 returns trigger
@@ -72,11 +74,17 @@ begin
   -- exact expression so a client-passed signup is never server-rejected.
   v_raw_birth_year := new.raw_user_meta_data->>'birth_year';
 
+  -- FAIL CLOSED (review F1 / D-009): a present-but-unparseable birth_year
+  -- (e.g. "2013.5", "2013abc", "0x7DD", "2_013", a JSON boolean) must NOT be
+  -- swallowed to NULL — that would skip the under-13 gate below and admit the
+  -- account. Only a genuinely absent/empty birth_year proceeds as NULL. The
+  -- RAISE here is outside the username-collision handler further down, so it
+  -- propagates and aborts the whole signup (nothing persists).
   if v_raw_birth_year is not null and length(trim(v_raw_birth_year)) > 0 then
     begin
       v_birth_year := v_raw_birth_year::int;
     exception when others then
-      v_birth_year := null;  -- non-numeric birth_year: treat as absent, not an error
+      raise exception 'signup rejected: birth_year present but not a valid integer (%)', v_raw_birth_year;
     end;
   else
     v_birth_year := null;
@@ -98,8 +106,16 @@ begin
 
   -- ── happy path ────────────────────────────────────────────────────────────
   v_username := new.raw_user_meta_data->>'username';
-  if v_username is null or char_length(v_username) < 3 or char_length(v_username) > 20 then
-    v_username := null;  -- null/blank/invalid -> go straight to the fallback path below
+  -- null / whitespace-only / out-of-length -> fallback path. A whitespace-only
+  -- name (e.g. "   ") is effectively blank and must NOT be stored as a real
+  -- username (review F3 / D-009). Non-empty usernames are NOT trimmed or
+  -- normalized otherwise — the freeze is case-sensitive EXACT match (D-008 §1),
+  -- so " alice " stays distinct from "alice" and username_available stays byte-exact.
+  if v_username is null
+     or length(trim(v_username)) = 0
+     or char_length(v_username) < 3
+     or char_length(v_username) > 20 then
+    v_username := null;
   end if;
 
   if v_username is not null then
@@ -120,10 +136,21 @@ begin
   -- needs_profile_completion so the client prompts for a real one. A2 only
   -- ever SETS this true; clearing it is A3's column-restriction trigger.
   if v_username is null then
-    v_placeholder := left('user_' || replace(new.id::text, '-', ''), 20);
-    insert into public.profiles (id, username, birth_year, needs_profile_completion)
-    values (new.id, v_placeholder, v_birth_year, true)
-    on conflict (id) do nothing;
+    begin
+      v_placeholder := left('user_' || replace(new.id::text, '-', ''), 20);
+      insert into public.profiles (id, username, birth_year, needs_profile_completion)
+      values (new.id, v_placeholder, v_birth_year, true)
+      on conflict (id) do nothing;
+    exception when unique_violation then
+      -- The placeholder derives from only the first 15 hex of new.id (60 bits),
+      -- so a pre-squatted matching placeholder could collide on the username
+      -- UNIQUE index (astronomically unlikely, but review F2: it must not strand
+      -- the auth row). Retry once with fresh, independent entropy.
+      v_placeholder := left('user_' || replace(gen_random_uuid()::text, '-', ''), 20);
+      insert into public.profiles (id, username, birth_year, needs_profile_completion)
+      values (new.id, v_placeholder, v_birth_year, true)
+      on conflict (id) do nothing;
+    end;
   end if;
 
   -- ── progress row: always, regardless of which path above ran ────────────
