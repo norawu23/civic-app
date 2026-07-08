@@ -253,3 +253,31 @@ Owner ratification closing NUANCE_RUBRIC.md known-ambiguities 1 and 2 — the la
 2. **Code points are the unit of length (ambiguity 2); no Unicode normalization.** `Array.from(str).length` in JS ≡ `char_length()` in a UTF-8 Postgres — the only length definition both engines implement natively and identically. Grapheme clusters (ZWJ sequences, modifiers) are expressly NOT the unit; text gaming the difference is gibberish-tier, i.e. spot-check territory. **B4 DoD gains the gs-18 verification**: `char_length()` of forty U+1F642 returns exactly 40 through the live SQL, converting the rubric's "unverified" note into a tested fact when B4 lands.
 
 Rubric ambiguities 1–2 annotated as ratified; B4 spec DoD amended with both tests. With D-013/D-014/D-015, every E1 open item is closed — B4 implements against a fully pinned rubric.
+
+## D-016 — Batch-1a formal freeze record (for Fri Jul 10) — AUTHORED 2026-07-08, RATIFICATION PENDING
+
+BUILD_PLAN names Fri Jul 10 as the batch-1a interface freeze. Nearly everything on the freeze list was ratified early (D-008 through D-015); this entry consolidates the complete list with as-built evidence so Friday's sign-off is a single act. Prepared by the operator 2026-07-08.
+
+**Already frozen by prior ratifications — no Friday action:**
+- E1 in full: golden set hand-scored (202b7ab), trigram 0.55 (D-013), instrument UI constraint (D-014), measurement pins (D-015).
+- `answers` jsonb shape `{question_id, response_type, position?, other_side?}` — frozen with the WS-B signature contract, ratified D-010/D-011.
+- All 13 WS-B RPC signatures + the 14-code error registry (D-010/D-011, frozen early 2026-07-08).
+
+**Confirmed as-built, incorporated into the freeze by this entry (D-005 §1–3):**
+1. **Migration ownership** — executed: `0001` (A1) / `0002` (A2) / `0003` (A3) merged, full-chain verified on real PG15 (D-009); `0004`–`0008` assigned one-per-chunk to B1–B5 (D-012 §8).
+2. **`xp_awards` seeded in 0001** — completeness confirmed at A1 review; the derived 4,000-XP ceiling re-verified against the seed at D-012 ratification.
+3. **Unlock registry at `src/data/registry.js`** — merged (H1); `topics_catalog.position` seeds from it; C2 binds to it for `DEFAULT_PROGRESS` (D-012 §1).
+
+**Newly frozen by this entry — C1 guest envelope v2** (the one freeze-list item not previously ratified):
+- localStorage key `civic_envelope_v2`; envelope `{v: 2, anon_id, created_at, state: {total_xp, topics (flags only, no XP inside), opinion_builders, evolved_takes: [{opinion_builder_id, topic_id, cold_take, evolved_take, is_custom}], baseline_done}}`. `anon_id` from `crypto.randomUUID()` ONLY, minted once, lazily if unavailable at creation `[r1]`.
+- Module API: `loadEnvelope` / `saveEnvelope` / `getAnonId` / `migrateV1` / `clearEnvelope`, plus the `validateEnvelope` helper export. Backup keys `civic_progress_v1_backup` and `civic_envelope_v2_corrupt_backup`; legacy `civic_progress` cleared only by C3 after confirmed import.
+- As-built verified against the C1 spec at freeze prep (2026-07-08): API surface, storage keys, randomUUID-only generation, and quarantine paths all match; 21/21 tests green on re-run. The spec's "final shape to operator by EOD Thu Jul 9" deliverable is satisfied by the merged implementation.
+- Consumers bound: C2 (reads), C3/B5 (import consumes the FULL envelope incl. top-level `anon_id` — D-011 §1), E2 (`getAnonId` for baseline). Post-freeze changes are decisions.md events.
+
+**§3a runbook consolidation (no new decisions — surfacing already-ratified items into the step list):** precondition (0) = the D-006 §3 username ruling is ratified before the run; post-steps (5) rotate the prod DB password immediately after the repair (D-006 security note) and (6) deploy the D-002 "progress syncing paused" banner to the legacy client on repair day.
+
+**The only two Friday actions:**
+1. **Rule on D-006 §3 (overlength username):** accept the default identity-preserving rewrite (email local-part where it fits, else deterministic `user_<id-prefix>`, plus `needs_profile_completion = true`), or direct a specific handle / contact the tester first. Precondition for the week-2 repair.
+2. **Sign below.**
+
+**RATIFIED by owner 2026-07-__ :** _______________  (D-006 §3 username ruling: _______________)
