@@ -243,3 +243,13 @@ Owner ruling arising from the D-013 ratification discussion. Binds **E2** (basel
 2. **The structured capture form is frozen across sessions.** Identical fields, labels, input sizing, and framing copy at baseline and day 30 — and unchanged across the measurement window once real baselines exist. Any change to the capture form after first launch is a decisions.md event, because it breaks before/after comparability of the instrument.
 
 3. **Fairness posture recorded:** users never see nuance scores, a short genuine attempt falls to 2 (the "It's complicated" tier), not 1, and the 10% admin spot-check (N6/N8) is the designated evidence channel for revisiting `MIN_STRUCTURED_FIELD_CHARS = 40` post-launch — a one-constant decisions.md change plus re-cutting the 39/40/41 boundary fixtures, taken on observed answers, not speculation.
+
+## D-015 — E1 text-measurement rulings: no normalization, code points (2026-07-08)
+
+Owner ratification closing NUANCE_RUBRIC.md known-ambiguities 1 and 2 — the last open E1 items. Shared principle, continuous with D-013/D-014: **the scorer measures text exactly as stored** — every normalization step is a fresh opportunity for the JS reference and B4's SQL to silently disagree, and everything normalization would catch is already the admin spot-check's job (N6/N8).
+
+1. **Whitespace is untrimmed (ambiguity 1).** The ≥40 rule measures the field as stored; neither implementation trims (`trim()`, `btrim()`, or any stripping) before counting. Deciding "trim first" would itself create divergence — JS `trim()` and Postgres `trim()` disagree on what whitespace *is* (tabs, NBSP, etc.). Padding-to-40 requires knowing a threshold D-014 bars from disclosure, earns nothing user-visible, and is glaring in the spot-check. **B4 DoD gains a padded-input agreement test** (no golden-set fixture isolates this; the set is hard-pinned at 20).
+
+2. **Code points are the unit of length (ambiguity 2); no Unicode normalization.** `Array.from(str).length` in JS ≡ `char_length()` in a UTF-8 Postgres — the only length definition both engines implement natively and identically. Grapheme clusters (ZWJ sequences, modifiers) are expressly NOT the unit; text gaming the difference is gibberish-tier, i.e. spot-check territory. **B4 DoD gains the gs-18 verification**: `char_length()` of forty U+1F642 returns exactly 40 through the live SQL, converting the rubric's "unverified" note into a tested fact when B4 lands.
+
+Rubric ambiguities 1–2 annotated as ratified; B4 spec DoD amended with both tests. With D-013/D-014/D-015, every E1 open item is closed — B4 implements against a fully pinned rubric.

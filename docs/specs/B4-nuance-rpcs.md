@@ -73,7 +73,8 @@ grant select (id, user_id, anon_id, kind, answers, excluded, created_at)
 - [ ] `0007` applies cleanly on 0001→0006 from empty; full-chain migrations job green
 - [ ] All three RPCs match the frozen signature table exactly — including the **`anon`-only** grants on the two anon RPCs (+ PUBLIC revoke everywhere; test: an authed caller invoking an anon RPC hits the grant wall)
 - [ ] **Calibration green in rpc mode:** every golden-set fixture scores identically through the live `submit_nuance_session` and the reference scorer; CI `calibration` job flipped per E1's TODO. Any mismatch is escalated, not patched
-- [ ] Threshold and rate limit exist **only** in their slot functions; the ratified Jul 13 threshold value is in place at merge
+- [ ] Threshold and rate limit exist **only** in their slot functions; the ratified threshold value (0.55, D-013) is in place at merge
+- [ ] **D-015 measurement pins verified on live SQL:** (a) whitespace untrimmed — a sub-40 field padded with spaces past 40 scores identically through the RPC and the reference scorer, no `trim()`/`btrim()` anywhere in the scoring path; (b) code points are the unit — `char_length()` on gs-18's forty-emoji (U+1F642) position returns exactly 40, converting the rubric's "unverified" note into a tested fact
 - [ ] Resubmission battery: authed baseline ×2, anon baseline ×2, day-30 ×2 → second call acks with **no** new row, no error, no 23505 in logs; UNIQUE constraint never raises through the RPC
 - [ ] Burst simulation `[r5]`: 30 submissions/10 min/1 IP (distinct anon_ids) all pass; 200 in the hour → `rate_limited` after the 60th; replays within a hot window still ack (order pin 4-before-5)
 - [ ] `anon_id_linked`: an anon_id linked via a simulated import (row with `user_id` set) is rejected on both anon RPCs
@@ -83,7 +84,7 @@ grant select (id, user_id, anon_id, kind, answers, excluded, created_at)
 
 ## Required tests
 
-- Scoring unit-level (via a definer test wrapper or direct calls as owner): each rubric rule in isolation — tap/complicated/structured; 39/40/41-char boundary; near-duplicate just above/below threshold (gs-09/gs-10 land correctly); failed structured attempt → 2; empty `other_side` → 2; gibberish pair → 3 (gs-11, documented limitation)
+- Scoring unit-level (via a definer test wrapper or direct calls as owner): each rubric rule in isolation — tap/complicated/structured; 39/40/41-char boundary; near-duplicate just above/below threshold (gs-09/gs-10 land correctly); failed structured attempt → 2; empty `other_side` → 2; gibberish pair → 3 (gs-11, documented limitation); D-015 pins — whitespace-padded field agreement + gs-18 `char_length()` = 40 (see DoD)
 - Full golden set through the RPC (the calibration harness is the vehicle — fresh identity per fixture)
 - `invalid_params` vs `invalid_answers` boundary: non-array vs bad-content fixtures on both sides, incl. `kind='session'` (the D-010-rejected third value) → `invalid_params`
 - Rate limits: burst table above + window rollover (manipulate `window_start` directly); missing `x-forwarded-for` header → shared bucket still limits
