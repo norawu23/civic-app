@@ -138,7 +138,7 @@ DoD tests: forged-XP clamp to catalog max, second import rejected, delete leaves
 ### WS-E — Nuance instrument
 
 **E1 — Rubric + golden set.** `docs/NUANCE_RUBRIC.md`, 20 hand-scored examples (operator hand-scores; builder harnesses), CI calibration job. Blocks B4 merge. Day 1 start. *1 bd + operator time.*
-**E2 — Baseline quiz UI.** First-session flow (guest + authed), two-field structured capture, zero-reward framing copy, guest install-prompt tie-in `[r6]`. E2E smoke #3. *2 bd.*
+**E2 — Baseline quiz UI.** First-session flow (guest + authed), two-field structured capture, zero-reward framing copy, guest install-prompt tie-in `[r6]` · **instrument freeze (D-014): no character counter, no minimum-length hint, no score display; capture form identical at baseline and day 30 — post-launch form changes are decisions.md events**. E2E smoke #3. *2 bd.*
 (Day-30 UI is deliberately P1 — cannot be exercised before ~Sept 29.)
 
 ### WS-F — Trust & legal

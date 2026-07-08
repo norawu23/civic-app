@@ -233,3 +233,13 @@ Executes D-005 §4's proposal-and-ratify, ahead of the Jul 13 date. The operator
 4. **Fidelity guard restated:** the JS trigram implementation is unverified against live `pg_trgm` (rubric ambiguity 3). Any B4 SQL-vs-reference disagreement on any golden-set fixture escalates per the E1 spec — never silently resolved; B4's DoD already requires agreement on all 20.
 
 NUANCE_RUBRIC.md status updated from PROVISIONAL to RATIFIED in the same commit. Rubric ambiguities 1 (whitespace trimming) and 2 (code-point counting, gs-18) remain open for separate rulings; they do not block B4 start.
+
+## D-014 — Nuance instrument UI constraint: undisclosed thresholds, frozen form (2026-07-08)
+
+Owner ruling arising from the D-013 ratification discussion. Binds **E2** (baseline quiz UI, batch 3) and **P1-2** (day-30 session UI); recorded now so it's standing when those chunks are spec'd in W3.
+
+1. **The scoring thresholds are never disclosed in-product.** No character counter, no minimum-length hint, no "write more" nudge, and (restating D-010) no score display. The 40-char and 0.55-trigram rules stay invisible so the score cannot be aimed at: a visible bar would measure compliance with a UI instruction rather than unprompted willingness to articulate both sides (Goodhart), and would hand skeptics the objection that the 30-day improvement is "users learning the form's requirements."
+
+2. **The structured capture form is frozen across sessions.** Identical fields, labels, input sizing, and framing copy at baseline and day 30 — and unchanged across the measurement window once real baselines exist. Any change to the capture form after first launch is a decisions.md event, because it breaks before/after comparability of the instrument.
+
+3. **Fairness posture recorded:** users never see nuance scores, a short genuine attempt falls to 2 (the "It's complicated" tier), not 1, and the 10% admin spot-check (N6/N8) is the designated evidence channel for revisiting `MIN_STRUCTURED_FIELD_CHARS = 40` post-launch — a one-constant decisions.md change plus re-cutting the 39/40/41 boundary fixtures, taken on observed answers, not speculation.
