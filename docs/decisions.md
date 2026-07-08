@@ -135,3 +135,27 @@ Interface changes and ambiguity rulings, per BUILD_PLAN §1 escalation protocol.
 4. **`restrict_profile_update()` trigger `search_path` pinned to `''` (A3 review nit).** Non-exploitable (SECURITY INVOKER, pure NEW/OLD field assignment, no schema-qualified lookups) but pinned for consistency with `is_admin()` and defense-in-depth on the privilege-escalation wall.
 
 **Architecture impact:** none — all four operate below the §2/§3 interface level. Cross-chunk consumer note: **F1** must honor decision 1 (send a clean integer or omit `birth_year`; mirror the `< 14` expression from D-008 §2). Both migrations are now on `main`; the merge was local only (not pushed).
+
+---
+
+## D-010 — WS-B signature freeze: return contract, error convention, amendments (2026-07-08)
+
+**Context:** authoring the WS-B RPC signature contract (`docs/specs/WS-B-signatures.md`) for the **Fri Jul 10 interface freeze**, per the batch-2 freeze brief. ARCHITECTURE §3 froze names and (mostly) params but hand-waved every return as "the updated progress snapshot" and defined no error convention. This entry records what the contract freezes and the two places it deliberately amends §3.
+
+**Decisions:**
+
+1. **Frozen return contract.** One canonical `progress_snapshot` type (the client-relevant `0001.progress` columns: `total_xp, streak, streak_freezes, last_login_date, tz_offset_minutes, topics, opinion_builders, schema_version, updated_at` — excluding `id`, internal `streak_freeze_awarded_at`, and analytics-only `imported_from_guest`), defined once in `io.js` zod and returned by every progress-writing RPC inside a uniform envelope `{snapshot, xp_awarded, ...addendum}`. Idempotency is observable: a replay succeeds with `xp_awarded: 0`, never errors. `complete_quiz` adds `n_correct` only — **no per-question correctness echo** (protects the §3.1 grading path). `check_streak` adds `streak_event ∈ {started, same_day, extended, freeze_spent, reset}` and doubles as the login bootstrap read (D-008 §4). Explicit shapes over nulls throughout (acks, `{n, gated: true}`).
+
+2. **Nuance-silent, structurally.** RATIFIED by owner 2026-07-08: **no score is shown after the nuance questionnaire** — all three nuance RPCs return `{accepted: true}` and nothing else, so the score has no client-facing return path to regress through. Rationale: zero-reward framing (§5.1.3/N6); a visible score invites gaming and pollutes the 30-day delta. Scores are readable solely via G2 admin views.
+
+3. **`get_ob_comparison` → B3.** In §3's list but assigned to no chunk; folded into B3 (complete + compare are one feature — bars render on OB completion, §5.2). Return frozen as `{n, gated: true}` under n<10, else `{n, gated: false, cold: {yes, no}, evolved: [{take, count}], custom_count}` — counts not percentages, custom-take text never returned. B3 grows slightly; accepted.
+
+4. **Error convention (the §3 gap).** RPC failure = Postgres exception: `raise exception using message = '<snake_case_code>', detail = '<human context>'`. The `message` is exactly one token from the frozen 16-code registry in the contract §6; `io.js` maps it via one zod enum (unknown → `internal`); screens consume typed errors only. Success bodies never carry an `error` key; `detail` never carries user-written content. Registry additions are decisions.md events.
+
+5. **AMENDMENT — `check_streak(tz_offset_minutes int)`** (§3 had zero params). D-001 requires the stored offset to be "refreshed on every app load," but A3's RLS leaves no direct write path to `progress`, and the streak day-boundary must be evaluated against the *fresh* offset, not a stale one. The offset therefore rides the streak check itself: clamped server-side to ±840, persisted, then the user-local date is derived from server `now()`. Closes an interface gap the zero-param signature could not satisfy.
+
+6. **AMENDMENT — `submit_nuance_session.kind ∈ {'baseline','day30'}`**, not the freeze brief's three-value set including `'session'`. The merged `0001` CHECK admits exactly two values, the `unique (user_id, anon_id, kind)` constraint structurally precludes a repeatable third kind, and no third session type exists in §5.1's design — the brief's third value was an error. Widening later is an additive migration + decisions.md event.
+
+7. **C2 rides the contract** — no separate C2 spec in this batch (ratified 2026-07-08). Batch 3 (D1–D3, E2, F2, G1–G3) remains W3, gated on C2.
+
+**Architecture impact:** §3's RPC list is amended by decisions 5 and 6 (param-level only; no new/removed RPCs). Items 5 and 6 were authored on operator authority against the Jul 10 deadline and flagged to the owner for ratification at the freeze. Cross-chunk consumers: **C2** (stubs + zod from the contract), **B1–B5** (implement to it; W2 specs may not alter it), **G2** (sole nuance-score read path), **E1** (threshold ratifies separately per D-005 §4 — untouched by these signatures).
