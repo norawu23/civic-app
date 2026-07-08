@@ -105,6 +105,62 @@ jobs:
   # Greps src/ for supabase-js table/column references and fails on any
   # reference to a table/column absent from 0001_schema.sql (spec DoD item
   # 6). Also runs the negative test proving the gate reddens on a fake column.
+  # ── rls ───────────────────────────────────────────────────────────────────
+  # A3 scope note: this job is owned by A3 (docs/specs/A3-rls-column-restriction.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — a new `rls` job
+  # only, per the per-chunk scope-note convention)"). Do not fold other
+  # chunks' work into it, and do not fold this job into `migrations` above
+  # (owned exclusively by A1).
+  #
+  # Provisions its own throwaway shadow DB (mirrors the `migrations` job's
+  # pattern above) with supabase/migrations/ applied from empty — which
+  # includes 0003_policies.sql (A3) and, once merged, 0002_auth.sql (A2) —
+  # then runs the RLS policy-suite and column-restriction-trigger integration
+  # tests against it. Both test files self-skip (exit 0) when Docker/psql are
+  # unavailable (A1's deny-all-smoke precedent); on ubuntu-latest both are
+  # present, so this job genuinely exercises the deny-path matrix here.
+  rls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow-rls
+          cp -r supabase ci-shadow-rls/supabase
+          (cd ci-shadow-rls && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-rls && supabase db start
+
+      - name: RLS policy suite (deny-path per policy per table)
+        run: |
+          cd ci-shadow-rls
+          node ../tests/rls/policies.test.mjs
+
+      - name: profiles column-restriction trigger
+        run: |
+          cd ci-shadow-rls
+          node ../tests/rls/column-restriction.test.mjs
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-rls && supabase stop --no-backup || true
+
+  # ── column-refs ──────────────────────────────────────────────────────────
+  # Greps src/ for supabase-js table/column references and fails on any
+  # reference to a table/column absent from 0001_schema.sql (spec DoD item
+  # 6). Also runs the negative test proving the gate reddens on a fake column.
+
   column-refs:
     runs-on: ubuntu-latest
     steps:
