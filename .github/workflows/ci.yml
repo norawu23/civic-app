@@ -64,6 +64,43 @@ jobs:
         if: always()
         run: cd ci-shadow && supabase stop --no-backup || true
 
+  # ── auth ──────────────────────────────────────────────────────────────────
+  # A2 scope note: this job is owned by A2 (docs/specs/A2-auth-trigger-
+  # username.md in-scope list — "`.github/workflows/ci.yml` (extend — a new
+  # `auth` job only)"). Do not fold other chunks' work into it, and do not
+  # fold this job's work into `migrations` above (A1's job).
+  #
+  # Exercises 0002_auth.sql (the on_auth_user_created trigger +
+  # username_available RPC) against a fresh local Supabase stack with 0001 +
+  # 0002 applied from empty. Both test files are self-contained — each spins
+  # up and tears down its own throwaway `supabase start` stack via
+  # tests/lib/supabase-stack.mjs (same pattern as deny-all-smoke.test.mjs),
+  # so this job just needs Docker + psql on the runner and invokes them
+  # directly; it does not need to manage its own ci-shadow project.
+  #
+  # Per A1's deny-all-smoke precedent: both tests SKIP (exit 0), not fail,
+  # when Docker/psql are absent — but ubuntu-latest has both, so this job
+  # genuinely runs the full trigger + RPC suite in CI.
+  auth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Auth trigger test suite (signup happy path, under-13 non-persistence, collision/missing-metadata fallback, double-fire idempotency)
+        run: node tests/auth/trigger.test.mjs
+
+      - name: username_available RPC test suite (taken/short/long/free, anon + authenticated callable)
+        run: node tests/auth/username-available.test.mjs
+
   # ── column-refs ──────────────────────────────────────────────────────────
   # Greps src/ for supabase-js table/column references and fails on any
   # reference to a table/column absent from 0001_schema.sql (spec DoD item
