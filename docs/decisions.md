@@ -219,3 +219,17 @@ Interface changes and ambiguity rulings, per BUILD_PLAN §1 escalation protocol.
 - **Ruling 2 confirmed as a deliberate product choice**, not only legacy parity: quiz completion pays, passive card completion doesn't. Adding card XP later = one `xp_awards` seed row + two RPC touches + re-derivation of the ruling-7 ceiling.
 
 Nuance-threshold ratification (D-005 §4, Jul 13) remains separate and untouched.
+
+## D-013 — E1 trigram near-duplicate threshold ratified at 0.55 (2026-07-08)
+
+Executes D-005 §4's proposal-and-ratify, ahead of the Jul 13 date. The operator, having completed the golden-set hand-scoring pass (all 20 fixtures ratified, commit 202b7ab), ratifies the E1 builder's proposed threshold.
+
+1. **Value: 0.55, strict `>` comparison.** `position` and `other_side` are near-duplicates iff their pg_trgm-style trigram similarity is **greater than** 0.55 — a pair measuring exactly 0.55 is NOT a duplicate. The value lives in exactly two single-definition constants that must always agree: `TRIGRAM_NEAR_DUPLICATE_THRESHOLD` (`tests/nuance/reference-scorer.mjs`) and B4's `nuance_trgm_threshold()` parameter-slot function (D-012 §9). Per D-005 §4 the ratified value is now part of the frozen rubric — changing it is a decisions.md event.
+
+2. **Boundary pins:** gs-09 (similarity 0.5683 → near-duplicate → 2 pts) and gs-10 (0.5297 → distinct → 3 pts) are the permanent regression fixtures for the exact line. Their synthetic construction (rubric ambiguity 4) is accepted for what they are — threshold pins, not naturalistic answers; a naturalistic supplement may be added later without a decision event as long as the threshold and the pins stand.
+
+3. **Basis, and the caveat accepted with it:** ratified on golden-set evidence, not corpus analysis (none can exist pre-launch — rubric ambiguity 5). Across all realistic fixtures, genuinely distinct argument pairs measure 0.03–0.32, light rewording measures 0.84, copy-paste 1.0; 0.55 sits in the empty band between honest and duplicate behavior with wide margin on both sides. Post-launch revision with real user text is expressly permitted — via a new decision entry.
+
+4. **Fidelity guard restated:** the JS trigram implementation is unverified against live `pg_trgm` (rubric ambiguity 3). Any B4 SQL-vs-reference disagreement on any golden-set fixture escalates per the E1 spec — never silently resolved; B4's DoD already requires agreement on all 20.
+
+NUANCE_RUBRIC.md status updated from PROVISIONAL to RATIFIED in the same commit. Rubric ambiguities 1 (whitespace trimming) and 2 (code-point counting, gs-18) remain open for separate rulings; they do not block B4 start.

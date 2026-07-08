@@ -1,6 +1,6 @@
 # Nuance session scoring rubric
 
-**Status:** PROVISIONAL — golden-set fixtures are builder-authored placeholders (E1) pending operator hand-scoring Jul 11–12 2026. The trigram threshold below is a **proposal**, not yet ratified (D-005 §4).
+**Status:** RATIFIED — all 20 golden-set fixtures hand-scored and ratified by the operator 2026-07-08 (commit 202b7ab). The trigram threshold below is **ratified at 0.55** (D-005 §4, executed by D-013 2026-07-08).
 
 **Basis:** ARCHITECTURE.md §5.1.3, transcribed verbatim below (this document does not reinterpret those rules — it explains and worked-examples them).
 
@@ -58,7 +58,7 @@ Even if both fields clear 40 characters, they must **not be near-duplicates of e
 
 `position` and `other_side` are **near-duplicates** iff `similarity(position, other_side) > TRIGRAM_NEAR_DUPLICATE_THRESHOLD`.
 
-### Proposed threshold: **0.55** (D-005 §4 — proposal, pending operator ratification)
+### Ratified threshold: **0.55** (D-005 §4, ratified by D-013 2026-07-08)
 
 This is a single named constant (`TRIGRAM_NEAR_DUPLICATE_THRESHOLD` in `reference-scorer.mjs`) specifically so the operator can change one number at the Jul 11–12 review without touching any scoring logic. B4 implements the identical threshold in SQL via `pg_trgm`'s `similarity()` function (same formula, so the numbers should transfer directly — see "Known ambiguities" for the residual risk).
 
@@ -118,5 +118,5 @@ These are places where the mechanical rule above has more than one reasonable re
 2. **Code-point vs grapheme-cluster counting (gs-18).** The reference scorer counts Unicode code points (`Array.from`). Simple emoji (single-codepoint, BMP or astral) likely count the same way in Postgres's `char_length()`. Multi-codepoint grapheme clusters (skin-tone modifiers, ZWJ family emoji, combining diacritics) are a case where "one visual character" and "one code point" diverge, and this has not been verified against a real Postgres `char_length()` call.
 3. **Trigram algorithm fidelity to real `pg_trgm`.** The reference implementation's trigram extraction (word-split, 2-space/1-space padding, Jaccard over sets) is a faithful reproduction of the documented `pg_trgm` algorithm, but has not been cross-checked against a running Postgres instance with the extension enabled. If B4's SQL `similarity()` calls produce different numbers than `trigramSimilarity()` on any golden-set fixture, that is exactly the kind of discrepancy the spec says to escalate, not silently resolve.
 4. **The near-duplicate boundary fixtures (gs-09/gs-10) are synthetic, not naturalistic.** They were constructed by controlling shared-word fraction precisely to land close to 0.55 on both sides, which produces slightly stilted prose. They are excellent regression pins for the exact threshold value but are not representative of what a real near-duplicate quiz answer looks like "in the wild" (example 1/2 in the trigram section above are more representative). If the operator wants a more naturalistic boundary pair, these two are the ones to replace or supplement.
-5. **The trigram threshold itself (0.55) is a proposal, not a validated number.** It was chosen because it comfortably separates the constructed boundary pair and "feels" like a reasonable cutoff, not from any corpus analysis of real nuance-session answers (none exist yet — this is a pre-launch instrument). The operator's Jul 11–12 hand-scoring pass, once it has real user-authored text to look at, is the first real opportunity to validate or revise it.
+5. **The trigram threshold (0.55) was chosen by construction, not corpus analysis** (none can exist pre-launch). *Ratified at 0.55 by D-013 (2026-07-08), accepting this caveat explicitly;* post-launch revision against real user text is permitted via a new decisions.md entry.
 6. **What counts as "gibberish" is entirely outside the scorer's authority.** gs-11 demonstrates that keyboard-mash text scores 3 mechanically. This rubric does not attempt to define gibberish detection — that judgment call belongs entirely to the admin spot-check, by design (§5.1.3). Nothing here should be read as suggesting the scorer should be extended to catch this case; doing so would reintroduce the free-text-heuristic problem structured scoring was built to fix (M7).
