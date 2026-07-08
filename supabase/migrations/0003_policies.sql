@@ -161,6 +161,10 @@ create policy events_select_admin on public.events
 create function public.restrict_profile_update()
 returns trigger
 language plpgsql
+-- search_path pinned for consistency with is_admin() and defense-in-depth
+-- (review nit). The body does only NEW/OLD field assignment with no schema-
+-- qualified lookups, so this is belt-and-suspenders, not a live vector.
+set search_path = ''
 as $$
 begin
   -- Never client-writable, no exceptions.
