@@ -145,7 +145,7 @@ DoD tests: forged-XP clamp to catalog max, second import rejected, delete leaves
 
 **F1 — Age gate.** Birth-year screen before ANY server-side capture · guest year used client-side only, never transmitted · device-persistent block after under-13 answer `[r4]` · legacy NULL re-prompt at login · re-prompt under-13 answer → account + data deletion flow `[r8]`.
 DoD: E2E proves no network call carries guest birth year; block survives reload. *2 bd. Adversarial review.*
-**F2 — Privacy + terms pages.** Plain language, minors-appropriate; deletion promise text conditional on `delete_account` being live `[r7]` · **discloses the error-reporting processor (Sentry) honestly — no "no third parties" claim** `[m-5]`. Operator legal-tone review. *1 bd.*
+**F2 — Privacy + terms pages.** Plain language, minors-appropriate; deletion promise text conditional on `delete_account` being live `[r7]` · **discloses the error-reporting processor (Sentry) honestly — no "no third parties" claim** `[m-5]` · **deletion copy discloses that anonymized events (`user_id → NULL`) are retained for aggregate statistics** (D-012 ratification rider). Operator legal-tone review. *1 bd.*
 
 ### WS-G — Observability
 

@@ -1,6 +1,8 @@
 # CIVIC — Architecture v3 (Hybrid Rebuild)
 
-**Status:** HARDENED v3.2 — audits 001–003 (docs/audits/); round-3 verdict: no blockers, no unaddressed majors. Residual minors r1–r8 transcribed into BUILD_PLAN.md definitions of done. Amendments v3.1 (D-001) and v3.2 (D-003) applied via the decision log.
+**Status:** HARDENED v3.3 — audits 001–003 (docs/audits/); round-3 verdict: no blockers, no unaddressed majors. Residual minors r1–r8 transcribed into BUILD_PLAN.md definitions of done. Amendments v3.1 (D-001), v3.2 (D-003), and v3.3 (D-012 ratification rider) applied via the decision log.
+
+**v3.3 amendment (D-012 ratification rider, 2026-07-08):** §8.2's privacy-page contents additionally disclose what account deletion retains: anonymized events (`user_id → NULL`) survive for aggregate analytics; everything identifying is erased. Binds F2's deletion-promise copy.
 
 **v3.2 amendment (decision D-003):** §8.2's privacy-page contents change from "no third parties" to an honest disclosure: one third-party error-reporting processor (Sentry), receiving reports scrubbed of PII and user-written content (scrubbing enforced and tested — BUILD_PLAN G3).
 
@@ -351,7 +353,7 @@ This is the standard 13+ general-audience posture under COPPA; v1's "collect not
 
 ### 8.2 Minors' political-opinion data
 - Treated as sensitive by policy: private to the user; admin visibility exists for moderation and is **disclosed in-product** at the point of writing ("Visible to you and the CIVIC team").
-- Privacy policy + terms pages shipped **in P0, before any real user** — plain-language, teenager-readable, covering: what's collected, admin visibility, aggregation rules (n≥10), no sale or sharing for marketing, honest disclosure of the single third-party error processor (Sentry, PII/content-scrubbed — D-003), deletion via `rpc.delete_account()`.
+- Privacy policy + terms pages shipped **in P0, before any real user** — plain-language, teenager-readable, covering: what's collected, admin visibility, aggregation rules (n≥10), no sale or sharing for marketing, honest disclosure of the single third-party error processor (Sentry, PII/content-scrubbed — D-003), deletion via `rpc.delete_account()` — including plain disclosure that deletion erases everything identifying while anonymous usage counts (events, `user_id → NULL`) are retained for aggregate statistics (D-012 ratification rider).
 - Anonymous comparison data always aggregated, n≥10, no individual exposure.
 - Admin screen shows usernames only, never emails.
 
