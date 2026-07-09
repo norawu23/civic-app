@@ -33,13 +33,17 @@ do $$ begin
   end if;
 end $$;
 
+-- Schema usage only — matching what the real supabase stack grants the client
+-- roles (CI's "permission denied for TABLE …", not "for SCHEMA …", confirms
+-- schema usage is present but table privileges are NOT auto-granted). We
+-- deliberately DO NOT blanket-grant table/sequence/function privileges here:
+-- an earlier version did, and it masked a real defect (0003 created
+-- `for select to authenticated` policies but never granted the base table
+-- SELECT — a policy filters rows, it does not grant access). The stub must
+-- mirror the real stack's default-deny-on-privilege posture so migration
+-- grants are exercised, not papered over. service_role has BYPASSRLS above and
+-- is used only for superuser-style seeding.
 grant usage on schema public to anon, authenticated, service_role;
-alter default privileges in schema public
-  grant all on tables to anon, authenticated, service_role;
-alter default privileges in schema public
-  grant all on sequences to anon, authenticated, service_role;
-alter default privileges in schema public
-  grant execute on functions to anon, authenticated, service_role;
 
 create schema if not exists auth;
 

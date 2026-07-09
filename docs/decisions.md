@@ -293,6 +293,25 @@ BUILD_PLAN names Fri Jul 10 as the batch-1a interface freeze. Nearly everything 
 
 **Conventions set (bind every future DB-suite CI job — B1–B5's rpc jobs included):**
 - **`CIVIC_TEST_DB_URL`:** every DB suite consumes an externally provisioned database when this env var is set (`acquireDb()` in `tests/lib/supabase-stack.mjs`), and only self-provisions a Docker stack when it isn't. **One stack per CI job**, handed to every suite in that job via this variable.
-- **`tests/lib/pg-local-stub.sql`:** a committed Supabase-environment stub (roles, permissive default grants, `auth.users` + `auth.uid()`) that lets the full migration chain and every DB suite run against plain Postgres — no Docker. This is the reproducible form of the operator's D-009 verification rig.
+- **`tests/lib/pg-local-stub.sql`:** a committed Supabase-environment stub (roles, schema-usage grants, `auth.users` + `auth.uid()`) that lets the full migration chain and every DB suite run against plain Postgres — no Docker. **Correction (D-018):** the first version of this file blanket-granted table privileges to the client roles, which masked a real missing-GRANT defect in 0003 (green locally, red in CI). It now grants schema usage only, mirroring the real stack, so migration grants are exercised rather than papered over.
 
 **Verification:** all five suites green against fresh stub+chain PG15 databases via the new path — 96 checks, 0 failures (deny-all 4, auth/trigger 44, auth/username-available 8, rls/policies 29, rls/column-restriction 11); calibration harness unaffected. The ci.yml wiring itself is verified on the next push (this machine cannot run Docker or reach Actions logs).
+
+## D-018 — Real access-control defect: RLS policies without base GRANTs (2026-07-08)
+
+**Finding (operator, via the D-017 CI fix + gh-authed log access):** with CI's `rls` job finally reaching its assertions, the "RLS policy suite" step failed with `permission denied for table profiles` (and progress, evolved_takes, nuance_sessions) and Postgres's own hint: `GRANT SELECT ON public.profiles TO authenticated`.
+
+**Root cause — a genuine bug, not a test artifact.** `0003_policies.sql` creates `for select to authenticated` (and `for update`) policies on the client-readable tables, but never grants the **base table privilege** those policies filter. In Postgres an RLS policy narrows access that a GRANT has already conferred; a policy alone grants nothing. So on the real Supabase stack — which does NOT auto-grant migration-created tables to the client roles — every authenticated client read of its own row is denied before RLS is even consulted. This would have broken the live app: per D-008 §4 the client reads its own profiles/progress/evolved_takes/nuance_sessions directly (RLS-scoped), not only via RPC.
+
+**Why it was invisible until now (three-layer mask):**
+1. The A2/A3 local "verified on real PG15" runs (D-009) almost certainly used a stub that blanket-granted the client roles — the same shortcut the first D-017 stub took — so the missing grant never surfaced.
+2. The D-017 CI-fix stub (`tests/lib/pg-local-stub.sql`) `ALTER DEFAULT PRIVILEGES … GRANT ALL`-ed, reproducing that blind spot; its first run reported 29/29 green while real CI was red.
+3. The suite's anon-denial and write-denial assertions are tolerant of `permission denied`, so a *missing* grant reads as a *correct* deny there — only the positive own-row reads exposed it.
+
+**Fix:**
+- `0003_policies.sql` now grants the minimal intended matrix: `SELECT` to `authenticated` on profiles, progress, evolved_takes, nuance_sessions, events (every table with a `to authenticated` SELECT policy); `UPDATE` to `authenticated` on profiles only (the sole client-writable table; the column-restriction trigger further limits columns). **`anon` receives nothing** (all anon interaction is SECURITY DEFINER RPCs); the three reference tables stay default-deny (D-008 §4); no INSERT/DELETE to any client role (RPC-only writes). This implements the already-ratified access matrix — it does not widen it; without it the control is simply non-functional. nuance_sessions gets full SELECT here; B4's 0007 masking migration replaces it with the score/elapsed_days-excluding column grant (D-011 §2 / D-012 §9), unchanged by this fix.
+- `tests/lib/pg-local-stub.sql` corrected to grant **schema usage only** (no blanket table/sequence/function grants), so it mirrors the real stack's privilege posture. This is what lets the suites reproduce a real grant defect instead of hiding it.
+
+**Verified (reproduce-then-repair, faithful stub):** on the corrected stub WITHOUT the 0003 grants, `rls/policies` reproduces CI's exact `permission denied for table profiles` failures; WITH them, all five DB suites pass 96/96 (deny-all 4, auth/trigger 44, auth/username-available 8, rls/policies 29, rls/column-restriction 11). CI confirmation on the next push.
+
+**Follow-up flagged:** because A2/A3's original verification shared the masking blind spot, their green status covered trigger/policy *logic* but not the base-grant layer. No other missing-grant is known (the other tables are intentionally ungranted), but B1–B5's builders inherit the corrected stub and the D-017 `CIVIC_TEST_DB_URL` convention, so their RPC grant-walls will now be exercised faithfully.

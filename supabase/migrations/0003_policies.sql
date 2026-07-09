@@ -134,6 +134,36 @@ create policy events_select_admin on public.events
 -- RLS is already enabled on all three from 0001, with zero policies, so this
 -- default-deny holds for both anon and authenticated.
 
+-- ── base table privileges for `authenticated` ────────────────────────────────
+-- The RLS policies above filter WHICH rows the authenticated role may see or
+-- update, but a policy grants nothing on its own: Postgres first requires the
+-- base table privilege to exist, then RLS narrows it. Without these GRANTs the
+-- select-own / update-own policies are dead letters — every client read of its
+-- own profile fails "permission denied for table profiles" (the real Supabase
+-- stack does NOT auto-grant migration-created tables; D-018).
+--
+-- SELECT for every table that has a `to authenticated` SELECT policy above
+-- (own-row and admin policies both run as the authenticated role); UPDATE only
+-- on profiles (the sole client-writable table — the column-restriction trigger
+-- below further limits which columns). All other writes go through
+-- SECURITY DEFINER RPCs, which run as owner and need no caller grant, so no
+-- INSERT/DELETE is granted to authenticated anywhere.
+--
+-- `anon` receives NOTHING (all anonymous interaction is via SECURITY DEFINER
+-- RPCs). The three reference tables (xp_awards, quiz_answer_keys,
+-- topics_catalog) are deliberately excluded — they stay default-deny (D-008 §4).
+-- nuance_sessions is granted full SELECT here; B4's masking migration (0007)
+-- replaces it with a column-scoped grant excluding score/elapsed_days
+-- (D-011 §2 / D-012 §9) — until B4 lands, no score is displayed anywhere.
+grant select on
+  public.profiles,
+  public.progress,
+  public.evolved_takes,
+  public.nuance_sessions,
+  public.events
+  to authenticated;
+grant update on public.profiles to authenticated;
+
 -- ── profiles column-restriction trigger ([N9]) ────────────────────────────────
 -- BEFORE UPDATE ON public.profiles: restricts which columns a client update
 -- can actually change, independent of (and in addition to) the RLS UPDATE
