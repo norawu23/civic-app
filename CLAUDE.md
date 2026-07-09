@@ -57,3 +57,10 @@ missing-grant defect was found). Keep it faithful to the real stack.
 `.github/workflows/ci.yml` — six jobs (`migrations`, `auth`, `rls`, `content`, `calibration`,
 `column-refs`). Keep `main` green: builders branch off it. CI logs are readable via the
 authenticated `gh` CLI (`gh run view <id> --log-failed`).
+
+**Branch protection (D-019):** `main` is protected server-side — all six job contexts are
+required, strict/up-to-date, linear history, no force-push. Non-admin builders must merge via
+PR with green checks; the operator/owner keep direct-push (`enforce_admins: false`). This is
+free because the repo is **public during the build phase**; at launch it flips to private +
+GitHub Pro and the same ruleset is re-applied (see D-019 launch sequence). The local
+`.git/hooks/pre-push` gate is now a fast belt-and-suspenders layer, not the primary guard.
