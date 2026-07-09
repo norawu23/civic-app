@@ -28,7 +28,7 @@ jobs:
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.109.1
 
       # `supabase db start` needs a config.toml. A1 does not check one into
       # the repo (out of scope + would collide with other chunks), so we
@@ -89,7 +89,7 @@ jobs:
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.109.1
 
       - name: Initialise a throwaway Supabase project
         run: |
@@ -144,7 +144,7 @@ jobs:
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.109.1
 
       - name: Initialise a throwaway Supabase project
         run: |
@@ -266,7 +266,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.109.1
 
       - name: Initialise a throwaway Supabase project (shadow DB for seeding)
         run: |
