@@ -82,7 +82,7 @@ Interface changes and ambiguity rulings, per BUILD_PLAN §1 escalation protocol.
 **Decision:**
 1. `repair_prod.sql` re-authored by the operator from the real dump. Strategy: drop+recreate all three legacy tables (profiles' 5 rows preserved via backup+reinsert — recreation is required to match 0001's column *order*, which ALTER cannot achieve); create the 5 missing tables + `xp_awards` seed + indexes. Legacy policies fall with their tables → 0001's zero-policy default-deny (the D-002 legacy-write break, by design).
 2. **Rehearsed locally to the empty-diff gate:** real prod dump → apply repair → `pg_dump` diff vs a fresh 0001 shadow = **empty** (exit-criterion 3 satisfied in rehearsal; re-run against real prod in week 2).
-3. **Overlength-username repair (flagged, owner to ratify):** one of the 5 accounts has a 21-char username (an email address), violating 0001's 3–20 check. The repair rewrites any such username to the email local-part where it fits (identity-preserving) else a deterministic `user_<id-prefix>` placeholder, and sets `needs_profile_completion=true`. The specific account identity is **deliberately kept out of version control** (it is real user PII); it was surfaced to the owner directly in-session for ratification. If it is a real beta tester whose display name matters, the owner may contact them or choose a different handle before the week-2 run.
+3. **Overlength-username repair (RATIFIED 2026-07-08 — accept default, see D-016 signature):** one of the 5 accounts has a 21-char username (an email address), violating 0001's 3–20 check. The repair rewrites any such username to the email local-part where it fits (identity-preserving) else a deterministic `user_<id-prefix>` placeholder, and sets `needs_profile_completion=true`. The specific account identity is **deliberately kept out of version control** (it is real user PII); it was surfaced to the owner directly in-session for ratification. If it is a real beta tester whose display name matters, the owner may contact them or choose a different handle before the week-2 run.
 
 **Security note:** the prod DB password was shared in-session and should be **rotated** (Supabase dashboard → Database → Reset password) after week-2 repair. Only read-only `--schema-only` operations were performed against prod; no writes.
 
@@ -254,7 +254,7 @@ Owner ratification closing NUANCE_RUBRIC.md known-ambiguities 1 and 2 — the la
 
 Rubric ambiguities 1–2 annotated as ratified; B4 spec DoD amended with both tests. With D-013/D-014/D-015, every E1 open item is closed — B4 implements against a fully pinned rubric.
 
-## D-016 — Batch-1a formal freeze record (for Fri Jul 10) — AUTHORED 2026-07-08, RATIFICATION PENDING
+## D-016 — Batch-1a formal freeze record (for Fri Jul 10) — AUTHORED 2026-07-08, RATIFIED 2026-07-08
 
 BUILD_PLAN names Fri Jul 10 as the batch-1a interface freeze. Nearly everything on the freeze list was ratified early (D-008 through D-015); this entry consolidates the complete list with as-built evidence so Friday's sign-off is a single act. Prepared by the operator 2026-07-08.
 
@@ -280,7 +280,7 @@ BUILD_PLAN names Fri Jul 10 as the batch-1a interface freeze. Nearly everything 
 1. **Rule on D-006 §3 (overlength username):** accept the default identity-preserving rewrite (email local-part where it fits, else deterministic `user_<id-prefix>`, plus `needs_profile_completion = true`), or direct a specific handle / contact the tester first. Precondition for the week-2 repair.
 2. **Sign below.**
 
-**RATIFIED by owner 2026-07-__ :** _______________  (D-006 §3 username ruling: _______________)
+**RATIFIED by owner 2026-07-08:** Nora Wu  (D-006 §3 username ruling: **accept the default** — identity-preserving rewrite to the email local-part where it fits 3–20, else the deterministic `user_<id-prefix>` placeholder, plus `needs_profile_completion = true`; no hand-picked handle, no pre-contact. Precondition (0) of the §3a week-2 repair runbook is now satisfied.)
 
 ## D-017 — CI was never green: three root causes fixed; external-DB test mode is now the convention (2026-07-08)
 
