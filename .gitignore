@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Secrets / local env — never commit (repo is public)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+supabase/.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
