@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import {
-  hasDocker, createProject, startProject, stopProject, destroyProject, getDbUrl, psql,
+  hasDocker, hasExternalDb, acquireDb, psql,
 } from '../lib/supabase-stack.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -36,8 +36,8 @@ function hasPsql() {
   return spawnSync('psql', ['--version'], { stdio: 'ignore' }).status === 0
 }
 
-if (!hasDocker()) {
-  console.log('SKIP rls/column-restriction: Docker is not available in this environment (required for the supabase CLI local stack). Run in CI / a Docker-capable environment.')
+if (!hasExternalDb() && !hasDocker()) {
+  console.log('SKIP rls/column-restriction: Docker is not available in this environment (required for the supabase CLI local stack) and CIVIC_TEST_DB_URL is not set. Run in CI, a Docker-capable environment, or against a prepared database (tests/lib/pg-local-stub.sql).')
   process.exit(0)
 }
 if (!hasPsql()) {
@@ -91,17 +91,24 @@ function lastLine(stdout) {
   return lines[lines.length - 1]
 }
 
-let projectDir
+let stack
 try {
-  projectDir = createProject({ repoRoot: REPO_ROOT, withMigrations: true })
-  startProject(projectDir)
-  const dbUrl = getDbUrl(projectDir)
+  stack = acquireDb({ repoRoot: REPO_ROOT, withMigrations: true })
+  const dbUrl = stack.dbUrl
 
   const seed = psql(dbUrl, `
     ${authUserInsert(USER_F, 'f@rls-test.local')}
     ${authUserInsert(USER_G, 'g@rls-test.local')}
     ${authUserInsert(USER_C, 'c@rls-test.local')}
     ${authUserInsert(USER_D, 'd@rls-test.local')}
+
+    -- Integration reality (operator, CI fix 2026-07-08): A2's
+    -- on_auth_user_created trigger (0002, applied on the full-chain shadow)
+    -- has already auto-created profiles + progress rows for the users above.
+    -- Clear them so the exact fixture rows below insert cleanly, as
+    -- originally verified (progress rows first — FK).
+    delete from public.progress where id in ('${USER_F}', '${USER_G}', '${USER_C}', '${USER_D}');
+    delete from public.profiles where id in ('${USER_F}', '${USER_G}', '${USER_C}', '${USER_D}');
 
     insert into public.profiles (id, username, is_admin, birth_year, needs_profile_completion) values
       ('${USER_F}', 'rls_user_f', false, null, false),
@@ -196,10 +203,7 @@ try {
   console.error(`FAIL rls/column-restriction: harness error: ${err.message}`)
   failed = true
 } finally {
-  if (projectDir) {
-    stopProject(projectDir)
-    destroyProject(projectDir)
-  }
+  if (stack) stack.release()
 }
 
 console.log(`\n=== rls/column-restriction summary: ${results.filter(r => r.ok).length}/${results.length} passed ===`)

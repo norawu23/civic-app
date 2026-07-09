@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import {
-  hasDocker, createProject, startProject, stopProject, destroyProject, getDbUrl, psql,
+  hasDocker, hasExternalDb, acquireDb, psql,
 } from '../lib/supabase-stack.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -25,8 +25,8 @@ function hasPsql() {
   return spawnSync('psql', ['--version'], { stdio: 'ignore' }).status === 0
 }
 
-if (!hasDocker()) {
-  console.log('SKIP auth/username-available: Docker is not available in this environment (required for the supabase CLI local stack). Run in CI / a Docker-capable environment.')
+if (!hasExternalDb() && !hasDocker()) {
+  console.log('SKIP auth/username-available: Docker is not available in this environment (required for the supabase CLI local stack) and CIVIC_TEST_DB_URL is not set. Run in CI, a Docker-capable environment, or against a prepared database (tests/lib/pg-local-stub.sql).')
   process.exit(0)
 }
 if (!hasPsql()) {
@@ -34,7 +34,7 @@ if (!hasPsql()) {
   process.exit(0)
 }
 
-let projectDir
+let stack
 let failed = false
 const results = []
 
@@ -58,13 +58,17 @@ function usernameAvailable(dbUrl, name, role = 'anon') {
   if (result.status !== 0) {
     throw new Error(`username_available('${name}') as ${role} failed:\n${result.stderr}`)
   }
-  return result.stdout.trim()
+  // stdout is "SET\nt" — `-t` suppresses headers/footers but NOT the SET
+  // command tag, so take the last non-empty line (the select's value).
+  // This was the auth CI job's actual failure: trim() alone returns
+  // "SET\nt", which never equals 't'/'f'. (operator, CI fix 2026-07-08)
+  const lines = result.stdout.trim().split('\n')
+  return lines[lines.length - 1].trim()
 }
 
 try {
-  projectDir = createProject({ repoRoot: REPO_ROOT, withMigrations: true })
-  startProject(projectDir)
-  const dbUrl = getDbUrl(projectDir)
+  stack = acquireDb({ repoRoot: REPO_ROOT, withMigrations: true })
+  const dbUrl = stack.dbUrl
 
   // Seed one taken username via a real auth.users insert (fires the A2
   // trigger, same as trigger.test.mjs), so this test also implicitly
@@ -104,10 +108,7 @@ try {
   results.push(`FAIL auth/username-available: harness error: ${err.message}`)
   failed = true
 } finally {
-  if (projectDir) {
-    stopProject(projectDir)
-    destroyProject(projectDir)
-  }
+  if (stack) stack.release()
 }
 
 for (const line of results) console.log(line)

@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import {
-  hasDocker, createProject, startProject, stopProject, destroyProject, getDbUrl, psql,
+  hasDocker, hasExternalDb, acquireDb, psql,
 } from '../lib/supabase-stack.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -42,8 +42,8 @@ function hasPsql() {
   return spawnSync('psql', ['--version'], { stdio: 'ignore' }).status === 0
 }
 
-if (!hasDocker()) {
-  console.log('SKIP rls/policies: Docker is not available in this environment (required for the supabase CLI local stack). Run in CI / a Docker-capable environment.')
+if (!hasExternalDb() && !hasDocker()) {
+  console.log('SKIP rls/policies: Docker is not available in this environment (required for the supabase CLI local stack) and CIVIC_TEST_DB_URL is not set. Run in CI, a Docker-capable environment, or against a prepared database (tests/lib/pg-local-stub.sql).')
   process.exit(0)
 }
 if (!hasPsql()) {
@@ -93,17 +93,25 @@ function asRole(dbUrl, role, jwtSub, sql) {
   return spawnSync('psql', [dbUrl, '-c', `${preamble} ${sql}`], { encoding: 'utf8' })
 }
 
-let projectDir
+let stack
 try {
-  projectDir = createProject({ repoRoot: REPO_ROOT, withMigrations: true })
-  startProject(projectDir)
-  const dbUrl = getDbUrl(projectDir)
+  stack = acquireDb({ repoRoot: REPO_ROOT, withMigrations: true })
+  const dbUrl = stack.dbUrl
 
   // ── seed fixtures (service-role / superuser, bypasses RLS) ────────────────
   const seed = psql(dbUrl, `
     ${authUserInsert(USER_A, 'a@rls-test.local')}
     ${authUserInsert(USER_B, 'b@rls-test.local')}
     ${authUserInsert(ADMIN, 'admin@rls-test.local')}
+
+    -- Integration reality (operator, CI fix 2026-07-08): with the full
+    -- migration chain applied, A2's on_auth_user_created trigger has already
+    -- auto-created profiles + progress rows for the inserts above (this
+    -- worktree's original assumption — 0003 only depends on 0001 — no longer
+    -- holds on the CI shadow). Clear the trigger-created rows so the exact
+    -- fixture rows below insert cleanly, as originally verified.
+    delete from public.progress where id in ('${USER_A}', '${USER_B}', '${ADMIN}');
+    delete from public.profiles where id in ('${USER_A}', '${USER_B}', '${ADMIN}');
 
     insert into public.profiles (id, username, is_admin, birth_year) values
       ('${USER_A}', 'rls_user_a', false, 1990),
@@ -191,10 +199,7 @@ try {
   console.error(`FAIL rls/policies: harness error: ${err.message}`)
   failed = true
 } finally {
-  if (projectDir) {
-    stopProject(projectDir)
-    destroyProject(projectDir)
-  }
+  if (stack) stack.release()
 }
 
 console.log(`\n=== rls/policies summary: ${results.filter(r => r.ok).length}/${results.length} passed ===`)

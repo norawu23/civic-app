@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import {
-  hasDocker, createProject, startProject, stopProject, destroyProject, getDbUrl, psql,
+  hasDocker, hasExternalDb, acquireDb, psql,
 } from '../lib/supabase-stack.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -31,8 +31,8 @@ function hasPsql() {
   return spawnSync('psql', ['--version'], { stdio: 'ignore' }).status === 0
 }
 
-if (!hasDocker()) {
-  console.log('SKIP auth/trigger: Docker is not available in this environment (required for the supabase CLI local stack). Run in CI / a Docker-capable environment.')
+if (!hasExternalDb() && !hasDocker()) {
+  console.log('SKIP auth/trigger: Docker is not available in this environment (required for the supabase CLI local stack) and CIVIC_TEST_DB_URL is not set. Run in CI, a Docker-capable environment, or against a prepared database (tests/lib/pg-local-stub.sql).')
   process.exit(0)
 }
 if (!hasPsql()) {
@@ -40,7 +40,7 @@ if (!hasPsql()) {
   process.exit(0)
 }
 
-let projectDir
+let stack
 let failed = false
 const results = []
 
@@ -81,9 +81,8 @@ function queryOne(dbUrl, sql) {
 }
 
 try {
-  projectDir = createProject({ repoRoot: REPO_ROOT, withMigrations: true })
-  startProject(projectDir) // applies 0001 + 0002 from empty — DoD item 1
-  const dbUrl = getDbUrl(projectDir)
+  stack = acquireDb({ repoRoot: REPO_ROOT, withMigrations: true }) // applies 0001 + 0002 from empty — DoD item 1
+  const dbUrl = stack.dbUrl
 
   // ── Happy path ────────────────────────────────────────────────────────────
   const happyId = 'aaaaaaaa-0000-0000-0000-000000000001'
@@ -269,10 +268,7 @@ try {
   results.push(`FAIL auth/trigger: harness error: ${err.message}`)
   failed = true
 } finally {
-  if (projectDir) {
-    stopProject(projectDir)
-    destroyProject(projectDir)
-  }
+  if (stack) stack.release()
 }
 
 for (const line of results) console.log(line)

@@ -83,6 +83,37 @@ export function getDbUrl(dir) {
   return match[1]
 }
 
+// ── External-database mode (operator CI fix, 2026-07-08) ────────────────────
+// When CIVIC_TEST_DB_URL is set, suites run against that already-provisioned
+// database instead of spinning up their own Docker stack. Two providers:
+//   * CI: the job's single shadow stack (`supabase db start` + status DB_URL)
+//     — one stack per job; a second concurrent stack collides on the CLI's
+//     default ports, which is exactly how the first six CI runs failed.
+//   * Local, no Docker: a plain Postgres database prepared with
+//     tests/lib/pg-local-stub.sql followed by supabase/migrations/*.sql.
+// The URL must point at a database with the migrations already applied.
+// acquireDb() returns { dbUrl, release } — release() tears down only what
+// acquireDb() itself created (nothing, in external mode).
+export function hasExternalDb() {
+  return Boolean(process.env.CIVIC_TEST_DB_URL)
+}
+
+export function acquireDb({ repoRoot, withMigrations }) {
+  const external = process.env.CIVIC_TEST_DB_URL || null
+  if (external) {
+    return { dbUrl: external, release() {} }
+  }
+  const dir = createProject({ repoRoot, withMigrations })
+  startProject(dir)
+  return {
+    dbUrl: getDbUrl(dir),
+    release() {
+      stopProject(dir)
+      destroyProject(dir)
+    },
+  }
+}
+
 // Runs a SQL string against a project's DB via `psql` inside the local
 // Postgres container (avoids needing a psql/pg client on the host).
 export function psql(dbUrl, sql) {

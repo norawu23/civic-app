@@ -281,3 +281,18 @@ BUILD_PLAN names Fri Jul 10 as the batch-1a interface freeze. Nearly everything 
 2. **Sign below.**
 
 **RATIFIED by owner 2026-07-__ :** _______________  (D-006 §3 username ruling: _______________)
+
+## D-017 — CI was never green: three root causes fixed; external-DB test mode is now the convention (2026-07-08)
+
+**Finding (operator):** all six GitHub Actions runs since the first push had failed — the Docker-dependent jobs (`migrations`, `rls`, `auth`) were red from run 1. Nobody had seen it because every A1–A3 suite was verified locally against plain PG15, and **no pre-CI environment ever had Docker** (each suite's own header says so): GitHub Actions was the first time this code actually executed. `content` and `calibration` were genuinely green throughout; the migrations themselves were never the problem (`content` applies the full chain and seeds against it).
+
+**Root causes, each reproduced locally before fixing:**
+1. **Port collision (jobs `migrations`, `rls`):** ci.yml started a shadow stack per job, then ran suites that self-provision a *second* CLI stack — both `supabase init` configs use the same default ports. The job author assumed the tests would target the running stack; the test author assumed self-provisioning. Never reconciled because never executed.
+2. **Fixture collision with A2's trigger (both `rls` suites):** A3's fixtures direct-insert `profiles` rows for users just inserted into `auth.users` — but on the full-chain shadow, 0002's `on_auth_user_created` has already auto-created those rows → `duplicate key (profiles_pkey)`. A3's "0003 only depends on 0001" isolation assumption doesn't survive integration. Fix: delete the trigger-created rows, then insert the original fixtures unchanged.
+3. **stdout parsing bug (`auth/username-available`):** the helper ran `psql -t -A -c "set role anon; select …"` and compared `stdout.trim()` to `'t'`/`'f'` — but `-t` does not suppress the `SET` command tag, so the value was always `"SET\nt"`. Failed on every stack, Docker or not. Fix: take the last output line (the technique the sibling suites already used).
+
+**Conventions set (bind every future DB-suite CI job — B1–B5's rpc jobs included):**
+- **`CIVIC_TEST_DB_URL`:** every DB suite consumes an externally provisioned database when this env var is set (`acquireDb()` in `tests/lib/supabase-stack.mjs`), and only self-provisions a Docker stack when it isn't. **One stack per CI job**, handed to every suite in that job via this variable.
+- **`tests/lib/pg-local-stub.sql`:** a committed Supabase-environment stub (roles, permissive default grants, `auth.users` + `auth.uid()`) that lets the full migration chain and every DB suite run against plain Postgres — no Docker. This is the reproducible form of the operator's D-009 verification rig.
+
+**Verification:** all five suites green against fresh stub+chain PG15 databases via the new path — 96 checks, 0 failures (deny-all 4, auth/trigger 44, auth/username-available 8, rls/policies 29, rls/column-restriction 11); calibration harness unaffected. The ci.yml wiring itself is verified on the next push (this machine cannot run Docker or reach Actions logs).

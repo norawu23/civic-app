@@ -54,11 +54,12 @@ jobs:
 
       - name: Deny-all smoke (anon + authed SELECT denied under default-deny)
         run: |
-          cd ci-shadow
-          # Point the smoke test at the started shadow stack. It self-skips
-          # if Docker/psql are missing, but on ubuntu-latest both are present,
-          # so it genuinely runs here.
-          node ../tests/deny-all-smoke.test.mjs
+          # Point the smoke test at the job's already-running shadow stack via
+          # CIVIC_TEST_DB_URL. Without it the test self-provisions a SECOND
+          # stack, which collides with this one on the CLI's default ports —
+          # the root cause of this job's first-six-runs failures (D-017).
+          DB_URL=$(cd ci-shadow && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/deny-all-smoke.test.mjs
 
       - name: Stop shadow DB
         if: always()
@@ -71,16 +72,11 @@ jobs:
   # fold this job's work into `migrations` above (A1's job).
   #
   # Exercises 0002_auth.sql (the on_auth_user_created trigger +
-  # username_available RPC) against a fresh local Supabase stack with 0001 +
-  # 0002 applied from empty. Both test files are self-contained — each spins
-  # up and tears down its own throwaway `supabase start` stack via
-  # tests/lib/supabase-stack.mjs (same pattern as deny-all-smoke.test.mjs),
-  # so this job just needs Docker + psql on the runner and invokes them
-  # directly; it does not need to manage its own ci-shadow project.
-  #
-  # Per A1's deny-all-smoke precedent: both tests SKIP (exit 0), not fail,
-  # when Docker/psql are absent — but ubuntu-latest has both, so this job
-  # genuinely runs the full trigger + RPC suite in CI.
+  # username_available RPC) against the job's single shadow stack with the
+  # full migration chain applied from empty. Both suites consume the stack
+  # via CIVIC_TEST_DB_URL (one stack per job — a second concurrent stack
+  # collides on the CLI's default ports, D-017); they still SKIP (exit 0),
+  # not fail, when run with neither Docker nor CIVIC_TEST_DB_URL available.
   auth:
     runs-on: ubuntu-latest
     steps:
@@ -95,11 +91,28 @@ jobs:
         with:
           version: latest
 
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow-auth
+          cp -r supabase ci-shadow-auth/supabase
+          (cd ci-shadow-auth && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-auth && supabase db start
+
       - name: Auth trigger test suite (signup happy path, under-13 non-persistence, collision/missing-metadata fallback, double-fire idempotency)
-        run: node tests/auth/trigger.test.mjs
+        run: |
+          DB_URL=$(cd ci-shadow-auth && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/auth/trigger.test.mjs
 
       - name: username_available RPC test suite (taken/short/long/free, anon + authenticated callable)
-        run: node tests/auth/username-available.test.mjs
+        run: |
+          DB_URL=$(cd ci-shadow-auth && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/auth/username-available.test.mjs
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-auth && supabase stop --no-backup || true
 
   # ── column-refs ──────────────────────────────────────────────────────────
   # Greps src/ for supabase-js table/column references and fails on any
@@ -144,13 +157,16 @@ jobs:
 
       - name: RLS policy suite (deny-path per policy per table)
         run: |
-          cd ci-shadow-rls
-          node ../tests/rls/policies.test.mjs
+          # One stack per job: both suites consume this job's shadow via
+          # CIVIC_TEST_DB_URL instead of self-provisioning colliding stacks
+          # (D-017).
+          DB_URL=$(cd ci-shadow-rls && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/rls/policies.test.mjs
 
       - name: profiles column-restriction trigger
         run: |
-          cd ci-shadow-rls
-          node ../tests/rls/column-restriction.test.mjs
+          DB_URL=$(cd ci-shadow-rls && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/rls/column-restriction.test.mjs
 
       - name: Stop shadow DB
         if: always()
