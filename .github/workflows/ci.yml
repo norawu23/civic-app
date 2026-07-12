@@ -307,3 +307,55 @@ jobs:
             exit 1
           fi
           echo "::warning::content:lint reported errors (expected: factcheck.org, D-004). Tracked and NON-blocking until $CONTENT_COMPLIANCE_DEADLINE (D-007); H2–H5 replace the citation before then."
+
+  # ── rpc-grading ────────────────────────────────────────────────────────────
+  # B1 scope note: this job is owned by B1 (docs/specs/B1-l1-grading.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — a new `rpc-grading`
+  # job only, per the per-chunk job convention)"). Do not fold other chunks'
+  # work into it, and do not fold this job's work into any job above.
+  #
+  # Provisions its own throwaway shadow DB (mirrors the `rls` job's pattern)
+  # with supabase/migrations/ applied from empty — now including B1's
+  # 0004_rpc_grading.sql — then runs the B1 grading suite against it. The
+  # suite seeds quiz_answer_keys/topics_catalog itself via H1's idempotent
+  # `content:seed` generator and reads the answer keys back from the DB, so
+  # it needs the content pipeline healthy first: `needs: [content]` per H1's
+  # job note above ("later chunks whose jobs read quiz_answer_keys/
+  # topics_catalog (B1's RPC tests) should declare needs: [content]"). The
+  # suite self-skips (exit 0) when neither Docker nor CIVIC_TEST_DB_URL is
+  # available, per the established convention.
+  rpc-grading:
+    runs-on: ubuntu-latest
+    needs: [content]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.109.1
+
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow-rpc-grading
+          cp -r supabase ci-shadow-rpc-grading/supabase
+          (cd ci-shadow-rpc-grading && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-rpc-grading && supabase db start
+
+      - name: B1 grading RPC suite (complete_flashcards / complete_quiz / helpers / grant wall)
+        run: |
+          # One stack per job: the suite consumes this job's shadow via
+          # CIVIC_TEST_DB_URL instead of self-provisioning a colliding
+          # second stack (D-017).
+          DB_URL=$(cd ci-shadow-rpc-grading && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/rpc/b1-grading.test.mjs
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-rpc-grading && supabase stop --no-backup || true
