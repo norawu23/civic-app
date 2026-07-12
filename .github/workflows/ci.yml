@@ -203,15 +203,16 @@ jobs:
   # fixture's expected_score. This is the calibration gate B4's SQL scoring
   # function must pass before merge (blocks B4 merge per the spec header).
   #
-  # CALIBRATION_TARGET=reference runs now (zero-dep, no DB needed).
-  # CALIBRATION_TARGET=rpc is wired but SKIPPED until B4 lands
-  # rpc.submit_nuance_session — flip this env var to `rpc` once B4 merges
-  # (see the TODO in tests/nuance/calibration.test.js); rpc mode then becomes
-  # the required CI mode per the spec's "Interfaces exposed".
+  # FLIPPED TO RPC MODE by B4 per the E1 TODO (B4 spec in-scope list —
+  # "flipping the `calibration` job to run rpc mode once your migration is in
+  # the chain"): rpc mode is now the REQUIRED CI mode — every golden-set
+  # fixture runs through the LIVE submit_nuance_session (0007_rpc_nuance.sql)
+  # on this job's shadow stack and must match its expected_score. The
+  # zero-dep reference-mode run is kept as a first step (it exercises the
+  # reference scorer + fixture schema + provisional gate with no DB, and
+  # keeps the reference implementation itself pinned).
   calibration:
     runs-on: ubuntu-latest
-    env:
-      CALIBRATION_TARGET: reference
     steps:
       - uses: actions/checkout@v4
 
@@ -219,8 +220,84 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Nuance rubric calibration harness (golden set vs reference scorer)
+      - name: Nuance rubric calibration harness (reference mode — golden set vs reference scorer)
+        env:
+          CALIBRATION_TARGET: reference
         run: node tests/nuance/calibration.test.js
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.109.1
+
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow-calibration
+          cp -r supabase ci-shadow-calibration/supabase
+          (cd ci-shadow-calibration && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-calibration && supabase db start
+
+      - name: Nuance rubric calibration harness (rpc mode — golden set vs LIVE submit_nuance_session)
+        env:
+          CALIBRATION_TARGET: rpc
+        run: |
+          # One stack per job (D-017): the harness consumes this job's shadow
+          # via CIVIC_TEST_DB_URL instead of self-provisioning a colliding one.
+          DB_URL=$(cd ci-shadow-calibration && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/nuance/calibration.test.js
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-calibration && supabase stop --no-backup || true
+
+  # ── rpc-nuance ────────────────────────────────────────────────────────────
+  # B4 scope note: this job is owned by B4 (docs/specs/B4-nuance-rpcs.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — a new `rpc-nuance`
+  # job only, plus flipping the `calibration` job to rpc mode)"). Do not fold
+  # other chunks' work into it.
+  #
+  # Exercises 0007_rpc_nuance.sql end-to-end against this job's single shadow
+  # stack with the full migration chain applied from empty: scoring rubric
+  # unit-level (incl. the D-013 gs-09/gs-10 threshold pins and both D-015
+  # measurement pins), signature/grant conformance incl. the anon-only grant
+  # wall, the invalid_params/invalid_answers boundary, resubmission
+  # idempotency (D-011 ruling 4), anon_id_linked [r2], day-30 preconditions,
+  # rate-limit bursts [r5], and the column-grant masking (D-011 ruling 2).
+  # The suite SKIPs (exit 0), not fails, when run with neither Docker nor
+  # CIVIC_TEST_DB_URL available (D-017).
+  rpc-nuance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.109.1
+
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow-rpc-nuance
+          cp -r supabase ci-shadow-rpc-nuance/supabase
+          (cd ci-shadow-rpc-nuance && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-rpc-nuance && supabase db start
+
+      - name: B4 nuance RPC suite (scoring, grants, idempotency, rate limits, day-30, masking)
+        run: |
+          DB_URL=$(cd ci-shadow-rpc-nuance && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/rpc/b4-nuance.test.mjs
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-rpc-nuance && supabase stop --no-backup || true
 
   # ── content ───────────────────────────────────────────────────────────────
   # H1 scope note: this job is owned by H1 (docs/specs/H1-content-pipeline.md

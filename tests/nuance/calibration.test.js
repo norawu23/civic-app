@@ -302,8 +302,9 @@ function runCalibration(fixtures) {
 }
 
 // ─── 5. calibration run ─────────────────────────────────────────────────────
-// CALIBRATION_TARGET=reference (default, runs now) | rpc (wired, skipped
-// until B4 lands submit_nuance_session).
+// CALIBRATION_TARGET=reference (default, zero-dep) | rpc (the required CI
+// mode now that B4's 0007 defines submit_nuance_session — runs the golden
+// set through the live RPC; SKIPs only where no database is available).
 {
   const target = process.env.CALIBRATION_TARGET ?? 'reference'
   const section = `calibration run (${target})`
@@ -320,21 +321,82 @@ function runCalibration(fixtures) {
       }
     }
   } else if (target === 'rpc') {
-    // TODO(B4): once supabase/migrations/000X_*.sql defines
-    // rpc.submit_nuance_session (or the SQL scoring function it calls) and a
-    // local Supabase stack is available in CI, wire this branch to:
-    //   1. start a local Supabase stack (see tests/lib/supabase-stack.mjs,
-    //      owned by A1 — reuse it, don't fork it)
-    //   2. for each golden-set fixture, call the RPC (or the underlying
-    //      scoring function directly) with fx.answers
-    //   3. assert the returned score === fx.expected_score, same
-    //      mismatch-reporting shape as the reference branch above
-    // Until then this mode is SKIPPED (not a pass, not a fail) so CI doesn't
-    // block on infrastructure this chunk does not own. Per D-005 batch-1a
-    // framing and the spec's "Interfaces exposed": rpc mode becomes the
-    // REQUIRED CI mode once B4 lands — flip CALIBRATION_TARGET in ci.yml at
-    // that point, and this branch must be implemented before that flip.
-    console.log(`SKIP ${section}: rpc.submit_nuance_session does not exist yet (B4, not yet merged) — TODO above; this mode becomes required once B4 lands`)
+    // Wired by B4 per the TODO this branch replaced (E1 spec "Interfaces
+    // exposed"; B4 spec in-scope list — extend only as E1's TODO directs):
+    //   1. acquires a stack via tests/lib/supabase-stack.mjs (reused, not
+    //      forked): CIVIC_TEST_DB_URL if set (CI shadow / D-017 local
+    //      Postgres), else a throwaway Docker stack
+    //   2. for each golden-set fixture, calls the LIVE
+    //      public.submit_nuance_session (0007_rpc_nuance.sql) with
+    //      fx.answers, as a FRESH authenticated identity per fixture
+    //   3. asserts the score === fx.expected_score, same mismatch-reporting
+    //      shape as the reference branch above. The RPC's return is the
+    //      information-free {accepted: true} ack (D-010 — no score, ever, on
+    //      any path), so the score is read back from nuance_sessions as the
+    //      DB owner — the storage layer is the only place it exists.
+    // Any mismatch here is a SQL-vs-reference/golden-set disagreement: an
+    // ESCALATION per the E1/B4 specs and D-013 §4 — never something to patch
+    // into agreement on either side.
+    // SKIPs (not a pass, not a fail) when neither Docker nor
+    // CIVIC_TEST_DB_URL (plus psql) is available, per the D-017 convention;
+    // the CI calibration job provides a shadow stack.
+    const { spawnSync } = await import('node:child_process')
+    const { hasDocker, hasExternalDb, acquireDb } = await import('../lib/supabase-stack.mjs')
+    const hasPsql = spawnSync('psql', ['--version'], { stdio: 'ignore' }).status === 0
+    if ((!hasExternalDb() && !hasDocker()) || !hasPsql) {
+      console.log(`SKIP ${section}: requires Docker or CIVIC_TEST_DB_URL, plus psql on PATH (D-017) — run in CI or against a prepared database (tests/lib/pg-local-stub.sql + migrations incl. 0007)`)
+    } else if (goldenSet?.fixtures) {
+      const repoRoot = join(__dirname, '..', '..')
+      let stack
+      try {
+        stack = acquireDb({ repoRoot, withMigrations: true })
+        const dbUrl = stack.dbUrl
+        const su = sql => spawnSync('psql', [dbUrl, '-t', '-A', '-c', sql], { encoding: 'utf8' })
+        const lastLine = r => {
+          const ls = r.stdout.trim().split('\n').filter(l => l.trim() !== '')
+          return ls.length ? ls[ls.length - 1].trim() : ''
+        }
+
+        // Rerun-safety on a persistent local DB: clear this harness's own
+        // fixture identities (auth.users cascade deletes their sessions).
+        su(`delete from auth.users where id::text like 'ca11b4a0-%';`)
+
+        const mismatches = []
+        goldenSet.fixtures.forEach((fx, i) => {
+          const uid = `ca11b4a0-0000-4000-8000-${String(i + 1).padStart(12, '0')}`
+          const seed = su(`insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token, email_change_token_new, email_change) values ('00000000-0000-0000-0000-000000000000', '${uid}', 'authenticated', 'authenticated', '${fx.id}@calibration.local', '', now(), now(), now(), '{}', '{}', '', '', '', '');`)
+          if (seed.status !== 0) {
+            mismatches.push({ id: fx.id, error: `identity seed failed: ${seed.stderr.trim()}` })
+            return
+          }
+          const answersSql = JSON.stringify(fx.answers).replace(/'/g, "''")
+          const call = spawnSync('psql', [dbUrl, '-t', '-A', '-c',
+            `set role authenticated; set request.jwt.claims = '{"sub":"${uid}","role":"authenticated"}'; select public.submit_nuance_session('baseline', '${answersSql}'::jsonb);`,
+          ], { encoding: 'utf8' })
+          if (call.status !== 0) {
+            mismatches.push({ id: fx.id, error: `rpc call failed: ${call.stderr.trim()}` })
+            return
+          }
+          const read = su(`select score from public.nuance_sessions where user_id = '${uid}' and kind = 'baseline';`)
+          const got = Number(lastLine(read))
+          if (read.status !== 0 || got !== fx.expected_score) {
+            mismatches.push({ id: fx.id, expected: fx.expected_score, got: read.status === 0 ? got : `score read failed: ${read.stderr.trim()}` })
+          }
+        })
+
+        if (mismatches.length === 0) {
+          pass(`${section}: live submit_nuance_session agrees with expected_score on all ${goldenSet.fixtures.length} fixtures (fresh authenticated identity per fixture)`)
+        } else {
+          for (const m of mismatches) {
+            fail(`${section}: fixture ${m.id} ${m.error ?? `expected ${m.expected}, RPC-stored score ${m.got}`} — ESCALATE (E1/B4 spec, D-013 §4), do not patch either scorer`)
+          }
+        }
+      } catch (e) {
+        fail(`${section}: harness error: ${e.message}`)
+      } finally {
+        if (stack) stack.release()
+      }
+    }
   } else {
     fail(`${section}: unknown CALIBRATION_TARGET '${target}' (expected 'reference' or 'rpc')`)
   }
