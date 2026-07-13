@@ -328,7 +328,7 @@ BUILD_PLAN names Fri Jul 10 as the batch-1a interface freeze. Nearly everything 
 
 **At launch (flip to private):** re-enable protection under Pro — GitHub drops branch-protection rules when a repo with them goes private without Pro. Sequence: purchase Pro → set private → re-apply the same ruleset (`repos/{owner}/{repo}/branches/main/protection`). Recorded here so the launch runbook includes it.
 
-## D-020 — B4 merge disposition + rate-limit-key escalation from Tier-1 review (2026-07-12) — PROPOSED items await owner ratification
+## D-020 — B4 merge disposition + rate-limit-key escalation from Tier-1 review (2026-07-12) — RATIFIED by owner 2026-07-13
 
 **Context:** B4 (0007, nuance RPCs — Sonnet builder, worktree) passed its Tier-1 independent-Opus adversarial review with verdict **READY-WITH-NITS**: score-leakage, scoring-fidelity, grant-wall, and idempotency all CLEAN under direct attack (reviewer re-ran the 116-check suite, 20/20 rpc-mode calibration, plus its own probes: 6 score-leak attempts denied, 16 adversarial scoring fixtures and 12 similarity pairs with zero SQL-vs-reference divergence). Operator re-verified on the combined 0001→0004+0007 chain and merged. Three review findings dispose as follows:
 
@@ -337,6 +337,8 @@ BUILD_PLAN names Fri Jul 10 as the batch-1a interface freeze. Nearly everything 
 **2. F2 [CONFIRMED] — `nuance_rate_limits` has no GC/TTL and an uncapped text key.** Low severity (server-internal, RLS-on/zero-grant, admin-truncatable), but unbounded growth with no reaper — and F1-style spoofing would mint one row per spoofed value. **PROPOSED:** fold a `left(key, 64)` cap + a stale-window sweep (e.g. delete windows older than 48 h, run inside the RPC opportunistically or as a scheduled task) into the same D-012 §9 amendment that resolves F1. Not fixed now for the same no-silent-edit reason.
 
 **3. F3 — new `rpc-*` CI jobs are not in the D-019 required-status-checks list.** The `calibration` required context *is* flipped to rpc mode (so the golden-set gate is enforced at merge), but the grant-wall/masking/rate-limit/idempotency assertions live in the non-required `rpc-nuance`/`rpc-grading`/`rpc-progression`/`rpc-opinion` jobs. **Action (operator/admin, after the batch lands on origin and the jobs exist as contexts):** extend the D-019 ruleset to require all four rpc-* contexts. Deferred until push because GitHub can only require contexts it has seen. **DONE 2026-07-13 (post-push):** all four rpc-* contexts appended to required_status_checks (now 10 contexts, strict unchanged) — verified via GET.
+
+**RATIFICATION (Nora, 2026-07-13):** items 1 and 2 approved as proposed — (1a) week-2 empirical XFF probe against the real Supabase edge is now a committed week-2 runbook step (alongside the prod repair and password rotation); (1b) if the gateway appends client XFF, the D-012 §9 amendment (rightmost-untrusted-hop key) proceeds as a new decisions entry with the one-line `nuance_consume_rate_limit()` change; (2) the key-length cap + stale-window sweep ride the same amendment. Item 3 (required checks) was executed 2026-07-13, see above. No code changes until the gateway evidence is in.
 
 Review also cleared, for the record: error-detail hygiene (all 14 details static, no user content), the 8 KB cap's `octet_length(answers::text)` reading, and `anon_id_linked` as an acceptable 128-bit-unguessable existence oracle per [r2].
 
