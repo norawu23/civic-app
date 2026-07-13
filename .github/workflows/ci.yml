@@ -361,15 +361,18 @@ jobs:
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/content-seed.sql
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/content-seed.sql
 
-      - name: Assert row counts (5 topics_catalog, 10 quiz_answer_keys)
+      - name: Assert row counts (5 topics_catalog, 10 quiz_answer_keys, 10 ob_catalog)
         run: |
           DB_URL=$(cd ci-shadow-content && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
           CATALOG_COUNT=$(psql "$DB_URL" -t -A -c "select count(*) from public.topics_catalog;")
           ANSWERKEY_COUNT=$(psql "$DB_URL" -t -A -c "select count(*) from public.quiz_answer_keys;")
+          OB_CATALOG_COUNT=$(psql "$DB_URL" -t -A -c "select count(*) from public.ob_catalog;")
           echo "topics_catalog rows: $CATALOG_COUNT"
           echo "quiz_answer_keys rows: $ANSWERKEY_COUNT"
+          echo "ob_catalog rows: $OB_CATALOG_COUNT"
           test "$CATALOG_COUNT" = "5" || { echo "FAIL: expected 5 topics_catalog rows, got $CATALOG_COUNT"; exit 1; }
           test "$ANSWERKEY_COUNT" = "10" || { echo "FAIL: expected 10 quiz_answer_keys rows, got $ANSWERKEY_COUNT"; exit 1; }
+          test "$OB_CATALOG_COUNT" = "10" || { echo "FAIL: expected 10 ob_catalog rows, got $OB_CATALOG_COUNT"; exit 1; }
 
       - name: Stop shadow DB
         if: always()
@@ -436,3 +439,55 @@ jobs:
       - name: Stop shadow DB
         if: always()
         run: cd ci-shadow-rpc-grading && supabase stop --no-backup || true
+
+  # ── rpc-opinion ────────────────────────────────────────────────────────────
+  # B3 scope note: this job is owned by B3 (docs/specs/B3-opinion-builder.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — a new `rpc-opinion`
+  # job only, plus the `content` job's row-count assertion gains `10
+  # ob_catalog`)"). Do not fold other chunks' work into it, and do not fold
+  # this job's work into any job above.
+  #
+  # Provisions its own throwaway shadow DB (mirrors the `rpc-grading` job's
+  # pattern) with supabase/migrations/ applied from empty — now including
+  # B3's 0006_rpc_opinion_builder.sql — then runs the B3 opinion-builder
+  # suite against it. The suite seeds topics_catalog/quiz_answer_keys/
+  # ob_catalog itself via the B3-extended idempotent `content:seed` generator
+  # and reads topic/ob ids back from the DB, so it needs the content pipeline
+  # healthy first: `needs: [content]` per H1's job note above. The suite
+  # self-skips (exit 0) when neither Docker nor CIVIC_TEST_DB_URL is
+  # available, per the established convention.
+  rpc-opinion:
+    runs-on: ubuntu-latest
+    needs: [content]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.109.1
+
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow-rpc-opinion
+          cp -r supabase ci-shadow-rpc-opinion/supabase
+          (cd ci-shadow-rpc-opinion && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-rpc-opinion && supabase db start
+
+      - name: B3 opinion-builder RPC suite (complete_opinion_builder / get_ob_comparison / ob_catalog / grant wall)
+        run: |
+          # One stack per job: the suite consumes this job's shadow via
+          # CIVIC_TEST_DB_URL instead of self-provisioning a colliding
+          # second stack (D-017).
+          DB_URL=$(cd ci-shadow-rpc-opinion && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/rpc/b3-opinion-builder.test.mjs
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-rpc-opinion && supabase stop --no-backup || true

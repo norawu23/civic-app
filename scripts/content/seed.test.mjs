@@ -8,6 +8,14 @@
 //   - Registry: topics_catalog positions match TOPIC_UNLOCK_ORDER exactly;
 //     level_count = 3 for all five
 //
+// Required tests (B3 spec, docs/specs/B3-opinion-builder.md — this seeder
+// extension is B3's, not H1's, per the B3 in-scope file list):
+//   - Seeder: golden assertion of one ob_catalog row against the JSON
+//   - idempotency (covered by the same double-run + ON CONFLICT checks below)
+//   - FK order: topics_catalog rows precede ob_catalog rows in the
+//     generated SQL text
+//   - row count: 10 ob_catalog rows (5 topics x 2 opinionBuilders each)
+//
 // This runs entirely against the SQL-generation path (no DB needed) — see
 // the H1 handoff for why: no local Docker/Supabase in this environment.
 // "Idempotency" is asserted two ways: (1) two independent invocations
@@ -68,14 +76,61 @@ else {
   }
 }
 
-// ── row counts: 5 catalog rows, 10 answer-key rows ──────────────────────────
+// ── row counts: 5 catalog rows, 10 answer-key rows, 10 ob_catalog rows ──────
 
 const catalogInsertCount = (sql1.match(/insert into public\.topics_catalog/g) ?? []).length
 const answerKeyInsertCount = (sql1.match(/insert into public\.quiz_answer_keys/g) ?? []).length
+const obCatalogInsertCount = (sql1.match(/insert into public\.ob_catalog/g) ?? []).length
 if (catalogInsertCount !== 5) fail(`expected 5 topics_catalog INSERTs, found ${catalogInsertCount}`)
 else console.log('PASS seed: exactly 5 topics_catalog rows generated')
 if (answerKeyInsertCount !== 10) fail(`expected 10 quiz_answer_keys INSERTs, found ${answerKeyInsertCount}`)
 else console.log('PASS seed: exactly 10 quiz_answer_keys rows generated (5 topics x level1+level3)')
+if (obCatalogInsertCount !== 10) fail(`expected 10 ob_catalog INSERTs, found ${obCatalogInsertCount}`)
+else console.log('PASS seed: exactly 10 ob_catalog rows generated (5 topics x 2 opinionBuilders each, B3/D-012 §4)')
+
+// ── B3 golden assertion: taxes tax-ob-01 ob_catalog row against the JSON ───
+
+const expectedTaxOb01 = taxesJson.opinionBuilders.find((ob) => ob.id === 'tax-ob-01')
+if (!expectedTaxOb01) {
+  fail(`fixture problem: taxes.json has no opinionBuilders entry with id 'tax-ob-01'`)
+} else {
+  // ob_catalog rows are single-line INSERTs (one per statement); match the
+  // whole statement for 'tax-ob-01' rather than trying to hand-parse the
+  // text[] literal (preset take texts contain commas/quotes).
+  const obLineRe = /insert into public\.ob_catalog \(ob_id, topic_id, required, position, standard_options\) values \('tax-ob-01', '([^']*)', (true|false), (\d+), ARRAY\[(.*?)\]::text\[\]\)/
+  const obMatch = sql1.match(obLineRe)
+  if (!obMatch) {
+    fail(`could not find an ob_catalog INSERT for 'tax-ob-01' in generated SQL`)
+  } else {
+    const [, gotTopicId, gotRequired, gotPosition, gotOptionsRaw] = obMatch
+    // Each array element is a single-quoted, ''-escaped SQL string literal;
+    // split on the `', '` boundary between elements (options themselves are
+    // plain prose with no embedded `', '` sequence in the current content).
+    const gotOptions = gotOptionsRaw
+      .slice(1, -1) // strip leading/trailing quote
+      .split(`', '`)
+      .map((s) => s.replace(/''/g, "'"))
+    const okTopic = gotTopicId === 'taxes'
+    const okRequired = (gotRequired === 'true') === Boolean(expectedTaxOb01.required)
+    const okPosition = Number(gotPosition) === 0 // tax-ob-01 is index 0 in taxes.json's opinionBuilders[]
+    const okOptions = JSON.stringify(gotOptions) === JSON.stringify(expectedTaxOb01.evolvedTake.standardOptions)
+    if (okTopic && okRequired && okPosition && okOptions) {
+      console.log(`PASS seed: ob_catalog row for 'tax-ob-01' matches taxes.json exactly (topic_id, required, position, standard_options verbatim)`)
+    } else {
+      fail(`ob_catalog row for 'tax-ob-01' mismatch: topic ${okTopic}, required ${okRequired}, position ${okPosition}, options ${okOptions}`)
+    }
+  }
+}
+
+// ── FK order: every topics_catalog INSERT precedes every ob_catalog INSERT ─
+
+const lastTopicsCatalogIdx = sql1.lastIndexOf('insert into public.topics_catalog')
+const firstObCatalogIdx = sql1.indexOf('insert into public.ob_catalog')
+if (lastTopicsCatalogIdx === -1 || firstObCatalogIdx === -1 || lastTopicsCatalogIdx > firstObCatalogIdx) {
+  fail(`FK order violation: expected all topics_catalog INSERTs before any ob_catalog INSERT (last topics_catalog at ${lastTopicsCatalogIdx}, first ob_catalog at ${firstObCatalogIdx})`)
+} else {
+  console.log('PASS seed: topics_catalog rows precede ob_catalog rows in generated SQL (FK order)')
+}
 
 // ── registry: positions match TOPIC_UNLOCK_ORDER; level_count = 3 for all ──
 
@@ -107,12 +162,16 @@ if (sql1 !== sql2) {
 
 const catalogInserts = sql1.match(/insert into public\.topics_catalog[^;]*;/g) ?? []
 const answerKeyInserts = sql1.match(/insert into public\.quiz_answer_keys[^;]*;/g) ?? []
+const obCatalogInserts = sql1.match(/insert into public\.ob_catalog[^;]*;/g) ?? []
 const allCatalogIdempotent = catalogInserts.every((s) => /on conflict \(topic_id\) do update/.test(s))
 const allAnswerKeyIdempotent = answerKeyInserts.every((s) => /on conflict \(topic_id, level\) do update/.test(s))
+const allObCatalogIdempotent = obCatalogInserts.every((s) => /on conflict \(ob_id\) do update/.test(s))
 if (!allCatalogIdempotent) fail('one or more topics_catalog INSERTs is missing ON CONFLICT (topic_id) DO UPDATE')
 else console.log('PASS seed: every topics_catalog INSERT uses ON CONFLICT (topic_id) DO UPDATE')
 if (!allAnswerKeyIdempotent) fail('one or more quiz_answer_keys INSERTs is missing ON CONFLICT (topic_id, level) DO UPDATE')
 else console.log('PASS seed: every quiz_answer_keys INSERT uses ON CONFLICT (topic_id, level) DO UPDATE')
+if (!allObCatalogIdempotent) fail('one or more ob_catalog INSERTs is missing ON CONFLICT (ob_id) DO UPDATE')
+else console.log('PASS seed: every ob_catalog INSERT uses ON CONFLICT (ob_id) DO UPDATE')
 
 // ── --apply with no DB available: must SKIP, not fail ───────────────────────
 
