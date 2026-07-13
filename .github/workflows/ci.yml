@@ -491,3 +491,55 @@ jobs:
       - name: Stop shadow DB
         if: always()
         run: cd ci-shadow-rpc-opinion && supabase stop --no-backup || true
+
+  # ── rpc-progression ────────────────────────────────────────────────────────
+  # B2 scope note: this job is owned by B2 (docs/specs/B2-progression-streak.md
+  # in-scope list — "`.github/workflows/ci.yml` (extend — a new
+  # `rpc-progression` job only)"). Do not fold other chunks' work into it,
+  # and do not fold this job's work into any job above.
+  #
+  # Provisions its own throwaway shadow DB (mirrors the `rpc-grading` job's
+  # pattern) with supabase/migrations/ applied from empty — now including
+  # B2's 0005_rpc_progression_streak.sql — then runs the B2 progression +
+  # streak suite against it (transition-table rows 1–5, milestone battery,
+  # the D-001 adversarial offset battery, the D-012 §3 sign-convention
+  # fixture, grant wall). The suite seeds topics_catalog itself via H1's
+  # idempotent `content:seed` generator, so it needs the content pipeline
+  # healthy first: `needs: [content]` per H1's job note. The suite
+  # self-skips (exit 0) when neither Docker nor CIVIC_TEST_DB_URL is
+  # available, per the established convention.
+  rpc-progression:
+    runs-on: ubuntu-latest
+    needs: [content]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.109.1
+
+      - name: Initialise a throwaway Supabase project
+        run: |
+          mkdir -p ci-shadow-rpc-progression
+          cp -r supabase ci-shadow-rpc-progression/supabase
+          (cd ci-shadow-rpc-progression && supabase init || true)
+
+      - name: Apply migrations from empty (shadow DB)
+        run: cd ci-shadow-rpc-progression && supabase db start
+
+      - name: B2 progression + streak RPC suite (complete_level2 / complete_level3_cards / check_streak / D-001 battery / grant wall)
+        run: |
+          # One stack per job: the suite consumes this job's shadow via
+          # CIVIC_TEST_DB_URL instead of self-provisioning a colliding
+          # second stack (D-017).
+          DB_URL=$(cd ci-shadow-rpc-progression && supabase status -o env | grep '^DB_URL=' | cut -d '=' -f2- | tr -d '"')
+          CIVIC_TEST_DB_URL="$DB_URL" node tests/rpc/b2-progression-streak.test.mjs
+
+      - name: Stop shadow DB
+        if: always()
+        run: cd ci-shadow-rpc-progression && supabase stop --no-backup || true
